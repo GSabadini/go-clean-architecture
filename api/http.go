@@ -4,25 +4,22 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gsabadini/go-stone/api/action"
+
 	"github.com/gorilla/mux"
 )
 
-type HTTPServer struct {}
+type HTTPServer struct{}
 
 func (s HTTPServer) Listen() {
 	var (
-		router         = mux.NewRouter()
+		router = mux.NewRouter()
 	)
 
-	router.HandleFunc("/", HealthCheck)
+	router.HandleFunc("/health-check", action.HealthCheck)
 
 	log.Printf("Iniciando servidor HTTP na porta %d", 3001)
 	if err := http.ListenAndServe(":3001", router); err != nil {
 		log.Fatalln("Erro ao iniciar API HTTP", err)
 	}
-}
-
-func HealthCheck(w http.ResponseWriter, _ *http.Request) {
-	w.Write([]byte("Gorilla!\n"))
-	w.WriteHeader(http.StatusOK)
 }

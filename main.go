@@ -4,7 +4,7 @@ import (
 	"github.com/gsabadini/go-stone/api"
 )
 
-func main () {
+func main() {
 	server := api.HTTPServer{}
 	server.Listen()
 }
