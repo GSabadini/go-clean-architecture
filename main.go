@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"github.com/gsabadini/go-stone/api"
+)
 
 func main () {
-	fmt.Println("hello world")
+	server := api.HTTPServer{}
+	server.Listen()
 }

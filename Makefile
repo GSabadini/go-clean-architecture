@@ -1,5 +1,8 @@
 #!make
 
+fmt:
+	go fmt ./...
+
 up:
 	docker-compose up -d
 
