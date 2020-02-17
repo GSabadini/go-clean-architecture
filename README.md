@@ -4,14 +4,14 @@
 - Docker
 - Docker-compose
 
-##Getting Started
+## Getting Started
 
 
-##Code status
+## Code status
 - Development
 
-##License
+## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-##Credits
+## Credits
 - **Gabriel Facina** - [GSabadini](https://github.com/GSabadini)
