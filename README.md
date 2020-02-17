@@ -6,6 +6,8 @@
 
 ## Getting Started
 
+## Git workflow
+- Gitflow
 
 ## Code status
 - Development
