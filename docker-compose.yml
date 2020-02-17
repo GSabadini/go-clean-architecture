@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+  go-stone:
+    container_name: 'go-stone'
+    build: .
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./:/go-stone
