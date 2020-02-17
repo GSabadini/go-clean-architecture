@@ -3,6 +3,9 @@
 fmt:
 	go fmt ./...
 
+test:
+	go test -cover ./...
+
 up:
 	docker-compose up -d
 
