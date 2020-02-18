@@ -11,5 +11,5 @@ func (m MongoHandlerSuccessMock) Insert(_ string, _ interface{}) error {
 type MongoHandlerErrorMock struct{}
 
 func (m MongoHandlerErrorMock) Insert(_ string, _ interface{}) error {
-	return errors.New("Fail")
+	return errors.New("Error")
 }
