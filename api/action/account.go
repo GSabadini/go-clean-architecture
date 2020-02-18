@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/gsabadini/go-stone/domain"
-	"github.com/gsabadini/go-stone/infrastructure/database"
-	"github.com/gsabadini/go-stone/repository"
-	"github.com/gsabadini/go-stone/usecase"
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
 type Account struct {

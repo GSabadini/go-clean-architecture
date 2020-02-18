@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gsabadini/go-stone/domain"
-	"github.com/gsabadini/go-stone/infrastructure/database"
-	"github.com/gsabadini/go-stone/repository"
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 func TestCreate(t *testing.T) {

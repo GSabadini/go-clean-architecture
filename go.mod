@@ -1,4 +1,4 @@
-module github.com/gsabadini/go-stone
+module github.com/gsabadini/go-bank-transfer
 
 go 1.12
 

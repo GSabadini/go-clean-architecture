@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gsabadini/go-stone/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 )
 
 func TestAccountCreate(t *testing.T) {

@@ -3,8 +3,8 @@ package repository
 import (
 	"time"
 
-	"github.com/gsabadini/go-stone/domain"
-	"github.com/gsabadini/go-stone/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 )
 
 const accountsCollectionName = "accounts"

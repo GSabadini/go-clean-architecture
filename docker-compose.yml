@@ -1,13 +1,13 @@
 version: '3.3'
 
 services:
-  go-stone:
-    container_name: 'go-stone'
+  go-bank-transfer:
+    container_name: 'go-bank-transfer'
     build: .
     ports:
       - '3001:3001'
     volumes:
-      - ./:/go-stone
+      - ./:/go-bank-transfer
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
     env_file:
       - .env

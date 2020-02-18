@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"github.com/gsabadini/go-stone/domain"
-	"github.com/gsabadini/go-stone/repository"
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 func Create(repository repository.Account, account domain.Account) error {

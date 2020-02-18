@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gsabadini/go-stone/api/action"
-	"github.com/gsabadini/go-stone/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/api/action"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -18,7 +18,7 @@ type HTTPServer struct {
 
 func NewHTTPServer() HTTPServer {
 	return HTTPServer{
-		databaseConnection: createDatabaseConnection(getDatabaseURI()),
+		databaseConnection: createDatabaseConnection(getDatabaseHost(), getDatabaseName()),
 	}
 }
 
@@ -53,8 +53,8 @@ func (s HTTPServer) buildActionCreateAccount() *negroni.Negroni {
 	return negroni.New(negroni.Wrap(handler))
 }
 
-func createDatabaseConnection(uri string) *database.MongoHandler {
-	handler, err := database.NewMongoHandler(uri)
+func createDatabaseConnection(host, databaseName string) *database.MongoHandler {
+	handler, err := database.NewMongoHandler(host, databaseName)
 
 	if err != nil {
 		log.Println("Não foi possível realizar a conexão com o banco de dados")
@@ -68,10 +68,18 @@ func createDatabaseConnection(uri string) *database.MongoHandler {
 	return handler
 }
 
-func getDatabaseURI() string {
-	if uri := os.Getenv("MONGO_DB_URI"); uri != "" {
+func getDatabaseHost() string {
+	if uri := os.Getenv("MONGODB_HOST"); uri != "" {
 		return uri
 	}
 
-	panic("Variável de ambiente 'MONGO_DB_URI' não foi definida")
+	panic("Variável de ambiente 'MONGODB_HOST' não foi definida")
+}
+
+func getDatabaseName() string {
+	if uri := os.Getenv("MONGODB_DATABASE"); uri != "" {
+		return uri
+	}
+
+	panic("Variável de ambiente 'MONGODB_DATABASE' não foi definida")
 }
