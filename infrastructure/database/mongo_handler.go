@@ -14,11 +14,11 @@ type MongoHandler struct {
 }
 
 //Insert realiza uma inserção no banco de dados
-func (mdb MongoHandler) Insert(collection string, data interface{}) error {
-	session := mdb.Session.Clone()
+func (mgo MongoHandler) Insert(collection string, data interface{}) error {
+	session := mgo.Session.Clone()
 	defer session.Close()
 
-	return mdb.Database.C(collection).With(session).Insert(data)
+	return mgo.Database.C(collection).With(session).Insert(data)
 }
 
 //NewMongoHandler constrói um novo handler de banco para MongoDb

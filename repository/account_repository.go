@@ -7,9 +7,7 @@ import (
 
 const accountCollectionName = "account"
 
-type Account struct {
-	dbHandler database.NoSQLDBHandler
-}
+type Account DbRepository
 
 func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 	return Account{dbHandler: dbHandler}
