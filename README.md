@@ -1,4 +1,5 @@
-# Challenge Stone Golang
+# Go Bank Transfer
+- API for transfer between internal bank accounts
 
 ## Requirements/dependencies
 - Docker
@@ -6,6 +7,8 @@
 
 ## Getting Started
 
+## Git workflow
+- Gitflow
 
 ## Code status
 - Development
@@ -14,4 +17,4 @@
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Credits
-- **Gabriel Facina** - [GSabadini](https://github.com/GSabadini)
+- **Gabriel S. Facina** - [GSabadini](https://github.com/GSabadini)

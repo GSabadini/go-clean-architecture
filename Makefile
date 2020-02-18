@@ -9,5 +9,8 @@ test:
 up:
 	docker-compose up -d
 
+down:
+	docker-compose down
+
 logs:
-	docker-compose logs -f go-stone
+	docker-compose logs -f go-bank-transfer
