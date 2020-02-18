@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
-	server := api.HTTPServer{}
+	var server = api.NewHTTPServer()
+
 	server.Listen()
 }

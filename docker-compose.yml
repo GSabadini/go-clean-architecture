@@ -8,3 +8,18 @@ services:
       - '3001:3001'
     volumes:
       - ./:/go-stone
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: 'mongo:latest'
+    container_name: 'mongodb'
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./scripts/mongodb:/docker-entrypoint-initdb.d
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dev
+      MONGO_INITDB_ROOT_PASSWORD: dev
