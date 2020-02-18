@@ -8,6 +8,7 @@ services:
       - '3001:3001'
     volumes:
       - ./:/go-stone
+      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
     env_file:
       - .env
     depends_on:
@@ -20,6 +21,3 @@ services:
       - "27017:27017"
     volumes:
       - ./scripts/mongodb:/docker-entrypoint-initdb.d
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: dev
-      MONGO_INITDB_ROOT_PASSWORD: dev

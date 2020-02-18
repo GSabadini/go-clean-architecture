@@ -18,7 +18,7 @@ type HTTPServer struct {
 
 func NewHTTPServer() HTTPServer {
 	return HTTPServer{
-		databaseConnection: createDatabaseConnection(os.Getenv("MONGO_DB_URI")),
+		databaseConnection: createDatabaseConnection(getDatabaseURI()),
 	}
 }
 
@@ -66,4 +66,12 @@ func createDatabaseConnection(uri string) *database.MongoHandler {
 	log.Println("Conexão com o banco de dados realizada com sucesso")
 
 	return handler
+}
+
+func getDatabaseURI() string {
+	if uri := os.Getenv("MONGO_DB_URI"); uri != "" {
+		return uri
+	}
+
+	panic("Variável de ambiente 'MONGO_DATABASE_URI' não foi definida")
 }

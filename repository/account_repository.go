@@ -5,7 +5,7 @@ import (
 	"github.com/gsabadini/go-stone/infrastructure/database"
 )
 
-const stoneCollectionName = "stone"
+const accountCollectionName = "account"
 
 type Account struct {
 	dbHandler database.NoSQLDBHandler
@@ -16,5 +16,5 @@ func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 }
 
 func (a Account) Store(account domain.Account) error {
-	return a.dbHandler.Insert(stoneCollectionName, account)
+	return a.dbHandler.Insert(accountCollectionName, account)
 }

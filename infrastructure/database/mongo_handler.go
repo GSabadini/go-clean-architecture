@@ -37,7 +37,6 @@ func NewMongoHandler(uri string) (*MongoHandler, error) {
 
 func getSchema(uri string) string {
 	mongouri, err := url.Parse(uri)
-
 	if err != nil {
 		return ""
 	}

@@ -1,4 +1,4 @@
-db = db.getSiblingDB('stone');
+db = db.getSiblingDB('account');
 
 db.createUser({
     user: 'dev',
@@ -11,4 +11,4 @@ db.createUser({
     ],
 });
 
-db.createCollection('stone');
+db.createCollection('account');
