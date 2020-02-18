@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/gsabadini/go-stone/api"
+	"github.com/gsabadini/go-bank-transfer/api"
 )
 
 func main() {
-	server := api.HTTPServer{}
+	var server = api.NewHTTPServer()
+
 	server.Listen()
 }
