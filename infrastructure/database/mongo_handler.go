@@ -1,9 +1,6 @@
 package database
 
 import (
-	"net/url"
-	"strings"
-
 	mongo "gopkg.in/mgo.v2"
 )
 
@@ -11,14 +8,6 @@ import (
 type MongoHandler struct {
 	Database *mongo.Database
 	Session  *mongo.Session
-}
-
-//Insert realiza uma inserção no banco de dados
-func (mgo MongoHandler) Insert(collection string, data interface{}) error {
-	session := mgo.Session.Clone()
-	defer session.Close()
-
-	return mgo.Database.C(collection).With(session).Insert(data)
 }
 
 //NewMongoHandler constrói um novo handler de banco para MongoDb
@@ -30,16 +19,17 @@ func NewMongoHandler(uri string) (*MongoHandler, error) {
 
 	handler := new(MongoHandler)
 	handler.Session = session
-	handler.Database = handler.Session.DB(getSchema(uri))
+
+	//@TODO corrigir nome do database hard coded
+	handler.Database = handler.Session.DB("bank")
 
 	return handler, nil
 }
 
-func getSchema(uri string) string {
-	mongouri, err := url.Parse(uri)
-	if err != nil {
-		return ""
-	}
+//Insert realiza uma inserção no banco de dados
+func (mgo MongoHandler) Insert(collection string, data interface{}) error {
+	session := mgo.Session.Clone()
+	defer session.Close()
 
-	return strings.Replace(mongouri.EscapedPath(), "/", "", -1)
+	return mgo.Database.C(collection).With(session).Insert(data)
 }

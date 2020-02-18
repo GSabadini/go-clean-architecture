@@ -40,7 +40,7 @@ func (s HTTPServer) Listen() {
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
 	router.PathPrefix("/account").Handler(s.buildActionCreateAccount()).Methods(http.MethodPost)
 
-	router.HandleFunc("/health-check", action.HealthCheck).Methods(http.MethodGet)
+	router.HandleFunc("/healthcheck", action.HealthCheck).Methods(http.MethodGet)
 }
 
 func (s HTTPServer) buildActionCreateAccount() *negroni.Negroni {
@@ -73,5 +73,5 @@ func getDatabaseURI() string {
 		return uri
 	}
 
-	panic("Variável de ambiente 'MONGO_DATABASE_URI' não foi definida")
+	panic("Variável de ambiente 'MONGO_DB_URI' não foi definida")
 }

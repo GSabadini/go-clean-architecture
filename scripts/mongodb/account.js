@@ -1,4 +1,4 @@
-db = db.getSiblingDB('account');
+db = db.getSiblingDB('bank');
 
 db.createUser({
     user: 'dev',
@@ -11,4 +11,5 @@ db.createUser({
     ],
 });
 
-db.createCollection('account');
+db.createCollection('accounts');
+db.createCollection('transfers');

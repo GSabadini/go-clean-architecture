@@ -1,7 +1,15 @@
 package database
 
-type MongoHandlerMock struct{}
+import "errors"
 
-func (m MongoHandlerMock) Insert(_ string, _ interface{}) error {
+type MongoHandlerSuccessMock struct{}
+
+func (m MongoHandlerSuccessMock) Insert(_ string, _ interface{}) error {
 	return nil
+}
+
+type MongoHandlerErrorMock struct{}
+
+func (m MongoHandlerErrorMock) Insert(_ string, _ interface{}) error {
+	return errors.New("Fail")
 }

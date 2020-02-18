@@ -22,7 +22,7 @@ func TestCreate(t *testing.T) {
 		{
 			name: "Create account successful",
 			args: args{
-				repository: repository.NewAccount(database.MongoHandlerMock{}),
+				repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
 				account: domain.Account{
 					Id:        "1",
 					Name:      "Test",
@@ -33,6 +33,20 @@ func TestCreate(t *testing.T) {
 			},
 			expected: nil,
 		},
+		//{
+		//	name: "Create account error",
+		//	args: args{
+		//		repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
+		//		account: domain.Account{
+		//			Id:        "1",
+		//			Name:      "Test",
+		//			Cpf:       "123123123",
+		//			Ballance:  0,
+		//			CreatedAt: "01/01/01",
+		//		},
+		//	},
+		//	expected: "Fail",
+		//},
 	}
 
 	for _, tt := range tests {
