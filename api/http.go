@@ -3,18 +3,28 @@ package api
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gsabadini/go-stone/api/action"
+	"github.com/gsabadini/go-stone/infrastructure/database"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )
 
-type HTTPServer struct{}
+type HTTPServer struct {
+	databaseConnection database.NoSQLDBHandler
+}
+
+func NewHTTPServer() HTTPServer {
+	return HTTPServer{
+		databaseConnection: createDatabaseConnection(os.Getenv("MONGO_DB_URI")),
+	}
+}
 
 func (s HTTPServer) Listen() {
 	var (
-		router = mux.NewRouter()
+		router         = mux.NewRouter()
 		negroniHandler = negroni.New()
 	)
 
@@ -35,10 +45,25 @@ func (s HTTPServer) setAppHandlers(router *mux.Router) {
 
 func (s HTTPServer) buildActionCreateAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewAccountAction("connection database")
+		var accountAction = action.NewAccount(s.databaseConnection)
 
-		accountAction.CreateAccount(res, req)
+		accountAction.Create(res, req)
 	}
 
 	return negroni.New(negroni.Wrap(handler))
+}
+
+func createDatabaseConnection(uri string) *database.MongoHandler {
+	handler, err := database.NewMongoHandler(uri)
+
+	if err != nil {
+		log.Println("Não foi possível realizar a conexão com o banco de dados")
+
+		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
+		panic(err)
+	}
+
+	log.Println("Conexão com o banco de dados realizada com sucesso")
+
+	return handler
 }
