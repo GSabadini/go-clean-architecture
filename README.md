@@ -1,5 +1,5 @@
-# Challenge Stone Golang
-- API de transferência entre contas internas de um banco.
+# Go Bank Transfer
+- API for transfer between internal bank accounts
 
 ## Requirements/dependencies
 - Docker
