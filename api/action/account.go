@@ -45,7 +45,6 @@ func (a Account) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Success"))
 }
 
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
