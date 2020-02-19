@@ -128,6 +128,7 @@ func TestFindAll(t *testing.T) {
 			expectedError: "Error",
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
