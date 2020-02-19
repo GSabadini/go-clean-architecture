@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/gsabadini/go-bank-transfer/domain"
 	mongo "gopkg.in/mgo.v2"
 )
 
@@ -24,10 +25,23 @@ func NewMongoHandler(host, databaseName string) (*MongoHandler, error) {
 	return handler, nil
 }
 
-//Insert realiza uma inserção no banco de dados
-func (mgo MongoHandler) Insert(collection string, data interface{}) error {
+//Store realiza uma inserção no banco de dados
+func (mgo MongoHandler) Store(collection string, data interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
 
 	return mgo.Database.C(collection).With(session).Insert(data)
+}
+
+//FindAll realiza uma inserção no banco de dados
+func (mgo MongoHandler) FindAll(collection string, data []domain.Account) ([]domain.Account, error) {
+	session := mgo.Session.Clone()
+	defer session.Close()
+
+	err := mgo.Database.C(collection).With(session).Find(nil).Sort("name").All(&data)
+	if err == nil {
+		return data, nil
+	}
+
+	return nil, err
 }
