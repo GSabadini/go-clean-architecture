@@ -123,7 +123,6 @@ func TestFindAll(t *testing.T) {
 			name: "Error return list accounts",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
-				account:    []domain.Account{},
 			},
 			expectedError: "Error",
 		},
@@ -132,7 +131,7 @@ func TestFindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := FindAll(tt.args.repository, tt.args.account)
+			got, err := FindAll(tt.args.repository)
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, err, tt.expected)
 				return

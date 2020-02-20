@@ -13,8 +13,8 @@ func Create(repository repository.Account, account domain.Account) error {
 	return nil
 }
 
-func FindAll(repository repository.Account, account []domain.Account) ([]domain.Account, error) {
-	result, err := repository.FindAll(account)
+func FindAll(repository repository.Account) ([]domain.Account, error) {
+	result, err := repository.FindAll()
 	if err != nil {
 		return nil, err
 	}
