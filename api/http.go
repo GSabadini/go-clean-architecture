@@ -41,8 +41,10 @@ func (s HTTPServer) Listen() {
 }
 
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
-	router.PathPrefix("/account").Handler(s.buildActionCreateAccount()).Methods(http.MethodPost)
-	router.PathPrefix("/account").Handler(s.buildActionListAccount()).Methods(http.MethodGet)
+	router.PathPrefix("/accounts/{account_id}/ballance").Handler(s.buildActionShowAccount()).Methods(http.MethodGet)
+
+	router.PathPrefix("/accounts").Handler(s.buildActionCreateAccount()).Methods(http.MethodPost)
+	router.PathPrefix("/accounts").Handler(s.buildActionIndexAccount()).Methods(http.MethodGet)
 
 	router.HandleFunc("/healthcheck", action.HealthCheck).Methods(http.MethodGet)
 }
@@ -57,11 +59,21 @@ func (s HTTPServer) buildActionCreateAccount() *negroni.Negroni {
 	return negroni.New(negroni.Wrap(handler))
 }
 
-func (s HTTPServer) buildActionListAccount() *negroni.Negroni {
+func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var accountAction = action.NewAccount(s.databaseConnection)
 
 		accountAction.Index(res, req)
+	}
+
+	return negroni.New(negroni.Wrap(handler))
+}
+
+func (s HTTPServer) buildActionShowAccount() *negroni.Negroni {
+	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
+		var accountAction = action.NewAccount(s.databaseConnection)
+
+		accountAction.Show(res, req)
 	}
 
 	return negroni.New(negroni.Wrap(handler))

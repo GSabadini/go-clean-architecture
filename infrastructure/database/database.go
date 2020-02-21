@@ -4,4 +4,5 @@ package database
 type NoSQLDBHandler interface {
 	Store(string, interface{}) error
 	FindAll(string, interface{}, interface{}) error
+	FindOne(string, interface{}, interface{}) error
 }

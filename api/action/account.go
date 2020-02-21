@@ -2,6 +2,7 @@ package action
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
-//Account
 type Account struct {
 	dbHandler database.NoSQLDBHandler
 }
@@ -54,6 +54,29 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	var account []domain.Account
 	var accountRepository = repository.NewAccount(a.dbHandler)
 	result, err := usecase.FindAll(accountRepository, account)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (a Account) Show(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+	accountId := vars["account_id"]
+
+	var account domain.Account
+	var accountRepository = repository.NewAccount(a.dbHandler)
+	result, err := usecase.FindOne(accountRepository, account, accountId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
