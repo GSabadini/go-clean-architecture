@@ -24,10 +24,18 @@ func NewMongoHandler(host, databaseName string) (*MongoHandler, error) {
 	return handler, nil
 }
 
-//Insert realiza uma inserção no banco de dados
-func (mgo MongoHandler) Insert(collection string, data interface{}) error {
+//Store realiza uma inserção no banco de dados
+func (mgo MongoHandler) Store(collection string, data interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
 
 	return mgo.Database.C(collection).With(session).Insert(data)
+}
+
+//FindAll realiza uma inserção no banco de dados
+func (mgo MongoHandler) FindAll(collection string, query interface{}, data interface{}) error {
+	session := mgo.Session.Clone()
+	defer session.Close()
+
+	return mgo.Database.C(collection).With(session).Find(query).All(data)
 }
