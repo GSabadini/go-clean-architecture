@@ -12,19 +12,19 @@ import (
 	"github.com/urfave/negroni"
 )
 
-//HTTPServer armazena todas as dependências de um servidor HTTP
+//HTTPServer armazena as dependências do servidor HTTP
 type HTTPServer struct {
 	databaseConnection database.NoSQLDBHandler
 }
 
-//NewHTTPServer cria um servidor HTTP com todas as suas dependências
+//NewHTTPServer constrói um HTTPServer as suas dependências
 func NewHTTPServer() HTTPServer {
 	return HTTPServer{
 		databaseConnection: createDatabaseConnection(getDatabaseHost(), getDatabaseName()),
 	}
 }
 
-//Listen inicia o servidor http e configura todas dependências
+//Listen inicia o servidor HTTP
 func (s HTTPServer) Listen() {
 	var (
 		router         = mux.NewRouter()

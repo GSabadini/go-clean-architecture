@@ -9,6 +9,7 @@ import (
 
 const accountsCollectionName = "accounts"
 
+//Account representa um repositório para dados da account
 type Account DbRepository
 
 //NewAccount cria um repository com suas dependências
@@ -23,12 +24,11 @@ func (a Account) Store(account domain.Account) error {
 	return a.dbHandler.Store(accountsCollectionName, account)
 }
 
-//Store realiza uma busca no banco de dados através da implementação real do database
-func (a Account) FindAll() ([]domain.Account, error) {
-	var account []domain.Account
+//FindAll realiza uma busca no banco de dados através da implementação real do database
+func (a Account) FindAll(account []domain.Account) ([]domain.Account, error) {
 	err := a.dbHandler.FindAll(accountsCollectionName, nil, &account)
 	if err != nil {
-		return nil, err
+		return []domain.Account{}, err
 	}
 
 	return account, nil

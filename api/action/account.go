@@ -11,6 +11,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
+//Account
 type Account struct {
 	dbHandler database.NoSQLDBHandler
 }
@@ -50,8 +51,9 @@ func (a Account) Create(w http.ResponseWriter, r *http.Request) {
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	var account []domain.Account
 	var accountRepository = repository.NewAccount(a.dbHandler)
-	result, err := usecase.FindAll(accountRepository)
+	result, err := usecase.FindAll(accountRepository, account)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
