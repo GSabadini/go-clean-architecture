@@ -51,7 +51,7 @@ func (s HTTPServer) setAppHandlers(router *mux.Router) {
 
 func (s HTTPServer) buildActionCreateAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewAccount(s.databaseConnection)
+		var accountAction = action.NewAccountAction(s.databaseConnection)
 
 		accountAction.Create(res, req)
 	}
@@ -61,7 +61,7 @@ func (s HTTPServer) buildActionCreateAccount() *negroni.Negroni {
 
 func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewAccount(s.databaseConnection)
+		var accountAction = action.NewAccountAction(s.databaseConnection)
 
 		accountAction.Index(res, req)
 	}
@@ -71,7 +71,7 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 
 func (s HTTPServer) buildActionShowAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewAccount(s.databaseConnection)
+		var accountAction = action.NewAccountAction(s.databaseConnection)
 
 		accountAction.Show(res, req)
 	}

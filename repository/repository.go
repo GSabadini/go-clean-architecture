@@ -15,5 +15,5 @@ type DbRepository struct {
 type AccountRepository interface {
 	Store(domain.Account) error
 	FindAll([]domain.Account) ([]domain.Account, error)
-	FindOne(bson.M, *domain.Account) error
+	FindOne(bson.M, domain.Account) (domain.Account, error)
 }

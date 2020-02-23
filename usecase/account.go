@@ -24,15 +24,17 @@ func FindAll(repository repository.AccountRepository, account []domain.Account) 
 	return result, nil
 }
 
-func FindOne(repository repository.AccountRepository, account *domain.Account, id string) (*domain.Account, error) {
-	var query = bson.M{"_id": bson.ObjectIdHex(id)}
+func FindOne(repository repository.AccountRepository, account domain.Account, id string) (domain.Account, error) {
+	var (
+		query = bson.M{"_id": bson.ObjectIdHex(id)}
+	)
 
-	err := repository.FindOne(query, account)
+	result, err := repository.FindOne(query, account)
 	if err != nil {
-		return account, err
+		return domain.Account{}, err
 	}
 
-	return account, nil
+	return result, nil
 }
 
 //func RecoverUserTrackingData(hash assign.SenderHash, userTrackingRepository domain.UserTrackingRepository) (domain.UserTracking, error) {

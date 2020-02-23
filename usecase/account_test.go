@@ -28,7 +28,7 @@ func TestCreate(t *testing.T) {
 				account: domain.Account{
 					Name:      "Test",
 					Cpf:       "44451598087",
-					Ballance:  0,
+					Ballance:  10.12,
 					CreatedAt: time.Now(),
 				},
 			},
@@ -63,7 +63,7 @@ func TestFindAll(t *testing.T) {
 	var timeNow = time.Now()
 
 	type args struct {
-		repository repository.Account
+		repository repository.AccountRepository
 		account    []domain.Account
 	}
 
@@ -82,14 +82,14 @@ func TestFindAll(t *testing.T) {
 						Id:        "0",
 						Name:      "Test-0",
 						Cpf:       "",
-						Ballance:  0,
+						Ballance:  0.00,
 						CreatedAt: timeNow,
 					},
 					{
 						Id:        "1",
 						Name:      "Test-1",
 						Cpf:       "",
-						Ballance:  120,
+						Ballance:  120.00,
 						CreatedAt: timeNow,
 					},
 				},
@@ -147,9 +147,9 @@ func TestFindAll(t *testing.T) {
 
 func TestFindOne(t *testing.T) {
 	type args struct {
-		repository repository.Account
+		repository repository.AccountRepository
+		account    domain.Account
 		id         string
-		account    *domain.Account
 	}
 
 	tests := []struct {
@@ -162,10 +162,13 @@ func TestFindOne(t *testing.T) {
 			name: "Success return ballance account",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
-				id:         "5e519055ba39bfc244dc4625",
+				account: domain.Account{
+					Ballance: 100.00,
+				},
+				id: "5e519055ba39bfc244dc4625",
 			},
 			expected: domain.Account{
-				Ballance:  100,
+				Ballance: 100.00,
 			},
 		},
 	}
