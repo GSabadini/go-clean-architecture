@@ -144,3 +144,42 @@ func TestFindAll(t *testing.T) {
 		})
 	}
 }
+
+func TestFindOne(t *testing.T) {
+	type args struct {
+		repository repository.Account
+		id         string
+		account    *domain.Account
+	}
+
+	tests := []struct {
+		name          string
+		args          args
+		expected      domain.Account
+		expectedError interface{}
+	}{
+		{
+			name: "Success return ballance account",
+			args: args{
+				repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
+				id:         "5e519055ba39bfc244dc4625",
+			},
+			expected: domain.Account{
+				Ballance:  100,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		got, err := FindOne(tt.args.repository, tt.args.account, tt.args.id)
+
+		if (err != nil) && (err.Error() != tt.expectedError) {
+			t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, err, tt.expected)
+			return
+		}
+
+		if !reflect.DeepEqual(got, tt.expected) {
+			t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.expected)
+		}
+	}
+}

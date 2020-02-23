@@ -36,12 +36,6 @@ func (a Account) FindAll(account []domain.Account) ([]domain.Account, error) {
 }
 
 //FindOne realiza uma busca no banco de dados através da implementação real do database
-func (a Account) FindOne(query bson.M, account domain.Account) (domain.Account, error) {
-	//return a.dbHandler.FindOne(accountsCollectionName, query, account)
-	err := a.dbHandler.FindOne(accountsCollectionName, query, &account)
-	if err != nil {
-		return domain.Account{}, err
-	}
-
-	return account, nil
+func (a Account) FindOne(query bson.M, account *domain.Account) error {
+	return a.dbHandler.FindOne(accountsCollectionName, query, account)
 }
