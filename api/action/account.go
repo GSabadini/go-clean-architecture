@@ -79,13 +79,13 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	Success(result, http.StatusOK).Send(w)
 }
 
-type ReturnBallance struct {
-	Ballance float64 `json:"ballance"`
+type ReturnBalance struct {
+	Balance float64 `json:"balance"`
 }
 
-//ShowBallance é um handler para buscar o ballance de uma account
-func (a Account) ShowBallance(w http.ResponseWriter, r *http.Request) {
-	const logKey = "show_ballance"
+//ShowBalance é um handler para buscar o balance de uma account
+func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
+	const logKey = "show_balance"
 	var vars = mux.Vars(r)
 
 	accountId, ok := vars["account_id"]
@@ -116,11 +116,11 @@ func (a Account) ShowBallance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultBallance := ReturnBallance{Ballance: result.Ballance}
+	resultBalance := ReturnBalance{Balance: result.Balance}
 
 	a.logInfoSuccess(logKey, "success when returning account balance", http.StatusOK)
 
-	Success(resultBallance, http.StatusOK).Send(w)
+	Success(resultBalance, http.StatusOK).Send(w)
 }
 
 func (a Account) logInfoSuccess(key string, description string, httpStatus int) {

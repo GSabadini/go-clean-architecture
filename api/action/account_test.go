@@ -28,7 +28,7 @@ func TestAccountStore(t *testing.T) {
 			expectedStatusCode: http.StatusCreated,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
-				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "ballance": 10 }`),
+				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": 10 }`),
 			},
 		},
 		{
@@ -123,7 +123,7 @@ func TestAccountIndex(t *testing.T) {
 	}
 }
 
-func TestAccountShowBallance(t *testing.T) {
+func TestAccountShowBalance(t *testing.T) {
 	type args struct {
 		accountAction Account
 	}
@@ -151,7 +151,7 @@ func TestAccountShowBallance(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req, err := http.NewRequest(http.MethodGet, "/accounts/5e5282beba39bfc244dc4c4b/ballance", nil)
+			req, err := http.NewRequest(http.MethodGet, "/accounts/5e5282beba39bfc244dc4c4b/balance", nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -163,7 +163,7 @@ func TestAccountShowBallance(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts/{account_id}/ballance", tt.args.accountAction.ShowBallance).Methods(http.MethodGet)
+			r.HandleFunc("/accounts/{account_id}/balance", tt.args.accountAction.ShowBalance).Methods(http.MethodGet)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {

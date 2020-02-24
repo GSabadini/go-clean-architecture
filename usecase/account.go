@@ -28,7 +28,7 @@ func FindAll(repository repository.AccountRepository) ([]domain.Account, error) 
 }
 
 //FindOne recupera uma account com base em um ID
-func FindOne(repository repository.AccountRepository, id string) (domain.Account, error) {
+func FindOne(repository repository.AccountRepository, id string) (*domain.Account, error) {
 	var query = bson.M{"_id": bson.ObjectIdHex(id)}
 
 	result, err := repository.FindOne(query)

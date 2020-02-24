@@ -31,14 +31,14 @@ func TestCreate(t *testing.T) {
 		//		account: domain.Account{
 		//			Name:      "Test",
 		//			Cpf:       "44451598087",
-		//			Ballance:  10.12,
+		//			Balance:  10.12,
 		//			CreatedAt: timeNow,
 		//		},
 		//	},
 		//	expected: domain.Account{
 		//		Name:      "Test",
 		//		Cpf:       "44451598087",
-		//		Ballance:  10.12,
+		//		Balance:  10.12,
 		//		CreatedAt: timeNow,
 		//	},
 		//},
@@ -49,7 +49,7 @@ func TestCreate(t *testing.T) {
 		//		account: &domain.Account{
 		//			Name:      "Test",
 		//			Cpf:       "44451598087",
-		//			Ballance:  0,
+		//			Balance:  0,
 		//			CreatedAt: time.Now(),
 		//		},
 		//	},
@@ -98,14 +98,14 @@ func TestFindAll(t *testing.T) {
 		//			Id:        "0",
 		//			Name:      "Test-0",
 		//			Cpf:       "",
-		//			Ballance:  0,
+		//			Balance:  0,
 		//			CreatedAt: timeNow,
 		//		},
 		//		{
 		//			Id:        "1",
 		//			Name:      "Test-1",
 		//			Cpf:       "",
-		//			Ballance:  120,
+		//			Balance:  120,
 		//			CreatedAt: timeNow,
 		//		},
 		//	},
@@ -156,17 +156,17 @@ func TestFindOne(t *testing.T) {
 		expectedError interface{}
 	}{
 		//{
-		//	name: "Success return ballance account",
+		//	name: "Success return balance account",
 		//	args: args{
 		//		repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
 		//		id:         "5e519055ba39bfc244dc4625",
 		//	},
 		//	expected: domain.Account{
-		//		Ballance: 100.00,
+		//		Balance: 100.00,
 		//	},
 		//},
 		{
-			name: "Error return ballance account",
+			name: "Error return balance account",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
 				id:         "5e519055ba39bfc244dc4625",

@@ -1,11 +1,12 @@
 package usecase
 
 import (
-	"errors"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
+
+	"github.com/pkg/errors"
 )
 
 //StoreTransfer cria uma nova transação
@@ -14,49 +15,49 @@ func StoreTransfer(
 	accountRepository repository.AccountRepository,
 	transfer *domain.Transfer,
 ) error {
-	var queryAccountOriginId = bson.M{"_id": transfer.AccountOriginId}
-	accountOrigin, err := accountRepository.FindOne(queryAccountOriginId)
+	accountOrigin, err := accountRepository.FindOne(bson.M{"_id": transfer.AccountOriginId})
 	if err != nil {
+		return errors.Wrap(err, "erro ao buscar conta de origem")
+	}
+
+	accountDestination, err := accountRepository.FindOne(bson.M{"_id": transfer.AccountDestinationId})
+	if err != nil {
+		return errors.Wrap(err, "erro ao buscar conta de destino")
+	}
+
+	if err = transferAccountBalance(accountOrigin, accountDestination, transfer.Amount); err != nil {
 		return err
 	}
 
-	//@TODO CRIAR ERRO ESPECIFICO
-	if accountOrigin.Ballance < transfer.Amount {
-		return errors.New("A conta de origin não tem saldo suficiente")
+	if err = accountRepository.Update(
+		bson.M{"_id": transfer.AccountOriginId},
+		bson.M{"$set": bson.M{"balance": accountOrigin.Balance}},
+	); err != nil {
+		return errors.Wrap(err, "erro ao atualizar conta de origem")
 	}
 
-	accountOrigin.Ballance = accountOrigin.Ballance - transfer.Amount
-	var updateBallanceAccountOriginId = bson.M{"$set": bson.M{"ballance": accountOrigin.Ballance}}
-
-	err = accountRepository.Update(queryAccountOriginId, updateBallanceAccountOriginId)
-	if err != nil {
-		return err
+	if err = accountRepository.Update(
+		bson.M{"_id": transfer.AccountDestinationId},
+		bson.M{"$set": bson.M{"balance": accountDestination.Balance}},
+	); err != nil {
+		return errors.Wrap(err, "erro ao atualizar conta de destino")
 	}
 
-	//-------------------
-	var queryAccountDestinationId = bson.M{"_id": transfer.AccountDestinationId}
-	accountDestinationId, err := accountRepository.FindOne(queryAccountDestinationId)
-	if err != nil {
-		return err
-	}
-
-	accountDestinationId.Ballance = accountDestinationId.Ballance + transfer.Amount
-	var updateBallanceaccountDestinationId = bson.M{"$set": bson.M{"ballance": accountDestinationId.Ballance}}
-	err = accountRepository.Update(queryAccountDestinationId, updateBallanceaccountDestinationId)
-	if err != nil {
-		return err
-	}
-
-	//------------------------
-
-	err = transferRepository.Store(transfer)
-	if err != nil {
+	if err = transferRepository.Store(transfer); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func TransferAccount(accountOrigin domain.Account, accountDestination domain.Account) {
+func transferAccountBalance(accountOrigin *domain.Account, accountDestination *domain.Account, amount float64) error {
+	if accountOrigin.Balance < amount {
+		return errors.New("A conta de origem não tem saldo suficiente")
+	}
 
+	accountOrigin.SubtractBalance(amount)
+
+	accountDestination.SumBalance(amount)
+
+	return nil
 }

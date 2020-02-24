@@ -50,7 +50,7 @@ func (s HTTPServer) Listen() {
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
 	router.PathPrefix("/transfers").Handler(s.buildActionStoreTransfer()).Methods(http.MethodPost)
 
-	router.PathPrefix("/accounts/{account_id}/ballance").Handler(s.buildActionShowBallanceAccount()).Methods(http.MethodGet)
+	router.PathPrefix("/accounts/{account_id}/balance").Handler(s.buildActionShowBalanceAccount()).Methods(http.MethodGet)
 	router.PathPrefix("/accounts").Handler(s.buildActionStoreAccount()).Methods(http.MethodPost)
 	router.PathPrefix("/accounts").Handler(s.buildActionIndexAccount()).Methods(http.MethodGet)
 
@@ -99,11 +99,11 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	)
 }
 
-func (s HTTPServer) buildActionShowBallanceAccount() *negroni.Negroni {
+func (s HTTPServer) buildActionShowBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var accountAction = action.NewAccount(s.databaseConnection, s.log)
 
-		accountAction.ShowBallance(res, req)
+		accountAction.ShowBalance(res, req)
 	}
 
 	return negroni.New(
