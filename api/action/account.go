@@ -3,6 +3,7 @@ package action
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -27,16 +28,16 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 
 	var account domain.Account
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		log.Println([]byte(err.Error()))
+		ErrInternalServer.Send(w)
 		return
 	}
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 	err := usecase.Store(accountRepository, account)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		log.Println([]byte(err.Error()))
+		ErrInternalServer.Send(w)
 		return
 	}
 
@@ -45,22 +46,20 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 
 //Index é um handler para retornar a lista de accounts
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var accountRepository = repository.NewAccount(a.dbHandler)
+
 	result, err := usecase.FindAll(accountRepository)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		log.Println([]byte(err.Error()))
+		ErrInternalServer.Send(w)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+	if err := Success(result, http.StatusOK).Send(w); err != nil {
+		log.Println([]byte(err.Error()))
+		ErrInternalServer.Send(w)
+		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 type ReturnBallance struct {
@@ -69,8 +68,6 @@ type ReturnBallance struct {
 
 //Show é um handler para buscar uma account específica
 func (a Account) Show(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	vars := mux.Vars(r)
 
 	accountId, ok := vars["account_id"]
@@ -82,17 +79,16 @@ func (a Account) Show(w http.ResponseWriter, r *http.Request) {
 	var accountRepository = repository.NewAccount(a.dbHandler)
 	result, err := usecase.FindOne(accountRepository, accountId)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		log.Println([]byte(err.Error()))
+		ErrInternalServer.Send(w)
 		return
 	}
 
 	resultBallance := ReturnBallance{Ballance: result.Ballance}
 
-	if err := json.NewEncoder(w).Encode(resultBallance); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+	if err := Success(resultBallance, http.StatusOK).Send(w); err != nil {
+		log.Println([]byte(err.Error()))
+		ErrInternalServer.Send(w)
+		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }

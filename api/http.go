@@ -56,7 +56,11 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 		accountAction.Store(res, req)
 	}
 
-	return negroni.New(negroni.Wrap(handler))
+	return negroni.New(
+		negroni.NewLogger(),
+		negroni.NewRecovery(),
+		negroni.Wrap(handler),
+	)
 }
 
 func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
@@ -66,7 +70,11 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 		accountAction.Index(res, req)
 	}
 
-	return negroni.New(negroni.Wrap(handler))
+	return negroni.New(
+		negroni.NewLogger(),
+		negroni.NewRecovery(),
+		negroni.Wrap(handler),
+	)
 }
 
 func (s HTTPServer) buildActionShowAccount() *negroni.Negroni {
@@ -76,7 +84,11 @@ func (s HTTPServer) buildActionShowAccount() *negroni.Negroni {
 		accountAction.Show(res, req)
 	}
 
-	return negroni.New(negroni.Wrap(handler))
+	return negroni.New(
+		negroni.NewLogger(),
+		negroni.NewRecovery(),
+		negroni.Wrap(handler),
+	)
 }
 
 func createDatabaseConnection(host, databaseName string) *database.MongoHandler {
