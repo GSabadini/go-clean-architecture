@@ -3,6 +3,7 @@ package domain
 import (
 	"time"
 
+	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -14,10 +15,20 @@ type Account struct {
 	CreatedAt time.Time     `json:"created_at" bson:"created_at"`
 }
 
-func (a *Account) SumBalance(amount float64) {
+func (a *Account) GetBalance() float64 {
+	return a.Balance
+}
+
+func (a *Account) Deposit(amount float64) {
 	a.Balance += amount
 }
 
-func (a *Account) SubtractBalance(amount float64) {
+func (a *Account) Withdraw(amount float64) error {
+	if a.Balance < amount {
+		return errors.New("source account does not have sufficient balance")
+	}
+
 	a.Balance -= amount
+
+	return nil
 }

@@ -13,3 +13,15 @@ type Transfer struct {
 	Amount               float64       `json:"amount" bson:"amount"`
 	CreatedAt            time.Time     `json:"created_at" bson:"created_at"`
 }
+
+func (t *Transfer) GetAccountOrigin() bson.ObjectId {
+	return t.AccountOriginId
+}
+
+func (t *Transfer) GetAccountDestination() bson.ObjectId {
+	return t.AccountOriginId
+}
+
+func (t *Transfer) GetAmount() float64 {
+	return t.Amount
+}

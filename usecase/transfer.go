@@ -15,49 +15,66 @@ func StoreTransfer(
 	accountRepository repository.AccountRepository,
 	transfer *domain.Transfer,
 ) error {
-	accountOrigin, err := accountRepository.FindOne(bson.M{"_id": transfer.AccountOriginId})
-	if err != nil {
-		return errors.Wrap(err, "erro ao buscar conta de origem")
-	}
-
-	accountDestination, err := accountRepository.FindOne(bson.M{"_id": transfer.AccountDestinationId})
-	if err != nil {
-		return errors.Wrap(err, "erro ao buscar conta de destino")
-	}
-
-	if err = transferAccountBalance(accountOrigin, accountDestination, transfer.Amount); err != nil {
+	if err := transferAccountBalance(accountRepository, transfer); err != nil {
 		return err
 	}
 
-	if err = accountRepository.Update(
-		bson.M{"_id": transfer.AccountOriginId},
-		bson.M{"$set": bson.M{"balance": accountOrigin.Balance}},
-	); err != nil {
-		return errors.Wrap(err, "erro ao atualizar conta de origem")
-	}
-
-	if err = accountRepository.Update(
-		bson.M{"_id": transfer.AccountDestinationId},
-		bson.M{"$set": bson.M{"balance": accountDestination.Balance}},
-	); err != nil {
-		return errors.Wrap(err, "erro ao atualizar conta de destino")
-	}
-
-	if err = transferRepository.Store(transfer); err != nil {
+	if err := transferRepository.Store(transfer); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func transferAccountBalance(accountOrigin *domain.Account, accountDestination *domain.Account, amount float64) error {
-	if accountOrigin.Balance < amount {
-		return errors.New("A conta de origem não tem saldo suficiente")
+func transferAccountBalance(accountRepository repository.AccountRepository, transfer *domain.Transfer) error {
+	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOrigin()})
+	if err != nil {
+		return err
 	}
 
-	accountOrigin.SubtractBalance(amount)
+	accountDestination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOrigin()})
+	if err != nil {
+		return err
+	}
 
-	accountDestination.SumBalance(amount)
+	if err := accountOrigin.Withdraw(transfer.GetAmount()); err != nil {
+		return err
+	}
+
+	accountDestination.Deposit(transfer.GetAmount())
+
+	if err = updateAccount(
+		accountRepository,
+		bson.M{"_id": transfer.GetAccountOrigin()},
+		bson.M{"$set": bson.M{"balance": accountOrigin.GetBalance()}},
+	); err != nil {
+		return err
+	}
+
+	if err = updateAccount(
+		accountRepository,
+		bson.M{"_id": transfer.GetAccountDestination()},
+		bson.M{"$set": bson.M{"balance": accountDestination.GetBalance()}},
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func findAccount(accountRepository repository.AccountRepository, query bson.M) (*domain.Account, error) {
+	account, err := accountRepository.FindOne(query)
+	if err != nil {
+		return account, errors.Wrap(err, "error fetching account")
+	}
+
+	return account, nil
+}
+
+func updateAccount(accountRepository repository.AccountRepository, query bson.M, update bson.M) error {
+	if err := accountRepository.Update(query, update); err != nil {
+		return errors.Wrap(err, "error updating account")
+	}
 
 	return nil
 }
