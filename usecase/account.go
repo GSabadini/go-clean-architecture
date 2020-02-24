@@ -1,22 +1,39 @@
 package usecase
 
 import (
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
-func Create(repository repository.Account, account domain.Account) error {
-	if err := repository.Store(account); err != nil {
-		return err
+//Store cria uma nova account
+func Store(repository repository.AccountRepository, account *domain.Account) (*domain.Account, error) {
+	result, err := repository.Store(account)
+	if err != nil {
+		return result, err
 	}
 
-	return nil
+	return result, nil
 }
 
-func FindAll(repository repository.Account, account []domain.Account) ([]domain.Account, error) {
-	result, err := repository.FindAll(account)
+//FindAll recupera uma lista de accounts
+func FindAll(repository repository.AccountRepository) ([]domain.Account, error) {
+	result, err := repository.FindAll()
 	if err != nil {
-		return nil, err
+		return result, err
+	}
+
+	return result, nil
+}
+
+//FindOne recupera uma account com base em um ID
+func FindOne(repository repository.AccountRepository, id string) (domain.Account, error) {
+	var query = bson.M{"_id": bson.ObjectIdHex(id)}
+
+	result, err := repository.FindOne(query)
+	if err != nil {
+		return result, err
 	}
 
 	return result, nil
