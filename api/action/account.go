@@ -3,7 +3,6 @@ package action
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -12,36 +11,38 @@ import (
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 type Account struct {
 	dbHandler database.NoSQLDBHandler
+	logger    *logrus.Logger
 }
 
-func NewAccount(dbHandler database.NoSQLDBHandler) Account {
-	return Account{dbHandler: dbHandler}
+func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
+	return Account{dbHandler: dbHandler, logger: log}
 }
 
 //Store é um handler para criação de account
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var account domain.Account
+
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
-		log.Println([]byte(err.Error()))
+		a.logger.WithField("error", err).Error("error when creating a new account")
 		ErrInternalServer.Send(w)
 		return
 	}
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
-	err := usecase.Store(accountRepository, account)
+
+	result, err := usecase.Store(accountRepository, account)
 	if err != nil {
-		log.Println([]byte(err.Error()))
+		a.logger.WithField("error", err).Error("error when creating a new account")
 		ErrInternalServer.Send(w)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	Success(result, http.StatusCreated).Send(w)
 }
 
 //Index é um handler para retornar a lista de accounts
@@ -50,24 +51,20 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 
 	result, err := usecase.FindAll(accountRepository)
 	if err != nil {
-		log.Println([]byte(err.Error()))
+		a.logger.WithField("error", err).Error("error fetching account list")
 		ErrInternalServer.Send(w)
 		return
 	}
 
-	if err := Success(result, http.StatusOK).Send(w); err != nil {
-		log.Println([]byte(err.Error()))
-		ErrInternalServer.Send(w)
-		return
-	}
+	Success(result, http.StatusOK).Send(w)
 }
 
 type ReturnBallance struct {
 	Ballance float64 `json:"ballance"`
 }
 
-//Show é um handler para buscar uma account específica
-func (a Account) Show(w http.ResponseWriter, r *http.Request) {
+//ShowBallance é um handler para buscar o ballance de uma account
+func (a Account) ShowBallance(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	accountId, ok := vars["account_id"]
@@ -77,18 +74,15 @@ func (a Account) Show(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
+
 	result, err := usecase.FindOne(accountRepository, accountId)
 	if err != nil {
-		log.Println([]byte(err.Error()))
+		a.logger.WithField("error", err).Error("error fetching account balance")
 		ErrInternalServer.Send(w)
 		return
 	}
 
 	resultBallance := ReturnBallance{Ballance: result.Ballance}
 
-	if err := Success(resultBallance, http.StatusOK).Send(w); err != nil {
-		log.Println([]byte(err.Error()))
-		ErrInternalServer.Send(w)
-		return
-	}
+	Success(resultBallance, http.StatusOK).Send(w)
 }

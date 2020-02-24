@@ -20,10 +20,11 @@ func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 }
 
 //Store realiza uma inserção no banco de dados através da implementação real do database
-func (a Account) Store(account domain.Account) error {
+func (a Account) Store(account domain.Account) (domain.Account, error) {
 	account.CreatedAt = time.Now()
+	account.Id = bson.NewObjectId()
 
-	return a.dbHandler.Store(accountsCollectionName, account)
+	return account, a.dbHandler.Store(accountsCollectionName, account)
 }
 
 //FindAll realiza uma busca no banco de dados através da implementação real do database

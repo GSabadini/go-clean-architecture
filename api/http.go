@@ -1,7 +1,6 @@
 package api
 
 import (
-	"log"
 	"net/http"
 	"os"
 
@@ -9,12 +8,14 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
 )
 
 //HTTPServer armazena as dependências do servidor HTTP
 type HTTPServer struct {
 	databaseConnection database.NoSQLDBHandler
+	log                *logrus.Logger
 }
 
 //NewHTTPServer constrói um HTTPServer as suas dependências
@@ -31,17 +32,22 @@ func (s HTTPServer) Listen() {
 		negroniHandler = negroni.New()
 	)
 
+	log := logrus.StandardLogger()
+	log.SetLevel(logrus.DebugLevel)
+
+	s.log = log
+
 	s.setAppHandlers(router)
 	negroniHandler.UseHandler(router)
 
-	log.Printf("Iniciando servidor HTTP na porta %d", 3001)
+	log.Infoln("Iniciando servidor HTTP na porta", 3001)
 	if err := http.ListenAndServe(":3001", negroniHandler); err != nil {
-		log.Fatalln("Erro ao iniciar API HTTP", err)
+		log.WithError(err).Fatalln("Erro ao iniciar servidor HTTP")
 	}
 }
 
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
-	router.PathPrefix("/accounts/{account_id}/ballance").Handler(s.buildActionShowAccount()).Methods(http.MethodGet)
+	router.PathPrefix("/accounts/{account_id}/ballance").Handler(s.buildActionShowBallanceAccount()).Methods(http.MethodGet)
 
 	router.PathPrefix("/accounts").Handler(s.buildActionStoreAccount()).Methods(http.MethodPost)
 	router.PathPrefix("/accounts").Handler(s.buildActionIndexAccount()).Methods(http.MethodGet)
@@ -51,7 +57,7 @@ func (s HTTPServer) setAppHandlers(router *mux.Router) {
 
 func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewAccount(s.databaseConnection)
+		var accountAction = action.NewAccount(s.databaseConnection, s.log)
 
 		accountAction.Store(res, req)
 	}
@@ -65,7 +71,7 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 
 func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewAccount(s.databaseConnection)
+		var accountAction = action.NewAccount(s.databaseConnection, s.log)
 
 		accountAction.Index(res, req)
 	}
@@ -77,11 +83,11 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	)
 }
 
-func (s HTTPServer) buildActionShowAccount() *negroni.Negroni {
+func (s HTTPServer) buildActionShowBallanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewAccount(s.databaseConnection)
+		var accountAction = action.NewAccount(s.databaseConnection, s.log)
 
-		accountAction.Show(res, req)
+		accountAction.ShowBallance(res, req)
 	}
 
 	return negroni.New(
@@ -95,13 +101,13 @@ func createDatabaseConnection(host, databaseName string) *database.MongoHandler 
 	handler, err := database.NewMongoHandler(host, databaseName)
 
 	if err != nil {
-		log.Println("Não foi possível realizar a conexão com o banco de dados")
+		logrus.Infoln("Não foi possível realizar a conexão com o banco de dados")
 
 		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
 		panic(err)
 	}
 
-	log.Println("Conexão com o banco de dados realizada com sucesso")
+	logrus.Infoln("Conexão com o banco de dados realizada com sucesso")
 
 	return handler
 }

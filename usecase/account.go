@@ -8,12 +8,13 @@ import (
 )
 
 //Store cria uma nova account
-func Store(repository repository.AccountRepository, account domain.Account) error {
-	if err := repository.Store(account); err != nil {
-		return err
+func Store(repository repository.AccountRepository, account domain.Account) (domain.Account, error) {
+	result, err := repository.Store(account)
+	if err != nil {
+		return result, err
 	}
 
-	return nil
+	return result, nil
 }
 
 //FindAll recupera uma lista de accounts
@@ -37,17 +38,3 @@ func FindOne(repository repository.AccountRepository, id string) (domain.Account
 
 	return result, nil
 }
-
-//func RecoverUserTrackingData(hash assign.SenderHash, userTrackingRepository domain.UserTrackingRepository) (domain.UserTracking, error) {
-//	var (
-//		hashQuery        = bson.M{"senderHash": hash}
-//		userTrackingData domain.UserTracking
-//	)
-//
-//	err := userTrackingRepository.RecoverOne(hashQuery, &userTrackingData)
-//	if err != nil && err.Error() == "not found" {
-//		return userTrackingData, NewNotFoundError(err.Error())
-//	}
-//
-//	return userTrackingData, err
-//}
