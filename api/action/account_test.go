@@ -9,6 +9,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 func TestAccountStore(t *testing.T) {
@@ -26,7 +27,7 @@ func TestAccountStore(t *testing.T) {
 			name:               "Store handler success",
 			expectedStatusCode: http.StatusCreated,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
 				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "ballance": 10 }`),
 			},
 		},
@@ -34,7 +35,7 @@ func TestAccountStore(t *testing.T) {
 			name:               "Store handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
 				rawPayload:    []byte(``),
 			},
 		},
@@ -83,14 +84,14 @@ func TestAccountIndex(t *testing.T) {
 			name:               "Index handler success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
 			},
 		},
 		{
 			name:               "Index handler error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
 			},
 		},
 	}
@@ -136,14 +137,14 @@ func TestAccountShow(t *testing.T) {
 			name:               "Show handler success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
 			},
 		},
 		{
 			name:               "Show handler error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
 			},
 		},
 	}
@@ -162,7 +163,7 @@ func TestAccountShow(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts/{account_id}/ballance", tt.args.accountAction.Show).Methods(http.MethodGet)
+			r.HandleFunc("/accounts/{account_id}/ballance", tt.args.accountAction.ShowBallance).Methods(http.MethodGet)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {

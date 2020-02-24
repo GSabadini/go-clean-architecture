@@ -5,7 +5,10 @@ import (
 	"net/http"
 )
 
-var ErrInternalServer = Error{statusCode: http.StatusInternalServerError, Message: "Internal Server Error"}
+var (
+	ErrInternalServer = Error{statusCode: http.StatusInternalServerError, Message: "Internal Server Error"}
+	ErrNotFound       = Error{statusCode: http.StatusNotFound, Message: "Not Found"}
+)
 
 type Error struct {
 	statusCode int

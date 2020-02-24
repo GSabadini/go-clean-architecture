@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
+	"github.com/gsabadini/go-bank-transfer/api/middleware"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 
 	"github.com/gorilla/mux"
@@ -63,7 +64,7 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 	}
 
 	return negroni.New(
-		negroni.NewLogger(),
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
@@ -77,7 +78,7 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	}
 
 	return negroni.New(
-		negroni.NewLogger(),
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
@@ -91,7 +92,7 @@ func (s HTTPServer) buildActionShowBallanceAccount() *negroni.Negroni {
 	}
 
 	return negroni.New(
-		negroni.NewLogger(),
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)

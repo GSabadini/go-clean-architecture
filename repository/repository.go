@@ -14,7 +14,7 @@ type DbRepository struct {
 
 //AccountRepository expõe os métodos disponíveis para as abstrações de banco
 type AccountRepository interface {
-	Store(domain.Account) (domain.Account, error)
+	Store(*domain.Account) (*domain.Account, error)
 	FindAll() ([]domain.Account, error)
 	FindOne(bson.M) (domain.Account, error)
 }
