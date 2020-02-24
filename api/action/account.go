@@ -2,68 +2,138 @@ package action
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/gsabadini/go-bank-transfer/usecase"
+
+	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
-//Account
 type Account struct {
 	dbHandler database.NoSQLDBHandler
+	logger    *logrus.Logger
 }
 
-func NewAccount(dbHandler database.NoSQLDBHandler) Account {
-	return Account{dbHandler: dbHandler}
+func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
+	return Account{dbHandler: dbHandler, logger: log}
 }
 
-func (a Account) Create(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+//Store é um handler para criação de account
+func (a Account) Store(w http.ResponseWriter, r *http.Request) {
+	const logKey = "create_account"
+	var account *domain.Account
 
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	var account domain.Account
-	if err = json.Unmarshal(reqBody, &account); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
+		a.logError(
+			logKey,
+			"error when decoding json",
+			http.StatusInternalServerError,
+			err,
+		)
+		ErrInternalServer.Send(w)
 		return
 	}
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
-	err = usecase.Create(accountRepository, account)
+
+	result, err := usecase.Store(accountRepository, account)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		a.logError(
+			logKey,
+			"error when creating a new account",
+			http.StatusInternalServerError,
+			err,
+		)
+		ErrInternalServer.Send(w)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	a.logInfoSuccess(logKey, "success create account", http.StatusCreated)
+
+	Success(result, http.StatusCreated).Send(w)
 }
 
+//Index é um handler para retornar a lista de accounts
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var account []domain.Account
+	const logKey = "index_account"
 	var accountRepository = repository.NewAccount(a.dbHandler)
-	result, err := usecase.FindAll(accountRepository, account)
+
+	result, err := usecase.FindAll(accountRepository)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		a.logError(
+			logKey,
+			"error when returning account list",
+			http.StatusInternalServerError,
+			err,
+		)
+		ErrInternalServer.Send(w)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+	a.logInfoSuccess(logKey, "success return list accounts", http.StatusOK)
+
+	Success(result, http.StatusOK).Send(w)
+}
+
+type ReturnBallance struct {
+	Ballance float64 `json:"ballance"`
+}
+
+//ShowBallance é um handler para buscar o ballance de uma account
+func (a Account) ShowBallance(w http.ResponseWriter, r *http.Request) {
+	const logKey = "show_ballance"
+	var vars = mux.Vars(r)
+
+	accountId, ok := vars["account_id"]
+	if !ok {
+		a.logError(
+			logKey,
+			"not parameter",
+			http.StatusNotFound,
+			nil,
+		)
+		ErrNotFound.Send(w)
+		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	var accountRepository = repository.NewAccount(a.dbHandler)
+
+	result, err := usecase.FindOne(accountRepository, accountId)
+	if err != nil {
+		a.logError(
+			logKey,
+			"error when returning account balance",
+			http.StatusInternalServerError,
+			err,
+		)
+		ErrInternalServer.Send(w)
+		return
+	}
+
+	resultBallance := ReturnBallance{Ballance: result.Ballance}
+
+	a.logInfoSuccess(logKey, "success when returning account balance", http.StatusOK)
+
+	Success(resultBallance, http.StatusOK).Send(w)
+}
+
+func (a Account) logInfoSuccess(key string, description string, httpStatus int) {
+	a.logger.WithFields(logrus.Fields{
+		"key":         key,
+		"http_status": httpStatus,
+		"description": description,
+	}).Info()
+}
+
+func (a Account) logError(key string, description string, httpStatus int, err error) {
+	a.logger.WithFields(logrus.Fields{
+		"key":         key,
+		"http_status": httpStatus,
+		"description": description,
+		"error":       err.Error(),
+	}).Error()
 }

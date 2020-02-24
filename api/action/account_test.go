@@ -2,7 +2,6 @@ package action
 
 import (
 	"bytes"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,13 +9,13 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
-func TestAccountCreate(t *testing.T) {
+func TestAccountStore(t *testing.T) {
 	type args struct {
 		accountAction Account
 		rawPayload    []byte
-		httpMethod    string
 	}
 
 	tests := []struct {
@@ -25,38 +24,45 @@ func TestAccountCreate(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Create handler success",
+			name:               "Store handler success",
 			expectedStatusCode: http.StatusCreated,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
 				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "ballance": 10 }`),
-				httpMethod:    http.MethodPost,
 			},
 		},
 		{
-			name:               "Create handler database error",
+			name:               "Store handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
 				rawPayload:    []byte(``),
-				httpMethod:    http.MethodPost,
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			statusCode, err := callHandler(t, tt.args.rawPayload, tt.args.accountAction, tt.args.httpMethod)
+			var body = bytes.NewReader(tt.args.rawPayload)
 
+			req, err := http.NewRequest(http.MethodPost, "/accounts", body)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			if statusCode != tt.expectedStatusCode {
+			var (
+				rr = httptest.NewRecorder()
+				r  = mux.NewRouter()
+			)
+
+			r.HandleFunc("/accounts", tt.args.accountAction.Store).Methods(http.MethodPost)
+			r.ServeHTTP(rr, req)
+
+			if rr.Code != tt.expectedStatusCode {
 				t.Errorf(
 					"[TestCase '%s'] O handler retornou um HTTP status code inesperado: retornado '%v' esperado '%v'",
 					tt.name,
-					statusCode,
+					rr.Code,
 					tt.expectedStatusCode,
 				)
 			}
@@ -64,74 +70,110 @@ func TestAccountCreate(t *testing.T) {
 	}
 }
 
-//@TODO Corrigir testes de handler
-//func TestAccountIndex(t *testing.T) {
-//	type args struct {
-//		accountAction Account
-//		httpMethod    string
-//	}
-//
-//	tests := []struct {
-//		name               string
-//		expectedStatusCode int
-//		args               args
-//	}{
-//		{
-//			name:               "Index handler success",
-//			expectedStatusCode: http.StatusOK,
-//			args: args{
-//				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
-//				httpMethod:    http.MethodGet,
-//			},
-//		},
-//		{
-//			name:               "Index handler error",
-//			expectedStatusCode: http.StatusInternalServerError,
-//			args: args{
-//				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
-//				httpMethod:    http.MethodGet,
-//			},
-//		},
-//	}
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			statusCode, err := callHandler(t, nil, tt.args.accountAction, tt.args.httpMethod)
-//
-//			if err != nil {
-//				t.Fatal(err)
-//			}
-//
-//			if statusCode != tt.expectedStatusCode {
-//				t.Errorf(
-//					"[TestCase '%s'] O handler retornou um HTTP status code inesperado: retornado '%v' esperado '%v'",
-//					tt.name,
-//					statusCode,
-//					tt.expectedStatusCode,
-//				)
-//			}
-//		})
-//	}
-//}
-
-func callHandler(t *testing.T, rawPayload []byte, action Account, httpMethod string) (int, error) {
-	var body io.Reader
-	if httpMethod != http.MethodGet {
-		body = bytes.NewReader(rawPayload)
+func TestAccountIndex(t *testing.T) {
+	type args struct {
+		accountAction Account
 	}
 
-	req, err := http.NewRequest(httpMethod, "/account", body)
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name               string
+		expectedStatusCode int
+		args               args
+	}{
+		{
+			name:               "Index handler success",
+			expectedStatusCode: http.StatusOK,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
+			},
+		},
+		{
+			name:               "Index handler error",
+			expectedStatusCode: http.StatusInternalServerError,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
+			},
+		},
 	}
 
-	var (
-		rr = httptest.NewRecorder()
-		r  = mux.NewRouter()
-	)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := http.NewRequest(http.MethodGet, "/accounts", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	r.HandleFunc("/account", action.Create).Methods(httpMethod)
-	r.ServeHTTP(rr, req)
+			var (
+				rr = httptest.NewRecorder()
+				r  = mux.NewRouter()
+			)
 
-	return rr.Code, nil
+			r.HandleFunc("/accounts", tt.args.accountAction.Index).Methods(http.MethodGet)
+			r.ServeHTTP(rr, req)
+
+			if rr.Code != tt.expectedStatusCode {
+				t.Errorf(
+					"[TestCase '%s'] O handler retornou um HTTP status code inesperado: retornado '%v' esperado '%v'",
+					tt.name,
+					rr.Code,
+					tt.expectedStatusCode,
+				)
+			}
+		})
+	}
+}
+
+func TestAccountShow(t *testing.T) {
+	type args struct {
+		accountAction Account
+	}
+
+	tests := []struct {
+		name               string
+		expectedStatusCode int
+		args               args
+	}{
+		{
+			name:               "Show handler success",
+			expectedStatusCode: http.StatusOK,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
+			},
+		},
+		{
+			name:               "Show handler error",
+			expectedStatusCode: http.StatusInternalServerError,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := http.NewRequest(http.MethodGet, "/accounts/5e5282beba39bfc244dc4c4b/ballance", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req = mux.SetURLVars(req, map[string]string{"account_id": "5e5282beba39bfc244dc4c4b"})
+
+			var (
+				rr = httptest.NewRecorder()
+				r  = mux.NewRouter()
+			)
+
+			r.HandleFunc("/accounts/{account_id}/ballance", tt.args.accountAction.ShowBallance).Methods(http.MethodGet)
+			r.ServeHTTP(rr, req)
+
+			if rr.Code != tt.expectedStatusCode {
+				t.Errorf(
+					"[TestCase '%s'] O handler retornou um HTTP status code inesperado: retornado '%v' esperado '%v'",
+					tt.name,
+					rr.Code,
+					tt.expectedStatusCode,
+				)
+			}
+		})
+	}
 }
