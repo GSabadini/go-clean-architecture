@@ -11,9 +11,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func TestAccountCreate(t *testing.T) {
+func TestAccountStore(t *testing.T) {
 	type args struct {
-		accountAction AccountAction
+		accountAction Account
 		rawPayload    []byte
 	}
 
@@ -23,18 +23,18 @@ func TestAccountCreate(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Create handler success",
+			name:               "Store handler success",
 			expectedStatusCode: http.StatusCreated,
 			args: args{
-				accountAction: NewAccountAction(database.MongoHandlerSuccessMock{}),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
 				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "ballance": 10 }`),
 			},
 		},
 		{
-			name:               "Create handler database error",
+			name:               "Store handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccountAction(database.MongoHandlerErrorMock{}),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
 				rawPayload:    []byte(``),
 			},
 		},
@@ -43,6 +43,7 @@ func TestAccountCreate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var body = bytes.NewReader(tt.args.rawPayload)
+
 			req, err := http.NewRequest(http.MethodPost, "/accounts", body)
 			if err != nil {
 				t.Fatal(err)
@@ -53,7 +54,7 @@ func TestAccountCreate(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts", tt.args.accountAction.Create).Methods(http.MethodPost)
+			r.HandleFunc("/accounts", tt.args.accountAction.Store).Methods(http.MethodPost)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
@@ -70,7 +71,7 @@ func TestAccountCreate(t *testing.T) {
 
 func TestAccountIndex(t *testing.T) {
 	type args struct {
-		accountAction AccountAction
+		accountAction Account
 	}
 
 	tests := []struct {
@@ -82,14 +83,14 @@ func TestAccountIndex(t *testing.T) {
 			name:               "Index handler success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccountAction(database.MongoHandlerSuccessMock{}),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
 			},
 		},
 		{
 			name:               "Index handler error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccountAction(database.MongoHandlerErrorMock{}),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
 			},
 		},
 	}
@@ -123,7 +124,7 @@ func TestAccountIndex(t *testing.T) {
 
 func TestAccountShow(t *testing.T) {
 	type args struct {
-		accountAction AccountAction
+		accountAction Account
 	}
 
 	tests := []struct {
@@ -135,14 +136,14 @@ func TestAccountShow(t *testing.T) {
 			name:               "Show handler success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccountAction(database.MongoHandlerSuccessMock{}),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}),
 			},
 		},
 		{
 			name:               "Show handler error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccountAction(database.MongoHandlerErrorMock{}),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}),
 			},
 		},
 	}
@@ -175,25 +176,3 @@ func TestAccountShow(t *testing.T) {
 		})
 	}
 }
-
-//func callHandler(t *testing.T, rawPayload []byte, action Account, httpMethod string) (int, error) {
-//	var body io.Reader
-//	if httpMethod != http.MethodGet {
-//		body = bytes.NewReader(rawPayload)
-//	}
-//
-//	req, err := http.NewRequest(httpMethod, "/account", body)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	var (
-//		rr = httptest.NewRecorder()
-//		r  = mux.NewRouter()
-//	)
-//
-//	r.HandleFunc("/account", action.Create).Methods(httpMethod)
-//	r.ServeHTTP(rr, req)
-//
-//	return rr.Code, nil
-//}

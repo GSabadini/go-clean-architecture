@@ -1,9 +1,10 @@
 package repository
 
 import (
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	"gopkg.in/mgo.v2/bson"
 )
 
 //DbRepository encapsula um repositório que contém um handler para determinado banco de dados

@@ -1,8 +1,6 @@
 package database
 
-import (
-	"errors"
-)
+import "errors"
 
 //MongoHandlerSuccessMock
 type MongoHandlerSuccessMock struct{}

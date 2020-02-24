@@ -101,14 +101,14 @@ func TestFindAll(t *testing.T) {
 			},
 			expected: []domain.Account{},
 		},
-		//{
-		//	name: "Error return list accounts",
-		//	args: args{
-		//		repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
-		//	},
-		//	expectedError: "Error",
-		//	expected: []domain.Account{},
-		//},
+		{
+			name: "Error return list accounts",
+			args: args{
+				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
+			},
+			expectedError: "Error",
+			expected:      []domain.Account{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -156,7 +156,7 @@ func TestFindOne(t *testing.T) {
 				id:         "5e519055ba39bfc244dc4625",
 			},
 			expectedError: "Error",
-			expected: domain.Account{},
+			expected:      domain.Account{},
 		},
 	}
 
