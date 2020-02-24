@@ -2,7 +2,6 @@ package action
 
 import (
 	"bytes"
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -122,7 +121,6 @@ func TestAccountIndex(t *testing.T) {
 	}
 }
 
-//@TODO Corrigir testes de handler
 func TestAccountShow(t *testing.T) {
 	type args struct {
 		accountAction AccountAction
@@ -152,17 +150,10 @@ func TestAccountShow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req, err := http.NewRequest(http.MethodGet, "/accounts/5e5282beba39bfc244dc4c4b/ballance", nil)
-			req = mux.SetURLVars(req, map[string]string{
-				"param1": "param1",
-				"param2": "param2",
-			})
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			ctx := req.Context()
-			ctx = context.WithValue(ctx, "request-uuid", "myvalue")
-			req = req.WithContext(ctx)
 			req = mux.SetURLVars(req, map[string]string{"account_id": "5e5282beba39bfc244dc4c4b"})
 
 			var (
@@ -170,7 +161,7 @@ func TestAccountShow(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts/5e5282beba39bfc244dc4c4b/ballance", tt.args.accountAction.Show).Methods(http.MethodGet)
+			r.HandleFunc("/accounts/{account_id}/ballance", tt.args.accountAction.Show).Methods(http.MethodGet)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {

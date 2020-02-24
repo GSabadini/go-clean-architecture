@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
@@ -26,7 +27,9 @@ func (a Account) Store(account domain.Account) error {
 }
 
 //FindAll realiza uma busca no banco de dados através da implementação real do database
-func (a Account) FindAll(account []domain.Account) ([]domain.Account, error) {
+func (a Account) FindAll() ([]domain.Account, error) {
+	var account []domain.Account
+
 	err := a.dbHandler.FindAll(accountsCollectionName, nil, &account)
 	if err != nil {
 		return []domain.Account{}, err
@@ -36,7 +39,9 @@ func (a Account) FindAll(account []domain.Account) ([]domain.Account, error) {
 }
 
 //FindOne realiza uma busca no banco de dados através da implementação real do database
-func (a Account) FindOne(query bson.M, account domain.Account) (domain.Account, error) {
+func (a Account) FindOne(query bson.M) (domain.Account, error) {
+	var account domain.Account
+
 	err := a.dbHandler.FindOne(accountsCollectionName, query, &account)
 	if err != nil {
 		return domain.Account{}, err

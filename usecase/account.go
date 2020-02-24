@@ -7,7 +7,8 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
-func Create(repository repository.AccountRepository, account domain.Account) error {
+//Store cria uma nova account
+func Store(repository repository.AccountRepository, account domain.Account) error {
 	if err := repository.Store(account); err != nil {
 		return err
 	}
@@ -15,21 +16,21 @@ func Create(repository repository.AccountRepository, account domain.Account) err
 	return nil
 }
 
-func FindAll(repository repository.AccountRepository, account []domain.Account) ([]domain.Account, error) {
-	result, err := repository.FindAll(account)
+//FindAll recupera uma lista de accounts
+func FindAll(repository repository.AccountRepository) ([]domain.Account, error) {
+	result, err := repository.FindAll()
 	if err != nil {
-		return nil, err
+		return []domain.Account{}, err
 	}
 
 	return result, nil
 }
 
-func FindOne(repository repository.AccountRepository, account domain.Account, id string) (domain.Account, error) {
-	var (
-		query = bson.M{"_id": bson.ObjectIdHex(id)}
-	)
+//FindOne recupera uma account com base em um ID
+func FindOne(repository repository.AccountRepository, id string) (domain.Account, error) {
+	var query = bson.M{"_id": bson.ObjectIdHex(id)}
 
-	result, err := repository.FindOne(query, account)
+	result, err := repository.FindOne(query)
 	if err != nil {
 		return domain.Account{}, err
 	}

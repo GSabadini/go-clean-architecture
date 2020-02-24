@@ -32,7 +32,7 @@ func (a AccountAction) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
-	err := usecase.Create(accountRepository, account)
+	err := usecase.Store(accountRepository, account)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -45,9 +45,8 @@ func (a AccountAction) Create(w http.ResponseWriter, r *http.Request) {
 func (a AccountAction) Index(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var account []domain.Account
 	var accountRepository = repository.NewAccount(a.dbHandler)
-	result, err := usecase.FindAll(accountRepository, account)
+	result, err := usecase.FindAll(accountRepository)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -62,11 +61,11 @@ func (a AccountAction) Index(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (a AccountAction) Show(w http.ResponseWriter, r *http.Request) {
-	type ReturnBallance struct {
-		Ballance float64 `json:"ballance"`
-	}
+type ReturnBallance struct {
+	Ballance float64 `json:"ballance"`
+}
 
+func (a AccountAction) Show(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
@@ -77,10 +76,8 @@ func (a AccountAction) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var account domain.Account
-
 	var accountRepository = repository.NewAccount(a.dbHandler)
-	result, err := usecase.FindOne(accountRepository, account, accountId)
+	result, err := usecase.FindOne(accountRepository, accountId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))

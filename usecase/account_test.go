@@ -64,7 +64,6 @@ func TestFindAll(t *testing.T) {
 
 	type args struct {
 		repository repository.AccountRepository
-		account    []domain.Account
 	}
 
 	tests := []struct {
@@ -77,22 +76,6 @@ func TestFindAll(t *testing.T) {
 			name: "Success return list accounts",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
-				account: []domain.Account{
-					{
-						Id:        "0",
-						Name:      "Test-0",
-						Cpf:       "",
-						Ballance:  0.00,
-						CreatedAt: timeNow,
-					},
-					{
-						Id:        "1",
-						Name:      "Test-1",
-						Cpf:       "",
-						Ballance:  120.00,
-						CreatedAt: timeNow,
-					},
-				},
 			},
 			expected: []domain.Account{
 				{
@@ -115,7 +98,6 @@ func TestFindAll(t *testing.T) {
 			name: "Empty return list accounts",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
-				account:    []domain.Account{},
 			},
 			expected: []domain.Account{},
 		},
@@ -123,7 +105,6 @@ func TestFindAll(t *testing.T) {
 			name: "Error return list accounts",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
-				account:    []domain.Account{},
 			},
 			expectedError: "Error",
 		},
@@ -132,7 +113,7 @@ func TestFindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := FindAll(tt.args.repository, tt.args.account)
+			got, err := FindAll(tt.args.repository)
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, err, tt.expected)
 				return
@@ -148,7 +129,6 @@ func TestFindAll(t *testing.T) {
 func TestFindOne(t *testing.T) {
 	type args struct {
 		repository repository.AccountRepository
-		account    domain.Account
 		id         string
 	}
 
@@ -162,10 +142,7 @@ func TestFindOne(t *testing.T) {
 			name: "Success return ballance account",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
-				account: domain.Account{
-					Ballance: 100.00,
-				},
-				id: "5e519055ba39bfc244dc4625",
+				id:         "5e519055ba39bfc244dc4625",
 			},
 			expected: domain.Account{
 				Ballance: 100.00,
@@ -174,7 +151,7 @@ func TestFindOne(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got, err := FindOne(tt.args.repository, tt.args.account, tt.args.id)
+		got, err := FindOne(tt.args.repository, tt.args.id)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, err, tt.expected)
