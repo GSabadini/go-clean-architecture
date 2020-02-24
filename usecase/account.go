@@ -20,7 +20,7 @@ func Store(repository repository.AccountRepository, account domain.Account) erro
 func FindAll(repository repository.AccountRepository) ([]domain.Account, error) {
 	result, err := repository.FindAll()
 	if err != nil {
-		return []domain.Account{}, err
+		return result, err
 	}
 
 	return result, nil
@@ -32,7 +32,7 @@ func FindOne(repository repository.AccountRepository, id string) (domain.Account
 
 	result, err := repository.FindOne(query)
 	if err != nil {
-		return domain.Account{}, err
+		return result, err
 	}
 
 	return result, nil

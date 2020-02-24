@@ -28,7 +28,7 @@ func (a Account) Store(account domain.Account) error {
 
 //FindAll realiza uma busca no banco de dados através da implementação real do database
 func (a Account) FindAll() ([]domain.Account, error) {
-	var account []domain.Account
+	var account = make([]domain.Account, 0)
 
 	err := a.dbHandler.FindAll(accountsCollectionName, nil, &account)
 	if err != nil {

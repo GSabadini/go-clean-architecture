@@ -13,15 +13,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type AccountAction struct {
+type Account struct {
 	dbHandler database.NoSQLDBHandler
 }
 
-func NewAccountAction(dbHandler database.NoSQLDBHandler) AccountAction {
-	return AccountAction{dbHandler: dbHandler}
+func NewAccount(dbHandler database.NoSQLDBHandler) Account {
+	return Account{dbHandler: dbHandler}
 }
 
-func (a AccountAction) Create(w http.ResponseWriter, r *http.Request) {
+//Store é um handler para criação de account
+func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var account domain.Account
@@ -42,7 +43,8 @@ func (a AccountAction) Create(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (a AccountAction) Index(w http.ResponseWriter, _ *http.Request) {
+//Index é um handler para retornar a lista de accounts
+func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
@@ -65,7 +67,8 @@ type ReturnBallance struct {
 	Ballance float64 `json:"ballance"`
 }
 
-func (a AccountAction) Show(w http.ResponseWriter, r *http.Request) {
+//Show é um handler para buscar uma account específica
+func (a Account) Show(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
