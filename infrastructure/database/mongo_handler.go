@@ -1,6 +1,8 @@
 package database
 
-import mongo "gopkg.in/mgo.v2"
+import (
+	mongo "gopkg.in/mgo.v2"
+)
 
 //MongoHandler implementação para banco de dados MongoDb
 type MongoHandler struct {
@@ -28,6 +30,14 @@ func (mgo MongoHandler) Store(collection string, data interface{}) error {
 	defer session.Close()
 
 	return mgo.Database.C(collection).With(session).Insert(data)
+}
+
+//Update realiza uma alteração no banco de dados
+func (mgo MongoHandler) Update(collection string, query interface{}, update interface{}) error {
+	session := mgo.Session.Clone()
+	defer session.Close()
+
+	return mgo.Database.C(collection).With(session).Update(query, update)
 }
 
 //FindAll realiza uma busca no banco de dados por todos os registros

@@ -32,6 +32,11 @@ func (a Account) Store(account *domain.Account) (*domain.Account, error) {
 	return account, nil
 }
 
+//Update realiza uma atualização no banco de dados através da implementação real do database
+func (a Account) Update(query bson.M, update bson.M) error {
+	return a.dbHandler.Update(accountsCollectionName, query, update)
+}
+
 //FindAll realiza uma busca no banco de dados através da implementação real do database
 func (a Account) FindAll() ([]domain.Account, error) {
 	var account = make([]domain.Account, 0)

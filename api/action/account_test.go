@@ -123,7 +123,7 @@ func TestAccountIndex(t *testing.T) {
 	}
 }
 
-func TestAccountShow(t *testing.T) {
+func TestAccountShowBallance(t *testing.T) {
 	type args struct {
 		accountAction Account
 	}
