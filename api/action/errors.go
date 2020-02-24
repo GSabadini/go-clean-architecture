@@ -20,3 +20,10 @@ func (e Error) Send(w http.ResponseWriter) error {
 	w.WriteHeader(e.statusCode)
 	return json.NewEncoder(w).Encode(e)
 }
+
+func ErrorMessage(err error, status int) *Error {
+	return &Error{
+		statusCode: status,
+		Message:    err.Error(),
+	}
+}

@@ -18,3 +18,8 @@ type AccountRepository interface {
 	FindAll() ([]domain.Account, error)
 	FindOne(bson.M) (domain.Account, error)
 }
+
+//TransferRepository expõe os métodos disponíveis para as abstrações de banco
+type TransferRepository interface {
+	Store(*domain.Transfer) error
+}

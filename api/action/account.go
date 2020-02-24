@@ -96,6 +96,7 @@ func (a Account) ShowBallance(w http.ResponseWriter, r *http.Request) {
 			http.StatusNotFound,
 			nil,
 		)
+
 		ErrNotFound.Send(w)
 		return
 	}
@@ -110,6 +111,7 @@ func (a Account) ShowBallance(w http.ResponseWriter, r *http.Request) {
 			http.StatusInternalServerError,
 			err,
 		)
+
 		ErrInternalServer.Send(w)
 		return
 	}

@@ -48,12 +48,27 @@ func (s HTTPServer) Listen() {
 }
 
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
-	router.PathPrefix("/accounts/{account_id}/ballance").Handler(s.buildActionShowBallanceAccount()).Methods(http.MethodGet)
+	router.PathPrefix("/transfers").Handler(s.buildActionStoreTransfer()).Methods(http.MethodPost)
 
+	router.PathPrefix("/accounts/{account_id}/ballance").Handler(s.buildActionShowBallanceAccount()).Methods(http.MethodGet)
 	router.PathPrefix("/accounts").Handler(s.buildActionStoreAccount()).Methods(http.MethodPost)
 	router.PathPrefix("/accounts").Handler(s.buildActionIndexAccount()).Methods(http.MethodGet)
 
 	router.HandleFunc("/healthcheck", action.HealthCheck).Methods(http.MethodGet)
+}
+
+func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
+	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
+		var accountAction = action.NewTransfer(s.databaseConnection, s.log)
+
+		accountAction.Store(res, req)
+	}
+
+	return negroni.New(
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
+		negroni.NewRecovery(),
+		negroni.Wrap(handler),
+	)
 }
 
 func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
