@@ -48,6 +48,7 @@ func (s HTTPServer) Listen() {
 }
 
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
+	//@TODO REVER PROBLEMAS NAS ROTAS
 	router.PathPrefix("/transfers").Handler(s.buildActionStoreTransfer()).Methods(http.MethodPost)
 
 	router.PathPrefix("/accounts/{account_id}/balance").Handler(s.buildActionShowBalanceAccount()).Methods(http.MethodGet)

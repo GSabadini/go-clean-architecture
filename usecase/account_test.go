@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"fmt"
+	"reflect"
+	"testing"
+
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/repository"
-	"reflect"
-	"testing"
 )
 
 func TestCreate(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrInternalServer = Error{statusCode: http.StatusInternalServerError, Message: "Internal Server Error"}
+	ErrInvalidJson    = Error{statusCode: http.StatusBadRequest, Message: "Invalid or malformed JSON"}
 	ErrNotFound       = Error{statusCode: http.StatusNotFound, Message: "Not Found"}
 )
 
@@ -16,7 +17,7 @@ type Error struct {
 	Message    string `json:"message,omitempty"`
 }
 
-//Send
+//Send envia uma resposta de erro
 func (e Error) Send(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(e.statusCode)

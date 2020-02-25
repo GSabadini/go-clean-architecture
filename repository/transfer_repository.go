@@ -22,7 +22,7 @@ func NewTransfer(dbHandler database.NoSQLDBHandler) Transfer {
 //Store cria uma transferência
 func (t Transfer) Store(transfer *domain.Transfer) error {
 	transfer.CreatedAt = time.Now()
-	transfer.Id = bson.NewObjectId()
+	transfer.ID = bson.NewObjectId()
 
 	return t.dbHandler.Store(transfersCollectionName, &transfer)
 }

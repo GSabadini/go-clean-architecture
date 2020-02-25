@@ -9,9 +9,9 @@ import (
 
 //Account armazena a estrutura de uma conta
 type Account struct {
-	Id        bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	ID        bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Name      string        `json:"name" bson:"name"`
-	Cpf       string        `json:"cpf" bson:"cpf"`
+	CPF       string        `json:"cpf" bson:"cpf"`
 	Balance   float64       `json:"balance" bson:"balance"`
 	CreatedAt time.Time     `json:"created_at" bson:"created_at"`
 }

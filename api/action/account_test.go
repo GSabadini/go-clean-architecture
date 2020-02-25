@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//@TODO REVER TESTES
 func TestAccountStore(t *testing.T) {
 	type args struct {
 		accountAction Account
@@ -24,7 +25,7 @@ func TestAccountStore(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Store handler success",
+			name:               "Store handler database success",
 			expectedStatusCode: http.StatusCreated,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
@@ -36,7 +37,15 @@ func TestAccountStore(t *testing.T) {
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
-				rawPayload:    []byte(``),
+				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": 10 }`),
+			},
+		},
+		{
+			name:               "Store handler invalid JSON",
+			expectedStatusCode: http.StatusBadRequest,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
+				rawPayload:    []byte(`{"name": }`),
 			},
 		},
 	}
@@ -81,14 +90,14 @@ func TestAccountIndex(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Index handler success",
+			name:               "Index handler database success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
 			},
 		},
 		{
-			name:               "Index handler error",
+			name:               "Index handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
@@ -134,14 +143,14 @@ func TestAccountShowBalance(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Show handler success",
+			name:               "ShowBalance handler database success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
 			},
 		},
 		{
-			name:               "Show handler error",
+			name:               "ShowBalance handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),

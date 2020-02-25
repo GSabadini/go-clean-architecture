@@ -17,12 +17,12 @@ func (m MongoHandlerSuccessMock) FindAll(_ string, _ interface{}, _ interface{})
 
 //FindOne
 func (m MongoHandlerSuccessMock) FindOne(_ string, _ interface{}, _ interface{}) error {
-	return errors.New("Error")
+	return nil
 }
 
 //Update
 func (m MongoHandlerSuccessMock) Update(_ string, _ interface{}, _ interface{}) error {
-	return errors.New("Error")
+	return nil
 }
 
 //MongoHandlerSuccessMock

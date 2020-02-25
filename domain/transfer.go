@@ -8,21 +8,21 @@ import (
 
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
-	Id                   bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	AccountOriginId      bson.ObjectId `json:"account_origin_id" bson:"account_origin_id"`
-	AccountDestinationId bson.ObjectId `json:"account_destination_id" bson:"account_destination_id"`
+	ID                   bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	AccountOriginID      bson.ObjectId `json:"account_origin_id" bson:"account_origin_id"`
+	AccountDestinationID bson.ObjectId `json:"account_destination_id" bson:"account_destination_id"`
 	Amount               float64       `json:"amount" bson:"amount"`
 	CreatedAt            time.Time     `json:"created_at" bson:"created_at"`
 }
 
-//GetAccountOriginId retorna o id da conta de origem
-func (t *Transfer) GetAccountOriginId() bson.ObjectId {
-	return t.AccountOriginId
+//GetAccountOriginID retorna o id da conta de origem
+func (t *Transfer) GetAccountOriginID() bson.ObjectId {
+	return t.AccountOriginID
 }
 
-//GetAccountDestinationId retorna o id da conta de destino
-func (t *Transfer) GetAccountDestinationId() bson.ObjectId {
-	return t.AccountDestinationId
+//GetAccountDestinationID retorna o id da conta de destino
+func (t *Transfer) GetAccountDestinationID() bson.ObjectId {
+	return t.AccountDestinationID
 }
 
 //GetAmount retorna o valor

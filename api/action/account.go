@@ -27,16 +27,19 @@ func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
 //Store é um handler para criação de conta
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
+
 	var account *domain.Account
 
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
 		a.logError(
 			logKey,
 			"error when decoding json",
-			http.StatusInternalServerError,
+			http.StatusBadRequest,
 			err,
 		)
-		ErrInternalServer.Send(w)
+
+		//ErrInvalidJson.Send(w)
+		ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
@@ -50,11 +53,12 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 			http.StatusInternalServerError,
 			err,
 		)
-		ErrInternalServer.Send(w)
+
+		ErrorMessage(err, http.StatusInternalServerError).Send(w)
 		return
 	}
 
-	a.logInfoSuccess(logKey, "success create account", http.StatusCreated)
+	a.logSuccess(logKey, "success create account", http.StatusCreated)
 
 	Success(result, http.StatusCreated).Send(w)
 }
@@ -62,6 +66,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 //Index é um handler para retornar a lista de contas
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
+
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
 	result, err := usecase.FindAllAccount(accountRepository)
@@ -72,22 +77,26 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 			http.StatusInternalServerError,
 			err,
 		)
-		ErrInternalServer.Send(w)
+
+		ErrorMessage(err, http.StatusInternalServerError).Send(w)
 		return
 	}
 
-	a.logInfoSuccess(logKey, "success return list accounts", http.StatusOK)
+	a.logSuccess(logKey, "success return list accounts", http.StatusOK)
 
 	Success(result, http.StatusOK).Send(w)
 }
 
-type ReturnBalance struct {
+type ResultBalance struct {
 	Balance float64 `json:"balance"`
 }
 
+//TODO REVER QUANDO MANDAR UM ID INVÁLIDO
+//TODO RETORNAR ERRO CORRETO QUANDO NÃO ENCONTRAR A CONTA
 //ShowBalance é um handler para retornar o saldo de uma conta
 func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "show_balance"
+
 	var vars = mux.Vars(r)
 
 	accountId, ok := vars["account_id"]
@@ -99,6 +108,7 @@ func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 			nil,
 		)
 
+		//ErrorMessage(err, http.StatusInternalServerError).Send(w)
 		ErrNotFound.Send(w)
 		return
 	}
@@ -114,18 +124,18 @@ func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 			err,
 		)
 
-		ErrInternalServer.Send(w)
+		ErrorMessage(err, http.StatusInternalServerError).Send(w)
 		return
 	}
 
-	resultBalance := ReturnBalance{Balance: result.Balance}
+	resultBalance := ResultBalance{Balance: result.Balance}
 
-	a.logInfoSuccess(logKey, "success when returning account balance", http.StatusOK)
+	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)
 
 	Success(resultBalance, http.StatusOK).Send(w)
 }
 
-func (a Account) logInfoSuccess(key string, description string, httpStatus int) {
+func (a Account) logSuccess(key string, description string, httpStatus int) {
 	a.logger.WithFields(logrus.Fields{
 		"key":         key,
 		"http_status": httpStatus,

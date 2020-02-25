@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -28,12 +27,7 @@ func StoreTransfer(
 }
 
 func transferAccountBalance(accountRepository repository.AccountRepository, transfer *domain.Transfer) error {
-	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginId()})
-	if err != nil {
-		return err
-	}
-
-	accountDestination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountDestinationId()})
+	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
 	}
@@ -42,22 +36,24 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 		return err
 	}
 
+	accountDestination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountDestinationID()})
+	if err != nil {
+		return err
+	}
+
 	accountDestination.Deposit(transfer.GetAmount())
 
-	if err = updateAccount(
+	if err = updateAccountBalance(
 		accountRepository,
-		bson.M{"_id": transfer.GetAccountOriginId()},
+		bson.M{"_id": transfer.GetAccountOriginID()},
 		bson.M{"$set": bson.M{"balance": accountOrigin.GetBalance()}},
 	); err != nil {
 		return err
 	}
 
-	fmt.Println(accountOrigin.GetBalance())
-
-	fmt.Println(accountDestination.GetBalance(), "dest")
-	if err = updateAccount(
+	if err = updateAccountBalance(
 		accountRepository,
-		bson.M{"_id": transfer.GetAccountDestinationId()},
+		bson.M{"_id": transfer.GetAccountDestinationID()},
 		bson.M{"$set": bson.M{"balance": accountDestination.GetBalance()}},
 	); err != nil {
 		return err
@@ -75,7 +71,7 @@ func findAccount(accountRepository repository.AccountRepository, query bson.M) (
 	return account, nil
 }
 
-func updateAccount(accountRepository repository.AccountRepository, query bson.M, update bson.M) error {
+func updateAccountBalance(accountRepository repository.AccountRepository, query bson.M, update bson.M) error {
 	if err := accountRepository.Update(query, update); err != nil {
 		return errors.Wrap(err, "error updating account")
 	}

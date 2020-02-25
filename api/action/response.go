@@ -11,7 +11,7 @@ type Response struct {
 	result     interface{}
 }
 
-//Send envia uma resposta
+//Send envia uma resposta de sucesso
 func (r *Response) Send(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(r.statusCode)
