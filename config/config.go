@@ -4,7 +4,7 @@ import "os"
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
-	AppName string
+	AppName      string
 	ApiPort      int
 	DatabaseName string
 	DatabaseHost string
@@ -13,7 +13,7 @@ type Config struct {
 //NewConfig retorna a configuração da aplicação
 func NewConfig() Config {
 	return Config{
-		AppName: "go-bank-transfer",
+		AppName:      "go-bank-transfer",
 		ApiPort:      3001,
 		DatabaseName: getDatabaseName(),
 		DatabaseHost: getDatabaseHost(),
