@@ -78,3 +78,13 @@ func updateAccountBalance(accountRepository repository.AccountRepository, query 
 
 	return nil
 }
+
+//FindAllTransfer retorna uma lista de transferência
+func FindAllTransfer(repository repository.TransferRepository) ([]domain.Transfer, error) {
+	result, err := repository.FindAll()
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}

@@ -91,3 +91,58 @@ func TestTransferStore(t *testing.T) {
 		})
 	}
 }
+
+func TestTransferIndex(t *testing.T) {
+	type args struct {
+		transferAction Transfer
+	}
+
+	var loggerMock, _ = test.NewNullLogger()
+
+	tests := []struct {
+		name               string
+		expectedStatusCode int
+		args               args
+	}{
+		{
+			name:               "Index handler database success",
+			expectedStatusCode: http.StatusOK,
+			args: args{
+				transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, loggerMock),
+			},
+		},
+		{
+			name:               "Index handler database error",
+			expectedStatusCode: http.StatusInternalServerError,
+			args: args{
+				transferAction: NewTransfer(database.MongoHandlerErrorMock{}, loggerMock),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := http.NewRequest(http.MethodGet, "/transfers", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var (
+				rr = httptest.NewRecorder()
+				r  = mux.NewRouter()
+			)
+
+			r.HandleFunc("/transfers", tt.args.transferAction.Index).Methods(http.MethodGet)
+			r.ServeHTTP(rr, req)
+
+			if rr.Code != tt.expectedStatusCode {
+				t.Errorf(
+					"[TestCase '%s'] O handler retornou um HTTP status code inesperado: retornado '%v' esperado '%v'",
+					tt.name,
+					rr.Code,
+					tt.expectedStatusCode,
+				)
+			}
+		})
+	}
+}

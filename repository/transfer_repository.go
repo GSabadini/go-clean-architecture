@@ -26,3 +26,14 @@ func (t Transfer) Store(transfer *domain.Transfer) error {
 
 	return t.dbHandler.Store(transfersCollectionName, &transfer)
 }
+
+//FindAll realiza uma busca no banco de dados através da implementação real do database
+func (t Transfer) FindAll() ([]domain.Transfer, error) {
+	var transfer = make([]domain.Transfer, 0)
+
+	if err := t.dbHandler.FindAll(transfersCollectionName, nil, &transfer); err != nil {
+		return []domain.Transfer{}, err
+	}
+
+	return transfer, nil
+}

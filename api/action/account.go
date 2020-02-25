@@ -58,7 +58,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.logSuccess(logKey, "success create account", http.StatusCreated)
+	a.logSuccess(logKey, "success creating account", http.StatusCreated)
 
 	Success(result, http.StatusCreated).Send(w)
 }
@@ -82,7 +82,7 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	a.logSuccess(logKey, "success return list accounts", http.StatusOK)
+	a.logSuccess(logKey, "success when returning account list", http.StatusOK)
 
 	Success(result, http.StatusOK).Send(w)
 }
