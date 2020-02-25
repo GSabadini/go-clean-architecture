@@ -10,14 +10,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//Logger armazena a estrutura de logger para entrada e saídas da API
 type Logger struct {
 	log *logrus.Logger
 }
 
+//NewLogger constrói um logger com suas dependências
 func NewLogger(log *logrus.Logger) Logger {
 	return Logger{log: log}
 }
 
+//Logging cria logs de entrada e saída da API
 func (l Logger) Logging(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	_, err := getRequestPayload(r)
 	if err != nil {
@@ -28,17 +31,17 @@ func (l Logger) Logging(w http.ResponseWriter, r *http.Request, next http.Handle
 	l.log.WithFields(logrus.Fields{
 		"key": "api_request",
 		//"payload":     body,
-		"url":         r.URL,
+		"url":         r.URL.Path,
 		"http_method": r.Method,
-	}).Info()
+	}).Info("request received by the API")
 
 	next.ServeHTTP(w, r)
 
 	l.log.WithFields(logrus.Fields{
 		"key":         "api_response",
-		"url":         r.URL,
+		"url":         r.URL.Path,
 		"http_method": r.Method,
-	}).Info()
+	}).Info("response returned from the API")
 }
 
 func getRequestPayload(r *http.Request) (string, error) {
