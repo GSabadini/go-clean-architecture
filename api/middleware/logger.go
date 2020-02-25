@@ -10,14 +10,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//Logger armazena a estrutura de logger para entrada e saídas da API
 type Logger struct {
 	log *logrus.Logger
 }
 
+//NewLogger constrói um logger com suas dependências
 func NewLogger(log *logrus.Logger) Logger {
 	return Logger{log: log}
 }
 
+//Logging cria logs de entrada e saída da API
 func (l Logger) Logging(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	_, err := getRequestPayload(r)
 	if err != nil {

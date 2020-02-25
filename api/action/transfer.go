@@ -12,16 +12,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//Transfer armazena as dependências de uma transferência
 type Transfer struct {
 	dbHandler database.NoSQLDBHandler
 	logger    *logrus.Logger
 }
 
+//NewTransfer constrói uma transferência com suas dependências
 func NewTransfer(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Transfer {
 	return Transfer{dbHandler: dbHandler, logger: log}
 }
 
-//Store é um handler para criação de account
+//Store é um handler para criação de transferência
 func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 	var transfer *domain.Transfer
@@ -56,7 +58,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 
 	t.logInfoSuccess(logKey, "success create transfer", http.StatusCreated)
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (t Transfer) logInfoSuccess(key string, description string, httpStatus int) {

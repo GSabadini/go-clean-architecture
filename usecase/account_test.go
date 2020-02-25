@@ -2,12 +2,11 @@ package usecase
 
 import (
 	"fmt"
-	"reflect"
-	"testing"
-
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/repository"
+	"reflect"
+	"testing"
 )
 
 func TestCreate(t *testing.T) {
@@ -60,7 +59,7 @@ func TestCreate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Store(tt.args.repository, tt.args.account)
+			got, err := StoreAccount(tt.args.repository, tt.args.account)
 
 			fmt.Println(got, tt.expected)
 
@@ -130,7 +129,7 @@ func TestFindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := FindAll(tt.args.repository)
+			got, err := FindAllAccount(tt.args.repository)
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 				return
@@ -152,7 +151,7 @@ func TestFindOne(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          args
-		expected      domain.Account
+		expected      *domain.Account
 		expectedError interface{}
 	}{
 		//{
@@ -172,12 +171,12 @@ func TestFindOne(t *testing.T) {
 				id:         "5e519055ba39bfc244dc4625",
 			},
 			expectedError: "Error",
-			expected:      domain.Account{},
+			expected:      &domain.Account{},
 		},
 	}
 
 	for _, tt := range tests {
-		got, err := FindOne(tt.args.repository, tt.args.id)
+		got, err := FindOneAccount(tt.args.repository, tt.args.id)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

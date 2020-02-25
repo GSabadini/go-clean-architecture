@@ -11,10 +11,10 @@ import (
 
 const accountsCollectionName = "accounts"
 
-//Account representa um repositório para dados da account
+//Account representa um repositório para dados de uma conta
 type Account DbRepository
 
-//NewAccount cria um repository com suas dependências
+//NewAccount constrói um repository com suas dependências
 func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 	return Account{dbHandler: dbHandler}
 }

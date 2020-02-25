@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+//Transfer armazena a estrutura de transferência
 type Transfer struct {
 	Id                   bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	AccountOriginId      bson.ObjectId `json:"account_origin_id" bson:"account_origin_id"`
@@ -14,14 +15,17 @@ type Transfer struct {
 	CreatedAt            time.Time     `json:"created_at" bson:"created_at"`
 }
 
-func (t *Transfer) GetAccountOrigin() bson.ObjectId {
+//GetAccountOriginId retorna o id da conta de origem
+func (t *Transfer) GetAccountOriginId() bson.ObjectId {
 	return t.AccountOriginId
 }
 
-func (t *Transfer) GetAccountDestination() bson.ObjectId {
-	return t.AccountOriginId
+//GetAccountDestinationId retorna o id da conta de destino
+func (t *Transfer) GetAccountDestinationId() bson.ObjectId {
+	return t.AccountDestinationId
 }
 
+//GetAmount retorna o valor
 func (t *Transfer) GetAmount() float64 {
 	return t.Amount
 }

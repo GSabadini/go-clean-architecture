@@ -13,16 +13,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//Account armazena as dependências de uma conta
 type Account struct {
 	dbHandler database.NoSQLDBHandler
 	logger    *logrus.Logger
 }
 
+//NewAccount constrói uma conta com suas dependências
 func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
 	return Account{dbHandler: dbHandler, logger: log}
 }
 
-//Store é um handler para criação de account
+//Store é um handler para criação de conta
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
 	var account *domain.Account
@@ -40,7 +42,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	result, err := usecase.Store(accountRepository, account)
+	result, err := usecase.StoreAccount(accountRepository, account)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -57,12 +59,12 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	Success(result, http.StatusCreated).Send(w)
 }
 
-//Index é um handler para retornar a lista de accounts
+//Index é um handler para retornar a lista de contas
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	result, err := usecase.FindAll(accountRepository)
+	result, err := usecase.FindAllAccount(accountRepository)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -83,7 +85,7 @@ type ReturnBalance struct {
 	Balance float64 `json:"balance"`
 }
 
-//ShowBalance é um handler para buscar o balance de uma account
+//ShowBalance é um handler para retornar o saldo de uma conta
 func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "show_balance"
 	var vars = mux.Vars(r)
@@ -103,7 +105,7 @@ func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	result, err := usecase.FindOne(accountRepository, accountId)
+	result, err := usecase.FindOneAccount(accountRepository, accountId)
 	if err != nil {
 		a.logError(
 			logKey,

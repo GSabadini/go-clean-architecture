@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -27,12 +28,12 @@ func StoreTransfer(
 }
 
 func transferAccountBalance(accountRepository repository.AccountRepository, transfer *domain.Transfer) error {
-	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOrigin()})
+	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginId()})
 	if err != nil {
 		return err
 	}
 
-	accountDestination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOrigin()})
+	accountDestination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountDestinationId()})
 	if err != nil {
 		return err
 	}
@@ -45,15 +46,18 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 
 	if err = updateAccount(
 		accountRepository,
-		bson.M{"_id": transfer.GetAccountOrigin()},
+		bson.M{"_id": transfer.GetAccountOriginId()},
 		bson.M{"$set": bson.M{"balance": accountOrigin.GetBalance()}},
 	); err != nil {
 		return err
 	}
 
+	fmt.Println(accountOrigin.GetBalance())
+
+	fmt.Println(accountDestination.GetBalance(), "dest")
 	if err = updateAccount(
 		accountRepository,
-		bson.M{"_id": transfer.GetAccountDestination()},
+		bson.M{"_id": transfer.GetAccountDestinationId()},
 		bson.M{"$set": bson.M{"balance": accountDestination.GetBalance()}},
 	); err != nil {
 		return err
@@ -65,7 +69,7 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 func findAccount(accountRepository repository.AccountRepository, query bson.M) (*domain.Account, error) {
 	account, err := accountRepository.FindOne(query)
 	if err != nil {
-		return account, errors.Wrap(err, "error fetching account")
+		return nil, errors.Wrap(err, "error fetching account")
 	}
 
 	return account, nil
