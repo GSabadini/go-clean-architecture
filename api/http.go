@@ -26,6 +26,7 @@ func NewHTTPServer(config config.Config) HTTPServer {
 	return HTTPServer{
 		appConfig:          config,
 		databaseConnection: createDatabaseConnection(config),
+		log:                createLoggerApp(config),
 	}
 }
 
@@ -36,12 +37,6 @@ func (s HTTPServer) Listen() {
 		negroniHandler = negroni.New()
 		address        = fmt.Sprintf(":%d", s.appConfig.ApiPort)
 	)
-
-	//@TODO REVER START DO LOGGER
-	log := logrus.StandardLogger()
-	log.SetLevel(logrus.DebugLevel)
-
-	s.log = log
 
 	s.setAppHandlers(router)
 	negroniHandler.UseHandler(router)
@@ -132,4 +127,16 @@ func createDatabaseConnection(config config.Config) *database.MongoHandler {
 	logrus.Infoln("Successfully connected to the database")
 
 	return handler
+}
+
+func createLoggerApp(config config.Config) *logrus.Logger {
+	log := logrus.New()
+	log.SetFormatter(&logrus.JSONFormatter{})
+
+	//standardFields := logrus.Fields{
+	//	"app": config.AppName,
+	//}
+	//log.SetLevel(logrus.DebugLevel)
+
+	return log
 }

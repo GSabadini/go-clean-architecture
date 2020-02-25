@@ -31,17 +31,17 @@ func (l Logger) Logging(w http.ResponseWriter, r *http.Request, next http.Handle
 	l.log.WithFields(logrus.Fields{
 		"key": "api_request",
 		//"payload":     body,
-		"url":         r.URL,
+		"url":         r.URL.Path,
 		"http_method": r.Method,
-	}).Info()
+	}).Info("request received by the API")
 
 	next.ServeHTTP(w, r)
 
 	l.log.WithFields(logrus.Fields{
 		"key":         "api_response",
-		"url":         r.URL,
+		"url":         r.URL.Path,
 		"http_method": r.Method,
-	}).Info()
+	}).Info("response returned from the API")
 }
 
 func getRequestPayload(r *http.Request) (string, error) {

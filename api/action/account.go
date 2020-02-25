@@ -135,19 +135,17 @@ func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 	Success(resultBalance, http.StatusOK).Send(w)
 }
 
-func (a Account) logSuccess(key string, description string, httpStatus int) {
+func (a Account) logSuccess(key string, message string, httpStatus int) {
 	a.logger.WithFields(logrus.Fields{
 		"key":         key,
 		"http_status": httpStatus,
-		"description": description,
-	}).Info()
+	}).Info(message)
 }
 
-func (a Account) logError(key string, description string, httpStatus int, err error) {
+func (a Account) logError(key string, message string, httpStatus int, err error) {
 	a.logger.WithFields(logrus.Fields{
 		"key":         key,
 		"http_status": httpStatus,
-		"description": description,
 		"error":       err.Error(),
-	}).Error()
+	}).Error(message)
 }

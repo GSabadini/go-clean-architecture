@@ -9,7 +9,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/test"
 )
 
 //TODO REVER TESTES
@@ -19,37 +19,17 @@ func TestTransferStore(t *testing.T) {
 		rawPayload     []byte
 	}
 
+	var loggerMock, _ = test.NewNullLogger()
+
 	tests := []struct {
 		name               string
 		expectedStatusCode int
 		args               args
 	}{
-		//{
-		//	name: "Store handler success",
-		//	args: args{
-		//		transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
-		//		rawPayload: []byte(
-		//			`{
-		//				"account_destination_id": "5e551c2c5bb0cb0107b058e1",
-		//				"account_origin_id": "5e551c315bb0cb0107b058e2",
-		//				"amount": 10
-		//			}`,
-		//		),
-		//	},
-		//	expectedStatusCode: http.StatusNoContent,
-		//},
 		{
-			name: "Store handler invalid ObjectID",
+			name: "Store handler success",
 			args: args{
-				transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
-				rawPayload:     []byte(`{"account_destination_id": "test","account_origin_id": "test", "amount": 10 }`),
-			},
-			expectedStatusCode: http.StatusBadRequest,
-		},
-		{
-			name: "Store handler database error",
-			args: args{
-				transferAction: NewTransfer(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
+				transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, loggerMock),
 				rawPayload: []byte(
 					`{
 						"account_destination_id": "5e551c2c5bb0cb0107b058e1",
@@ -58,8 +38,30 @@ func TestTransferStore(t *testing.T) {
 					}`,
 				),
 			},
-			expectedStatusCode: http.StatusInternalServerError,
+			expectedStatusCode: http.StatusNoContent,
 		},
+		//{
+		//	name: "Store handler invalid ObjectID",
+		//	args: args{
+		//		transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, loggerMock),
+		//		rawPayload:     []byte(`{"account_destination_id": "test","account_origin_id": "test", "amount": 10 }`),
+		//	},
+		//	expectedStatusCode: http.StatusBadRequest,
+		//},
+		//{
+		//	name: "Store handler database error",
+		//	args: args{
+		//		transferAction: NewTransfer(database.MongoHandlerErrorMock{}, loggerMock),
+		//		rawPayload: []byte(
+		//			`{
+		//				"account_destination_id": "5e551c2c5bb0cb0107b058e1",
+		//				"account_origin_id": "5e551c315bb0cb0107b058e2",
+		//				"amount": 10
+		//			}`,
+		//		),
+		//	},
+		//	expectedStatusCode: http.StatusInternalServerError,
+		//},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

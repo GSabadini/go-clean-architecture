@@ -4,6 +4,7 @@ import "os"
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
+	AppName string
 	ApiPort      int
 	DatabaseName string
 	DatabaseHost string
@@ -12,6 +13,7 @@ type Config struct {
 //NewConfig retorna a configuração da aplicação
 func NewConfig() Config {
 	return Config{
+		AppName: "go-bank-transfer",
 		ApiPort:      3001,
 		DatabaseName: getDatabaseName(),
 		DatabaseHost: getDatabaseHost(),
@@ -19,16 +21,16 @@ func NewConfig() Config {
 }
 
 func getDatabaseHost() string {
-	if uri := os.Getenv("MONGODB_HOST"); uri != "" {
-		return uri
+	if host := os.Getenv("MONGODB_HOST"); host != "" {
+		return host
 	}
 
 	panic("Environment variable 'MONGODB_HOST' has not been defined")
 }
 
 func getDatabaseName() string {
-	if uri := os.Getenv("MONGODB_DATABASE"); uri != "" {
-		return uri
+	if name := os.Getenv("MONGODB_DATABASE"); name != "" {
+		return name
 	}
 
 	panic("Environment variable 'MONGODB_DATABASE' has not been defined")
