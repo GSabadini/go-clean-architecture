@@ -9,14 +9,17 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/test"
 )
 
+//@TODO REVER TESTES
 func TestAccountStore(t *testing.T) {
 	type args struct {
 		accountAction Account
 		rawPayload    []byte
 	}
+
+	var loggerMock, _ = test.NewNullLogger()
 
 	tests := []struct {
 		name               string
@@ -24,19 +27,27 @@ func TestAccountStore(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Store handler success",
+			name:               "Store handler database success",
 			expectedStatusCode: http.StatusCreated,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
-				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "ballance": 10 }`),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
+				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": 10 }`),
 			},
 		},
 		{
 			name:               "Store handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
-				rawPayload:    []byte(``),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
+				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": 10 }`),
+			},
+		},
+		{
+			name:               "Store handler invalid JSON",
+			expectedStatusCode: http.StatusBadRequest,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
+				rawPayload:    []byte(`{"name": }`),
 			},
 		},
 	}
@@ -75,23 +86,25 @@ func TestAccountIndex(t *testing.T) {
 		accountAction Account
 	}
 
+	var loggerMock, _ = test.NewNullLogger()
+
 	tests := []struct {
 		name               string
 		expectedStatusCode int
 		args               args
 	}{
 		{
-			name:               "Index handler success",
+			name:               "Index handler database success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
 			},
 		},
 		{
-			name:               "Index handler error",
+			name:               "Index handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
 			},
 		},
 	}
@@ -123,10 +136,12 @@ func TestAccountIndex(t *testing.T) {
 	}
 }
 
-func TestAccountShow(t *testing.T) {
+func TestAccountShowBalance(t *testing.T) {
 	type args struct {
 		accountAction Account
 	}
+
+	var loggerMock, _ = test.NewNullLogger()
 
 	tests := []struct {
 		name               string
@@ -134,24 +149,24 @@ func TestAccountShow(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Show handler success",
+			name:               "ShowBalance handler database success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, logrus.StandardLogger()),
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
 			},
 		},
 		{
-			name:               "Show handler error",
+			name:               "ShowBalance handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}, logrus.StandardLogger()),
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req, err := http.NewRequest(http.MethodGet, "/accounts/5e5282beba39bfc244dc4c4b/ballance", nil)
+			req, err := http.NewRequest(http.MethodGet, "/accounts/5e5282beba39bfc244dc4c4b/balance", nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -163,7 +178,7 @@ func TestAccountShow(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts/{account_id}/ballance", tt.args.accountAction.ShowBallance).Methods(http.MethodGet)
+			r.HandleFunc("/accounts/{account_id}/balance", tt.args.accountAction.ShowBalance).Methods(http.MethodGet)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {

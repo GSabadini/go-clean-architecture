@@ -12,9 +12,15 @@ type DbRepository struct {
 	dbHandler database.NoSQLDBHandler
 }
 
-//AccountRepository expõe os métodos disponíveis para as abstrações de banco
+//AccountRepository expõe os métodos disponíveis para as abstrações de repository
 type AccountRepository interface {
 	Store(*domain.Account) (*domain.Account, error)
+	Update(bson.M, bson.M) error
 	FindAll() ([]domain.Account, error)
-	FindOne(bson.M) (domain.Account, error)
+	FindOne(bson.M) (*domain.Account, error)
+}
+
+//TransferRepository expõe os métodos disponíveis para as abstrações de repository
+type TransferRepository interface {
+	Store(*domain.Transfer) error
 }

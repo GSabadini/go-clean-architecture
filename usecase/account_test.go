@@ -31,14 +31,14 @@ func TestCreate(t *testing.T) {
 		//		account: domain.Account{
 		//			Name:      "Test",
 		//			Cpf:       "44451598087",
-		//			Ballance:  10.12,
+		//			Balance:  10.12,
 		//			CreatedAt: timeNow,
 		//		},
 		//	},
 		//	expected: domain.Account{
 		//		Name:      "Test",
 		//		Cpf:       "44451598087",
-		//		Ballance:  10.12,
+		//		Balance:  10.12,
 		//		CreatedAt: timeNow,
 		//	},
 		//},
@@ -49,7 +49,7 @@ func TestCreate(t *testing.T) {
 		//		account: &domain.Account{
 		//			Name:      "Test",
 		//			Cpf:       "44451598087",
-		//			Ballance:  0,
+		//			Balance:  0,
 		//			CreatedAt: time.Now(),
 		//		},
 		//	},
@@ -60,7 +60,7 @@ func TestCreate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Store(tt.args.repository, tt.args.account)
+			got, err := StoreAccount(tt.args.repository, tt.args.account)
 
 			fmt.Println(got, tt.expected)
 
@@ -98,14 +98,14 @@ func TestFindAll(t *testing.T) {
 		//			Id:        "0",
 		//			Name:      "Test-0",
 		//			Cpf:       "",
-		//			Ballance:  0,
+		//			Balance:  0,
 		//			CreatedAt: timeNow,
 		//		},
 		//		{
 		//			Id:        "1",
 		//			Name:      "Test-1",
 		//			Cpf:       "",
-		//			Ballance:  120,
+		//			Balance:  120,
 		//			CreatedAt: timeNow,
 		//		},
 		//	},
@@ -130,7 +130,7 @@ func TestFindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := FindAll(tt.args.repository)
+			got, err := FindAllAccount(tt.args.repository)
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 				return
@@ -152,32 +152,32 @@ func TestFindOne(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          args
-		expected      domain.Account
+		expected      *domain.Account
 		expectedError interface{}
 	}{
 		//{
-		//	name: "Success return ballance account",
+		//	name: "Success return balance account",
 		//	args: args{
 		//		repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
 		//		id:         "5e519055ba39bfc244dc4625",
 		//	},
 		//	expected: domain.Account{
-		//		Ballance: 100.00,
+		//		Balance: 100.00,
 		//	},
 		//},
 		{
-			name: "Error return ballance account",
+			name: "Error return balance account",
 			args: args{
 				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
 				id:         "5e519055ba39bfc244dc4625",
 			},
 			expectedError: "Error",
-			expected:      domain.Account{},
+			expected:      &domain.Account{},
 		},
 	}
 
 	for _, tt := range tests {
-		got, err := FindOne(tt.args.repository, tt.args.id)
+		got, err := FindOneAccount(tt.args.repository, tt.args.id)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

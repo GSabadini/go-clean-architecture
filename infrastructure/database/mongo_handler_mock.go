@@ -16,7 +16,12 @@ func (m MongoHandlerSuccessMock) FindAll(_ string, _ interface{}, _ interface{})
 }
 
 //FindOne
-func (m MongoHandlerSuccessMock) FindOne(string, interface{}, interface{}) error {
+func (m MongoHandlerSuccessMock) FindOne(_ string, _ interface{}, _ interface{}) error {
+	return nil
+}
+
+//Update
+func (m MongoHandlerSuccessMock) Update(_ string, _ interface{}, _ interface{}) error {
 	return nil
 }
 
@@ -34,6 +39,11 @@ func (m MongoHandlerErrorMock) FindAll(_ string, _ interface{}, _ interface{}) e
 }
 
 //FindOne
-func (m MongoHandlerErrorMock) FindOne(string, interface{}, interface{}) error {
+func (m MongoHandlerErrorMock) FindOne(_ string, _ interface{}, _ interface{}) error {
+	return errors.New("Error")
+}
+
+//Update
+func (m MongoHandlerErrorMock) Update(_ string, _ interface{}, _ interface{}) error {
 	return errors.New("Error")
 }
