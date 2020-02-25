@@ -53,7 +53,7 @@ func (s HTTPServer) setAppHandlers(router *mux.Router) {
 	api.Handle("/transfers", s.buildActionStoreTransfer()).Methods(http.MethodPost)
 	api.Handle("/transfers", s.buildActionIndexTransfer()).Methods(http.MethodGet)
 
-	api.Handle("/accounts/{account_id}/balance", s.buildActionShowBalanceAccount()).Methods(http.MethodGet)
+	api.Handle("/accounts/{account_id}/balance", s.buildActionFindBalanceAccount()).Methods(http.MethodGet)
 	api.Handle("/accounts", s.buildActionStoreAccount()).Methods(http.MethodPost)
 	api.Handle("/accounts", s.buildActionIndexAccount()).Methods(http.MethodGet)
 
@@ -116,11 +116,11 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	)
 }
 
-func (s HTTPServer) buildActionShowBalanceAccount() *negroni.Negroni {
+func (s HTTPServer) buildActionFindBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var accountAction = action.NewAccount(s.databaseConnection, s.log)
 
-		accountAction.ShowBalance(res, req)
+		accountAction.FindBalance(res, req)
 	}
 
 	return negroni.New(

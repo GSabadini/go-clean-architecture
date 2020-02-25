@@ -87,15 +87,11 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	Success(result, http.StatusOK).Send(w)
 }
 
-type ResultBalance struct {
-	Balance float64 `json:"balance"`
-}
-
 //TODO REVER QUANDO MANDAR UM ID INVÁLIDO
 //TODO RETORNAR ERRO CORRETO QUANDO NÃO ENCONTRAR A CONTA
-//ShowBalance é um handler para retornar o saldo de uma conta
-func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
-	const logKey = "show_balance"
+//FindBalance é um handler para retornar o saldo de uma conta
+func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
+	const logKey = "find_balance"
 
 	var vars = mux.Vars(r)
 
@@ -115,7 +111,7 @@ func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	result, err := usecase.FindOneAccount(accountRepository, accountId)
+	result, err := usecase.FindBalanceAccount(accountRepository, accountId)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -128,11 +124,9 @@ func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultBalance := ResultBalance{Balance: result.Balance}
-
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)
 
-	Success(resultBalance, http.StatusOK).Send(w)
+	Success(result, http.StatusOK).Send(w)
 }
 
 func (a Account) logSuccess(key string, message string, httpStatus int) {

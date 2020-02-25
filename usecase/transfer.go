@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-//StoreTransfer cria uma nova transação
+//StoreTransfer cria uma nova transferência
 func StoreTransfer(
 	transferRepository repository.TransferRepository,
 	accountRepository repository.AccountRepository,
@@ -79,7 +79,7 @@ func updateAccountBalance(accountRepository repository.AccountRepository, query 
 	return nil
 }
 
-//FindAllTransfer retorna uma lista de transferência
+//FindAllTransfer retorna uma lista de transferências
 func FindAllTransfer(repository repository.TransferRepository) ([]domain.Transfer, error) {
 	result, err := repository.FindAll()
 	if err != nil {
