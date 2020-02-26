@@ -33,6 +33,11 @@ func (m MongoHandlerErrorMock) Store(_ string, _ interface{}) error {
 	return errors.New("Error")
 }
 
+//Update
+func (m MongoHandlerErrorMock) Update(_ string, _ interface{}, _ interface{}) error {
+	return errors.New("Error")
+}
+
 //FindAll
 func (m MongoHandlerErrorMock) FindAll(_ string, _ interface{}, _ interface{}) error {
 	return errors.New("Error")
@@ -40,10 +45,5 @@ func (m MongoHandlerErrorMock) FindAll(_ string, _ interface{}, _ interface{}) e
 
 //FindOne
 func (m MongoHandlerErrorMock) FindOne(_ string, _ interface{}, _ interface{}) error {
-	return errors.New("Error")
-}
-
-//Update
-func (m MongoHandlerErrorMock) Update(_ string, _ interface{}, _ interface{}) error {
 	return errors.New("Error")
 }

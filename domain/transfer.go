@@ -8,7 +8,7 @@ import (
 
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
-	ID                   bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	ID                   bson.ObjectId `json:"id" bson:"_id"`
 	AccountOriginID      bson.ObjectId `json:"account_origin_id" bson:"account_origin_id"`
 	AccountDestinationID bson.ObjectId `json:"account_destination_id" bson:"account_destination_id"`
 	Amount               float64       `json:"amount" bson:"amount"`

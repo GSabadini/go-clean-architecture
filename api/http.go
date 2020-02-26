@@ -51,8 +51,9 @@ func (s HTTPServer) setAppHandlers(router *mux.Router) {
 	api := router.PathPrefix("/api").Subrouter()
 
 	api.Handle("/transfers", s.buildActionStoreTransfer()).Methods(http.MethodPost)
+	api.Handle("/transfers", s.buildActionIndexTransfer()).Methods(http.MethodGet)
 
-	api.Handle("/accounts/{account_id}/balance", s.buildActionShowBalanceAccount()).Methods(http.MethodGet)
+	api.Handle("/accounts/{account_id}/balance", s.buildActionFindBalanceAccount()).Methods(http.MethodGet)
 	api.Handle("/accounts", s.buildActionStoreAccount()).Methods(http.MethodPost)
 	api.Handle("/accounts", s.buildActionIndexAccount()).Methods(http.MethodGet)
 
@@ -61,9 +62,23 @@ func (s HTTPServer) setAppHandlers(router *mux.Router) {
 
 func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
-		var accountAction = action.NewTransfer(s.databaseConnection, s.log)
+		var transferAction = action.NewTransfer(s.databaseConnection, s.log)
 
-		accountAction.Store(res, req)
+		transferAction.Store(res, req)
+	}
+
+	return negroni.New(
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
+		negroni.NewRecovery(),
+		negroni.Wrap(handler),
+	)
+}
+
+func (s HTTPServer) buildActionIndexTransfer() *negroni.Negroni {
+	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
+		var transferAction = action.NewTransfer(s.databaseConnection, s.log)
+
+		transferAction.Index(res, req)
 	}
 
 	return negroni.New(
@@ -101,11 +116,11 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	)
 }
 
-func (s HTTPServer) buildActionShowBalanceAccount() *negroni.Negroni {
+func (s HTTPServer) buildActionFindBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var accountAction = action.NewAccount(s.databaseConnection, s.log)
 
-		accountAction.ShowBalance(res, req)
+		accountAction.FindBalance(res, req)
 	}
 
 	return negroni.New(

@@ -143,7 +143,7 @@ func TestFindAll(t *testing.T) {
 	}
 }
 
-func TestFindOne(t *testing.T) {
+func TestFindBalanceAccount(t *testing.T) {
 	type args struct {
 		repository repository.AccountRepository
 		id         string
@@ -152,7 +152,7 @@ func TestFindOne(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          args
-		expected      *domain.Account
+		expected      *AccountBalance
 		expectedError interface{}
 	}{
 		//{
@@ -172,12 +172,12 @@ func TestFindOne(t *testing.T) {
 				id:         "5e519055ba39bfc244dc4625",
 			},
 			expectedError: "Error",
-			expected:      &domain.Account{},
+			expected:      &AccountBalance{},
 		},
 	}
 
 	for _, tt := range tests {
-		got, err := FindOneAccount(tt.args.repository, tt.args.id)
+		got, err := FindBalanceAccount(tt.args.repository, tt.args.id)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

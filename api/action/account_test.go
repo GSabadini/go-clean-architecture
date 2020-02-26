@@ -149,14 +149,14 @@ func TestAccountShowBalance(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "ShowBalance handler database success",
+			name:               "FindBalance handler database success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
 			},
 		},
 		{
-			name:               "ShowBalance handler database error",
+			name:               "FindBalance handler database error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
@@ -178,7 +178,7 @@ func TestAccountShowBalance(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts/{account_id}/balance", tt.args.accountAction.ShowBalance).Methods(http.MethodGet)
+			r.HandleFunc("/accounts/{account_id}/balance", tt.args.accountAction.FindBalance).Methods(http.MethodGet)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
