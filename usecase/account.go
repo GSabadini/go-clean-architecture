@@ -27,15 +27,15 @@ func FindAllAccount(repository repository.AccountRepository) ([]domain.Account, 
 	return result, nil
 }
 
-type accountBalance struct {
+type AccountBalance struct {
 	Balance float64 `json:"balance"`
 }
 
 //FindBalanceAccount retorna o saldo de uma conta
-func FindBalanceAccount(repository repository.AccountRepository, id string) (*accountBalance, error) {
+func FindBalanceAccount(repository repository.AccountRepository, id string) (*AccountBalance, error) {
 	var (
-		query = bson.M{"_id": bson.ObjectIdHex(id)}
-		accountBalance = &accountBalance{}
+		query          = bson.M{"_id": bson.ObjectIdHex(id)}
+		accountBalance = &AccountBalance{}
 	)
 
 	result, err := repository.FindOne(query)
