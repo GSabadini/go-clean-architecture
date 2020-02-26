@@ -64,6 +64,30 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+//Index é um handler para retornar a lista de transferências
+func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
+	const logKey = "index_transfer"
+
+	var transferRepository = repository.NewTransfer(t.dbHandler)
+
+	result, err := usecase.FindAllTransfer(transferRepository)
+	if err != nil {
+		t.logError(
+			logKey,
+			"error when returning the transfer list",
+			http.StatusInternalServerError,
+			err,
+		)
+
+		ErrorMessage(err, http.StatusInternalServerError).Send(w)
+		return
+	}
+
+	t.logSuccess(logKey, "success when returning transfer list", http.StatusOK)
+
+	Success(result, http.StatusOK).Send(w)
+}
+
 func (t Transfer) logSuccess(key string, description string, httpStatus int) {
 	t.logger.WithFields(logrus.Fields{
 		"key":         key,

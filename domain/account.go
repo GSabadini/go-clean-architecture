@@ -9,7 +9,7 @@ import (
 
 //Account armazena a estrutura de uma conta
 type Account struct {
-	ID        bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	ID        bson.ObjectId `json:"id" bson:"_id"`
 	Name      string        `json:"name" bson:"name"`
 	CPF       string        `json:"cpf" bson:"cpf"`
 	Balance   float64       `json:"balance" bson:"balance"`

@@ -2,7 +2,10 @@ package action
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
@@ -27,7 +30,6 @@ func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
 //Store é um handler para criação de conta
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
-
 	var account *domain.Account
 
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
@@ -58,7 +60,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.logSuccess(logKey, "success create account", http.StatusCreated)
+	a.logSuccess(logKey, "success creating account", http.StatusCreated)
 
 	Success(result, http.StatusCreated).Send(w)
 }
@@ -66,7 +68,6 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 //Index é um handler para retornar a lista de contas
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
-
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
 	result, err := usecase.FindAllAccount(accountRepository)
@@ -82,40 +83,35 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	a.logSuccess(logKey, "success return list accounts", http.StatusOK)
+	a.logSuccess(logKey, "success when returning account list", http.StatusOK)
 
 	Success(result, http.StatusOK).Send(w)
 }
 
-type ResultBalance struct {
-	Balance float64 `json:"balance"`
-}
-
-//TODO REVER QUANDO MANDAR UM ID INVÁLIDO
 //TODO RETORNAR ERRO CORRETO QUANDO NÃO ENCONTRAR A CONTA
-//ShowBalance é um handler para retornar o saldo de uma conta
-func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
-	const logKey = "show_balance"
-
+//FindBalance é um handler para retornar o saldo de uma conta
+func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
+	const logKey = "find_balance"
 	var vars = mux.Vars(r)
 
 	accountId, ok := vars["account_id"]
-	if !ok {
+	if !ok || !bson.IsObjectIdHex(accountId) {
+		var err = errors.New("Parameter invalid")
+
 		a.logError(
 			logKey,
-			"not parameter",
+			"parameter invalid",
 			http.StatusNotFound,
-			nil,
+			err,
 		)
 
-		//ErrorMessage(err, http.StatusInternalServerError).Send(w)
-		ErrNotFound.Send(w)
+		ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	result, err := usecase.FindOneAccount(accountRepository, accountId)
+	result, err := usecase.FindBalanceAccount(accountRepository, accountId)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -128,11 +124,9 @@ func (a Account) ShowBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultBalance := ResultBalance{Balance: result.Balance}
-
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)
 
-	Success(resultBalance, http.StatusOK).Send(w)
+	Success(result, http.StatusOK).Send(w)
 }
 
 func (a Account) logSuccess(key string, message string, httpStatus int) {
