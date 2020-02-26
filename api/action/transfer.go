@@ -46,7 +46,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 		accountRepository  = repository.NewAccount(t.dbHandler)
 	)
 
-	err := usecase.StoreTransfer(transferRepository, accountRepository, transfer)
+	result, err := usecase.StoreTransfer(transferRepository, accountRepository, transfer)
 	if err != nil {
 		t.logError(
 			logKey,
@@ -59,9 +59,9 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t.logSuccess(logKey, "success create transfer", http.StatusNoContent)
+	t.logSuccess(logKey, "success create transfer", http.StatusCreated)
 
-	w.WriteHeader(http.StatusNoContent)
+	Success(result, http.StatusCreated).Send(w)
 }
 
 //Index é um handler para retornar a lista de transferências

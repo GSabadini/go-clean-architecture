@@ -21,7 +21,8 @@ func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 
 //Store realiza uma inserção no banco de dados através da implementação real do database
 func (a Account) Store(account *domain.Account) (*domain.Account, error) {
-	account.CreatedAt = time.Now()
+	t := time.Now()
+	account.CreatedAt = &t
 	account.ID = bson.NewObjectId()
 
 	if err := a.dbHandler.Store(accountsCollectionName, &account); err != nil {

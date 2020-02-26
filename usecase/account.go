@@ -11,7 +11,7 @@ import (
 func StoreAccount(repository repository.AccountRepository, account *domain.Account) (*domain.Account, error) {
 	result, err := repository.Store(account)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
 
 	return result, nil

@@ -22,6 +22,6 @@ type AccountRepository interface {
 
 //TransferRepository expõe os métodos disponíveis para as abstrações de repository
 type TransferRepository interface {
-	Store(*domain.Transfer) error
+	Store(*domain.Transfer) (*domain.Transfer, error)
 	FindAll() ([]domain.Transfer, error)
 }
