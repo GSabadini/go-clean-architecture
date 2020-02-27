@@ -20,13 +20,13 @@ func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 }
 
 //Store realiza uma inserção no banco de dados através da implementação real do database
-func (a Account) Store(account *domain.Account) (*domain.Account, error) {
+func (a Account) Store(account domain.Account) (domain.Account, error) {
 	t := time.Now()
 	account.CreatedAt = &t
 	account.ID = bson.NewObjectId()
 
 	if err := a.dbHandler.Store(accountsCollectionName, &account); err != nil {
-		return nil, err
+		return domain.Account{}, err
 	}
 
 	return account, nil
@@ -55,6 +55,35 @@ func (a Account) FindOne(query bson.M, selector interface{}) (*domain.Account, e
 	if err := a.dbHandler.FindOne(accountsCollectionName, query, selector, &account); err != nil {
 		return &domain.Account{}, err
 	}
+
+	return account, nil
+}
+
+type AccountRepositoryMock struct{}
+
+func (a AccountRepositoryMock) Store(account domain.Account) (domain.Account, error) {
+	return domain.Account{
+		ID:        "1",
+		Name:      "1",
+		CPF:       "1",
+		Balance:   100,
+		CreatedAt: nil,
+	}, nil
+}
+
+func (a AccountRepositoryMock) Update(query bson.M, update bson.M) error {
+	return nil
+}
+
+func (a AccountRepositoryMock) FindAll() ([]domain.Account, error) {
+	var account = make([]domain.Account, 0)
+
+	return account, nil
+}
+
+//FindOne realiza uma busca no banco de dados através da implementação real do database
+func (a AccountRepositoryMock) FindOne(query bson.M, selector interface{}) (*domain.Account, error) {
+	var account = &domain.Account{}
 
 	return account, nil
 }

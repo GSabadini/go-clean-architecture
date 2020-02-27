@@ -12,36 +12,29 @@ import (
 
 func TestCreate(t *testing.T) {
 	type args struct {
-		repository repository.Account
-		account    *domain.Account
+		repository repository.AccountRepository
+		account    domain.Account
 	}
-
-	//var timeNow = time.Now()
 
 	tests := []struct {
 		name          string
 		args          args
-		expected      interface{}
+		expected      domain.Account
 		expectedError interface{}
 	}{
-		//{
-		//	name: "Create account successful",
-		//	args: args{
-		//		repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
-		//		account: domain.Account{
-		//			Name:      "Test",
-		//			Cpf:       "44451598087",
-		//			Balance:  10.12,
-		//			CreatedAt: timeNow,
-		//		},
-		//	},
-		//	expected: domain.Account{
-		//		Name:      "Test",
-		//		Cpf:       "44451598087",
-		//		Balance:  10.12,
-		//		CreatedAt: timeNow,
-		//	},
-		//},
+		{
+			name: "Create account successful",
+			args: args{
+				repository: repository.AccountRepositoryMock{},
+			},
+			expected: domain.Account{
+				ID:        "1",
+				Name:      "1",
+				CPF:       "1",
+				Balance:   100,
+				CreatedAt: nil,
+			},
+		},
 		//{
 		//	name: "Create account error",
 		//	args: args{

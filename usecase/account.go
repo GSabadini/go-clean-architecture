@@ -8,10 +8,10 @@ import (
 )
 
 //StoreAccount cria uma nova conta
-func StoreAccount(repository repository.AccountRepository, account *domain.Account) (*domain.Account, error) {
+func StoreAccount(repository repository.AccountRepository, account domain.Account) (domain.Account, error) {
 	result, err := repository.Store(account)
 	if err != nil {
-		return nil, err
+		return domain.Account{}, err
 	}
 
 	return result, nil
