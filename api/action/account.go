@@ -3,8 +3,9 @@ package action
 import (
 	"encoding/json"
 	"errors"
-	"gopkg.in/mgo.v2/bson"
 	"net/http"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
@@ -40,6 +41,11 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		)
 
 		//ErrInvalidJson.Send(w)
+		ErrorMessage(err, http.StatusBadRequest).Send(w)
+		return
+	}
+
+	if err := account.ValidateBalance(); err != nil {
 		ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
@@ -110,7 +116,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	_, err := usecase.FindBalanceAccount(accountRepository, accountId)
+	result, err := usecase.FindBalanceAccount(accountRepository, accountId)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -123,13 +129,9 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ar := domain.Account{
-		Balance: 100,
-	}
-
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)
 
-	Success(ar, http.StatusOK).Send(w)
+	Success(result, http.StatusOK).Send(w)
 }
 
 func (a Account) logSuccess(key string, message string, httpStatus int) {

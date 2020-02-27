@@ -1,11 +1,16 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"github.com/sirupsen/logrus"
+)
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
 	AppName      string
 	ApiPort      int
+	Logger       *logrus.Logger
 	DatabaseName string
 	DatabaseHost string
 }
@@ -15,9 +20,17 @@ func NewConfig() Config {
 	return Config{
 		AppName:      "go-bank-transfer",
 		ApiPort:      3001,
+		Logger:       createLoggerApp(),
 		DatabaseName: getDatabaseName(),
 		DatabaseHost: getDatabaseHost(),
 	}
+}
+
+//TODO REVER LOCAL DE CRIAÇÃO DO LOGGER
+func createLoggerApp() *logrus.Logger {
+	log := logrus.New()
+	log.SetFormatter(&logrus.JSONFormatter{})
+	return log
 }
 
 func getDatabaseHost() string {

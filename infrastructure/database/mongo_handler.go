@@ -49,9 +49,9 @@ func (mgo MongoHandler) FindAll(collection string, query interface{}, result int
 }
 
 //FindOne realiza uma busca específica no banco de dados
-func (mgo MongoHandler) FindOne(collection string, query interface{}, result interface{}) error {
+func (mgo MongoHandler) FindOne(collection string, query interface{}, selector interface{}, result interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
 
-	return mgo.Database.C(collection).With(session).Find(query).One(result)
+	return mgo.Database.C(collection).With(session).Find(query).Select(selector).One(result)
 }

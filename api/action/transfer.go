@@ -41,6 +41,12 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//TODO rever aonde é ideal chamar essa validação
+	if err := transfer.ValidateAmount(); err != nil {
+		ErrorMessage(err, http.StatusBadRequest).Send(w)
+		return
+	}
+
 	var (
 		transferRepository = repository.NewTransfer(t.dbHandler)
 		accountRepository  = repository.NewAccount(t.dbHandler)

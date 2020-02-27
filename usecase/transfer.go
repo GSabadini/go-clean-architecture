@@ -64,7 +64,7 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 }
 
 func findAccount(accountRepository repository.AccountRepository, query bson.M) (*domain.Account, error) {
-	account, err := accountRepository.FindOne(query)
+	account, err := accountRepository.FindOne(query, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching account")
 	}

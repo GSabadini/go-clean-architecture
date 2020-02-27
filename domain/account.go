@@ -16,6 +16,15 @@ type Account struct {
 	CreatedAt *time.Time    `json:"created_at,omitempty" bson:"created_at"`
 }
 
+//ValidateBalance verifica se o saldo é valido
+func (a *Account) ValidateBalance() error {
+	if a.Balance < 0 {
+		return errors.New("balance invalid")
+	}
+
+	return nil
+}
+
 //GetBalance retorna o saldo
 func (a *Account) GetBalance() float64 {
 	return a.Balance

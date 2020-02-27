@@ -152,7 +152,7 @@ func TestFindBalanceAccount(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          args
-		expected      *AccountBalance
+		expected      *domain.Account
 		expectedError interface{}
 	}{
 		//{
@@ -172,7 +172,7 @@ func TestFindBalanceAccount(t *testing.T) {
 				id:         "5e519055ba39bfc244dc4625",
 			},
 			expectedError: "Error",
-			expected:      &AccountBalance{},
+			expected:      &domain.Account{},
 		},
 	}
 
