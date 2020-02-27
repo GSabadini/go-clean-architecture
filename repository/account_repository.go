@@ -21,7 +21,8 @@ func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 
 //Store realiza uma inserção no banco de dados através da implementação real do database
 func (a Account) Store(account *domain.Account) (*domain.Account, error) {
-	account.CreatedAt = time.Now()
+	t := time.Now()
+	account.CreatedAt = &t
 	account.ID = bson.NewObjectId()
 
 	if err := a.dbHandler.Store(accountsCollectionName, &account); err != nil {
@@ -48,10 +49,10 @@ func (a Account) FindAll() ([]domain.Account, error) {
 }
 
 //FindOne realiza uma busca no banco de dados através da implementação real do database
-func (a Account) FindOne(query bson.M) (*domain.Account, error) {
+func (a Account) FindOne(query bson.M, selector interface{}) (*domain.Account, error) {
 	var account = &domain.Account{}
 
-	if err := a.dbHandler.FindOne(accountsCollectionName, query, &account); err != nil {
+	if err := a.dbHandler.FindOne(accountsCollectionName, query, selector, &account); err != nil {
 		return &domain.Account{}, err
 	}
 

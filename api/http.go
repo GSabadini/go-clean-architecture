@@ -26,7 +26,7 @@ func NewHTTPServer(config config.Config) HTTPServer {
 	return HTTPServer{
 		appConfig:          config,
 		databaseConnection: createDatabaseConnection(config),
-		log:                createLoggerApp(config),
+		log:                config.Logger,
 	}
 }
 
@@ -48,6 +48,7 @@ func (s HTTPServer) Listen() {
 }
 
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
+	//@TODO REVER PREFIXO
 	api := router.PathPrefix("/api").Subrouter()
 
 	api.Handle("/transfers", s.buildActionStoreTransfer()).Methods(http.MethodPost)
@@ -130,28 +131,16 @@ func (s HTTPServer) buildActionFindBalanceAccount() *negroni.Negroni {
 	)
 }
 
-func createDatabaseConnection(config config.Config) *database.MongoHandler {
-	handler, err := database.NewMongoHandler(config.DatabaseHost, config.DatabaseName)
+func createDatabaseConnection(c config.Config) *database.MongoHandler {
+	handler, err := database.NewMongoHandler(c.DatabaseHost, c.DatabaseName)
 	if err != nil {
-		logrus.Infoln("Could not make a connection to the database")
+		c.Logger.Infoln("Could not make a connection to the database")
 
 		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
 		panic(err)
 	}
 
-	logrus.Infoln("Successfully connected to the database")
+	c.Logger.Infoln("Successfully connected to the database")
 
 	return handler
-}
-
-func createLoggerApp(config config.Config) *logrus.Logger {
-	log := logrus.New()
-	log.SetFormatter(&logrus.JSONFormatter{})
-
-	//standardFields := logrus.Fields{
-	//	"app": config.AppName,
-	//}
-	//log.SetLevel(logrus.DebugLevel)
-
-	return log
 }

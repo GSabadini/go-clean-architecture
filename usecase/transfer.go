@@ -14,16 +14,17 @@ func StoreTransfer(
 	transferRepository repository.TransferRepository,
 	accountRepository repository.AccountRepository,
 	transfer *domain.Transfer,
-) error {
+) (*domain.Transfer, error) {
 	if err := transferAccountBalance(accountRepository, transfer); err != nil {
-		return err
+		return nil, err
 	}
 
-	if err := transferRepository.Store(transfer); err != nil {
-		return err
+	result, err := transferRepository.Store(transfer)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return result, nil
 }
 
 func transferAccountBalance(accountRepository repository.AccountRepository, transfer *domain.Transfer) error {
@@ -63,7 +64,7 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 }
 
 func findAccount(accountRepository repository.AccountRepository, query bson.M) (*domain.Account, error) {
-	account, err := accountRepository.FindOne(query)
+	account, err := accountRepository.FindOne(query, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching account")
 	}

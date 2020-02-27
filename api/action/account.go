@@ -45,6 +45,11 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := account.ValidateBalance(); err != nil {
+		ErrorMessage(err, http.StatusBadRequest).Send(w)
+		return
+	}
+
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
 	result, err := usecase.StoreAccount(accountRepository, account)

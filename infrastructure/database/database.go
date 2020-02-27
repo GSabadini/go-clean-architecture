@@ -5,5 +5,5 @@ type NoSQLDBHandler interface {
 	Store(string, interface{}) error
 	Update(string, interface{}, interface{}) error
 	FindAll(string, interface{}, interface{}) error
-	FindOne(string, interface{}, interface{}) error
+	FindOne(string, interface{}, interface{}, interface{}) error
 }
