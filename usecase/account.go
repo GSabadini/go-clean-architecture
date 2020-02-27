@@ -32,12 +32,11 @@ func FindBalanceAccount(repository repository.AccountRepository, id string) (*do
 	var (
 		query    = bson.M{"_id": bson.ObjectIdHex(id)}
 		selector = bson.M{"balance": 1, "_id": 0}
-		account  = &domain.Account{}
 	)
 
 	result, err := repository.FindOne(query, selector)
 	if err != nil {
-		return account, err
+		return result, err
 	}
 
 	return result, nil

@@ -13,21 +13,21 @@ import (
 func StoreTransfer(
 	transferRepository repository.TransferRepository,
 	accountRepository repository.AccountRepository,
-	transfer *domain.Transfer,
-) (*domain.Transfer, error) {
+	transfer domain.Transfer,
+) (domain.Transfer, error) {
 	if err := transferAccountBalance(accountRepository, transfer); err != nil {
-		return nil, err
+		return domain.Transfer{}, err
 	}
 
 	result, err := transferRepository.Store(transfer)
 	if err != nil {
-		return nil, err
+		return domain.Transfer{}, err
 	}
 
 	return result, nil
 }
 
-func transferAccountBalance(accountRepository repository.AccountRepository, transfer *domain.Transfer) error {
+func transferAccountBalance(accountRepository repository.AccountRepository, transfer domain.Transfer) error {
 	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
