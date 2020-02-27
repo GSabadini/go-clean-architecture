@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -13,6 +14,15 @@ type Transfer struct {
 	AccountDestinationID bson.ObjectId `json:"account_destination_id" bson:"account_destination_id"`
 	Amount               float64       `json:"amount" bson:"amount"`
 	CreatedAt            time.Time     `json:"created_at" bson:"created_at"`
+}
+
+//ValidateAmount verifica se o saldo é valido
+func (t *Transfer) ValidateAmount() error {
+	if t.Amount < 0 {
+		return errors.New("amount invalid")
+	}
+
+	return nil
 }
 
 //GetAccountOriginID retorna o id da conta de origem

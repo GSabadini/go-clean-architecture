@@ -20,11 +20,15 @@ func NewTransfer(dbHandler database.NoSQLDBHandler) Transfer {
 }
 
 //Store cria uma transferência
-func (t Transfer) Store(transfer *domain.Transfer) error {
+func (t Transfer) Store(transfer *domain.Transfer) (*domain.Transfer, error) {
 	transfer.CreatedAt = time.Now()
 	transfer.ID = bson.NewObjectId()
 
-	return t.dbHandler.Store(transfersCollectionName, &transfer)
+	if err := t.dbHandler.Store(transfersCollectionName, &transfer); err != nil {
+		return nil, err
+	}
+
+	return transfer, nil
 }
 
 //FindAll realiza uma busca no banco de dados através da implementação real do database
