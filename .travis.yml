@@ -7,5 +7,4 @@ env:
   - GO111MODULE=on
 
 script:
-  - make fmt
-  - make test
+  - make code-review
