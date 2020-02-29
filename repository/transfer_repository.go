@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"github.com/pkg/errors"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -41,49 +40,4 @@ func (t Transfer) FindAll() ([]domain.Transfer, error) {
 	}
 
 	return transfer, nil
-}
-
-type TransferRepositoryMockSuccess struct{}
-
-//Store cria uma transferência
-func (t TransferRepositoryMockSuccess) Store(_ domain.Transfer) (domain.Transfer, error) {
-	return domain.Transfer{
-		ID:                   "5e570851adcef50116aa7a5a",
-		AccountOriginID:      "5e570851adcef50116aa7a5d",
-		AccountDestinationID: "5e570851adcef50116aa7a5c",
-		Amount:               20,
-		CreatedAt:            time.Time{},
-	}, nil
-}
-
-//FindAll realiza uma busca no banco de dados através da implementação real do database
-func (t TransferRepositoryMockSuccess) FindAll() ([]domain.Transfer, error) {
-	return []domain.Transfer{
-		{
-			ID:                   "5e570851adcef50116aa7a5a",
-			AccountOriginID:      "5e570851adcef50116aa7a5d",
-			AccountDestinationID: "5e570851adcef50116aa7a5c",
-			Amount:               100,
-			CreatedAt:            time.Time{},
-		},
-		{
-			ID:                   "5e570851adcef50116aa7a5b",
-			AccountOriginID:      "5e570851adcef50116aa7a5d",
-			AccountDestinationID: "5e570851adcef50116aa7a5c",
-			Amount:               500,
-			CreatedAt:            time.Time{},
-		},
-	}, nil
-}
-
-type TransferRepositoryMockError struct{}
-
-//Store
-func (t TransferRepositoryMockError) Store(_ domain.Transfer) (domain.Transfer, error) {
-	return domain.Transfer{}, errors.New("Error")
-}
-
-//FindAll
-func (t TransferRepositoryMockError) FindAll() ([]domain.Transfer, error) {
-	return []domain.Transfer{}, errors.New("Error")
 }
