@@ -22,15 +22,15 @@ func NewLogger(log *logrus.Logger) Logger {
 
 //Logging cria logs de entrada e saída da API
 func (l Logger) Logging(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	_, err := getRequestPayload(r)
+	body, err := getRequestPayload(r)
 	if err != nil {
 		l.log.Warningln("error when getting payload")
 	}
 
 	//@TODO CORRIGIR BODY
 	l.log.WithFields(logrus.Fields{
-		"key": "api_request",
-		//"payload":     body,
+		"key":         "api_request",
+		"payload":     body,
 		"url":         r.URL.Path,
 		"http_method": r.Method,
 	}).Info("request received by the API")

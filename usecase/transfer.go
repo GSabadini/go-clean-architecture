@@ -13,49 +13,49 @@ import (
 func StoreTransfer(
 	transferRepository repository.TransferRepository,
 	accountRepository repository.AccountRepository,
-	transfer *domain.Transfer,
-) (*domain.Transfer, error) {
-	if err := transferAccountBalance(accountRepository, transfer); err != nil {
-		return nil, err
+	transfer domain.Transfer,
+) (domain.Transfer, error) {
+	if err := processTransfer(accountRepository, transfer); err != nil {
+		return domain.Transfer{}, err
 	}
 
 	result, err := transferRepository.Store(transfer)
 	if err != nil {
-		return nil, err
+		return domain.Transfer{}, err
 	}
 
 	return result, nil
 }
 
-func transferAccountBalance(accountRepository repository.AccountRepository, transfer *domain.Transfer) error {
-	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginID()})
+func processTransfer(repository repository.AccountRepository, transfer domain.Transfer) error {
+	origin, err := findAccount(repository, bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
 	}
 
-	if err := accountOrigin.Withdraw(transfer.GetAmount()); err != nil {
+	if err := origin.Withdraw(transfer.GetAmount()); err != nil {
 		return err
 	}
 
-	accountDestination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountDestinationID()})
+	destination, err := findAccount(repository, bson.M{"_id": transfer.GetAccountDestinationID()})
 	if err != nil {
 		return err
 	}
 
-	accountDestination.Deposit(transfer.GetAmount())
+	destination.Deposit(transfer.GetAmount())
 
-	if err = updateAccountBalance(
-		accountRepository,
+	if err = updateAccount(
+		repository,
 		bson.M{"_id": transfer.GetAccountOriginID()},
-		bson.M{"$set": bson.M{"balance": accountOrigin.GetBalance()}},
+		bson.M{"$set": bson.M{"balance": origin.GetBalance()}},
 	); err != nil {
 		return err
 	}
 
-	if err = updateAccountBalance(
-		accountRepository,
+	if err = updateAccount(
+		repository,
 		bson.M{"_id": transfer.GetAccountDestinationID()},
-		bson.M{"$set": bson.M{"balance": accountDestination.GetBalance()}},
+		bson.M{"$set": bson.M{"balance": destination.GetBalance()}},
 	); err != nil {
 		return err
 	}
@@ -63,8 +63,8 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 	return nil
 }
 
-func findAccount(accountRepository repository.AccountRepository, query bson.M) (*domain.Account, error) {
-	account, err := accountRepository.FindOne(query, nil)
+func findAccount(repository repository.AccountRepository, query bson.M) (*domain.Account, error) {
+	account, err := repository.FindOne(query)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching account")
 	}
@@ -72,8 +72,8 @@ func findAccount(accountRepository repository.AccountRepository, query bson.M) (
 	return account, nil
 }
 
-func updateAccountBalance(accountRepository repository.AccountRepository, query bson.M, update bson.M) error {
-	if err := accountRepository.Update(query, update); err != nil {
+func updateAccount(repository repository.AccountRepository, query bson.M, update bson.M) error {
+	if err := repository.Update(query, update); err != nil {
 		return errors.Wrap(err, "error updating account")
 	}
 

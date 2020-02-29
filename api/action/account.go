@@ -30,7 +30,7 @@ func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
 //Store é um handler para criação de conta
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
-	var account *domain.Account
+	var account domain.Account
 
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
 		a.logError(

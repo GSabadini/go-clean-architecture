@@ -27,7 +27,7 @@ func NewTransfer(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Transfer
 func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 
-	var transfer *domain.Transfer
+	var transfer domain.Transfer
 
 	if err := json.NewDecoder(r.Body).Decode(&transfer); err != nil {
 		t.logError(

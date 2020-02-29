@@ -11,5 +11,7 @@ db.createUser({
     ],
 });
 
-db.createCollection('accounts');
+accounts = db.createCollection('accounts');
+db.accounts.createIndex( { "cpf": 1 }, { unique: true } )
+
 db.createCollection('transfers');
