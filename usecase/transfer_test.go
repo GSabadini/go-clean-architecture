@@ -84,3 +84,62 @@ func TestStoreTransfer(t *testing.T) {
 		})
 	}
 }
+
+func TestFindAllTransfer(t *testing.T) {
+	type args struct {
+		repository repository.TransferRepository
+	}
+
+	tests := []struct {
+		name          string
+		args          args
+		expected      []domain.Transfer
+		expectedError string
+	}{
+		{
+			name: "Success when returning the transfer list",
+			args: args{
+				repository: repository.TransferRepositoryMockSuccess{},
+			},
+			expected: []domain.Transfer{
+				{
+					ID:                   "5e570851adcef50116aa7a5a",
+					AccountOriginID:      "5e570851adcef50116aa7a5d",
+					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					Amount:               100,
+					CreatedAt:            time.Time{},
+				},
+				{
+					ID:                   "5e570851adcef50116aa7a5b",
+					AccountOriginID:      "5e570851adcef50116aa7a5d",
+					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					Amount:               500,
+					CreatedAt:            time.Time{},
+				},
+			},
+		},
+		{
+			name: "Error when returning the transfer list",
+			args: args{
+				repository: repository.TransferRepositoryMockError{},
+			},
+			expectedError: "Error",
+			expected:      []domain.Transfer{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := FindAllTransfer(tt.args.repository)
+
+			if (err != nil) && (err.Error() != tt.expectedError) {
+				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
+				return
+			}
+
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, result, tt.expected)
+			}
+		})
+	}
+}

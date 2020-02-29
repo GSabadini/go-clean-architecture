@@ -27,8 +27,8 @@ func StoreTransfer(
 	return result, nil
 }
 
-func processTransfer(accountRepository repository.AccountRepository, transfer domain.Transfer) error {
-	origin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginID()})
+func processTransfer(repository repository.AccountRepository, transfer domain.Transfer) error {
+	origin, err := findAccount(repository, bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
 	}
@@ -37,23 +37,23 @@ func processTransfer(accountRepository repository.AccountRepository, transfer do
 		return err
 	}
 
-	destination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountDestinationID()})
+	destination, err := findAccount(repository, bson.M{"_id": transfer.GetAccountDestinationID()})
 	if err != nil {
 		return err
 	}
 
 	destination.Deposit(transfer.GetAmount())
 
-	if err = updateAccountBalance(
-		accountRepository,
+	if err = updateAccount(
+		repository,
 		bson.M{"_id": transfer.GetAccountOriginID()},
 		bson.M{"$set": bson.M{"balance": origin.GetBalance()}},
 	); err != nil {
 		return err
 	}
 
-	if err = updateAccountBalance(
-		accountRepository,
+	if err = updateAccount(
+		repository,
 		bson.M{"_id": transfer.GetAccountDestinationID()},
 		bson.M{"$set": bson.M{"balance": destination.GetBalance()}},
 	); err != nil {
@@ -63,8 +63,8 @@ func processTransfer(accountRepository repository.AccountRepository, transfer do
 	return nil
 }
 
-func findAccount(accountRepository repository.AccountRepository, query bson.M) (*domain.Account, error) {
-	account, err := accountRepository.FindOne(query)
+func findAccount(repository repository.AccountRepository, query bson.M) (*domain.Account, error) {
+	account, err := repository.FindOne(query)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching account")
 	}
@@ -72,8 +72,8 @@ func findAccount(accountRepository repository.AccountRepository, query bson.M) (
 	return account, nil
 }
 
-func updateAccountBalance(accountRepository repository.AccountRepository, query bson.M, update bson.M) error {
-	if err := accountRepository.Update(query, update); err != nil {
+func updateAccount(repository repository.AccountRepository, query bson.M, update bson.M) error {
+	if err := repository.Update(query, update); err != nil {
 		return errors.Wrap(err, "error updating account")
 	}
 

@@ -44,14 +44,14 @@ func TestCreate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := StoreAccount(tt.args.repository, tt.args.account)
+			result, err := StoreAccount(tt.args.repository, tt.args.account)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 			}
 
-			if !reflect.DeepEqual(got, tt.expected) || got != tt.expected {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.expected)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, result, tt.expected)
 			}
 		})
 	}
@@ -100,15 +100,14 @@ func TestFindAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			result, err := FindAllAccount(tt.args.repository)
 
-			got, err := FindAllAccount(tt.args.repository)
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
-				return
 			}
 
-			if !reflect.DeepEqual(got, tt.expected) {
-				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.expected)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, result, tt.expected)
 			}
 		})
 	}
@@ -148,15 +147,15 @@ func TestFindBalanceAccount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got, err := FindBalanceAccount(tt.args.repository, tt.args.id)
+		result, err := FindBalanceAccount(tt.args.repository, tt.args.id)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 			return
 		}
 
-		if !reflect.DeepEqual(got, tt.expected) {
-			t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.expected)
+		if !reflect.DeepEqual(result, tt.expected) {
+			t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, result, tt.expected)
 		}
 	}
 }
