@@ -1,8 +1,6 @@
 package database
 
-import (
-	mongo "gopkg.in/mgo.v2"
-)
+import mongo "gopkg.in/mgo.v2"
 
 //MongoHandler armazena a estrutura para MongoDb
 type MongoHandler struct {

@@ -8,10 +8,10 @@ import (
 )
 
 //StoreAccount cria uma nova conta
-func StoreAccount(repository repository.AccountRepository, account *domain.Account) (*domain.Account, error) {
+func StoreAccount(repository repository.AccountRepository, account domain.Account) (domain.Account, error) {
 	result, err := repository.Store(account)
 	if err != nil {
-		return nil, err
+		return domain.Account{}, err
 	}
 
 	return result, nil
@@ -28,16 +28,15 @@ func FindAllAccount(repository repository.AccountRepository) ([]domain.Account, 
 }
 
 //FindBalanceAccount retorna o saldo de uma conta
-func FindBalanceAccount(repository repository.AccountRepository, id string) (*domain.Account, error) {
+func FindBalanceAccount(repository repository.AccountRepository, id string) (domain.Account, error) {
 	var (
 		query    = bson.M{"_id": bson.ObjectIdHex(id)}
 		selector = bson.M{"balance": 1, "_id": 0}
-		account  = &domain.Account{}
 	)
 
-	result, err := repository.FindOne(query, selector)
+	result, err := repository.FindOneWithSelector(query, selector)
 	if err != nil {
-		return account, err
+		return result, err
 	}
 
 	return result, nil

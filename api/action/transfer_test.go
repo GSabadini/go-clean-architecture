@@ -38,7 +38,7 @@ func TestTransferStore(t *testing.T) {
 		//			}`,
 		//		),
 		//	},
-		//	expectedStatusCode: http.StatusNoContent,
+		//	expectedStatusCode: http.StatusOK,
 		//},
 		{
 			name: "Store handler invalid ObjectID",

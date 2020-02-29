@@ -2,6 +2,7 @@ package action
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -48,6 +49,14 @@ func TestAccountStore(t *testing.T) {
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
 				rawPayload:    []byte(`{"name": }`),
+			},
+		},
+		{
+			name:               "Store handler invalid balance",
+			expectedStatusCode: http.StatusBadRequest,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
+				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": -10 }`),
 			},
 		},
 	}
@@ -136,9 +145,10 @@ func TestAccountIndex(t *testing.T) {
 	}
 }
 
-func TestAccountShowBalance(t *testing.T) {
+func TestAccountFindBalance(t *testing.T) {
 	type args struct {
 		accountAction Account
+		accountID     string
 	}
 
 	var loggerMock, _ = test.NewNullLogger()
@@ -153,6 +163,7 @@ func TestAccountShowBalance(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
+				accountID:     "5e5282beba39bfc244dc4c4b",
 			},
 		},
 		{
@@ -160,13 +171,23 @@ func TestAccountShowBalance(t *testing.T) {
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
 				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
+				accountID:     "5e5282beba39bfc244dc4c4b",
+			},
+		},
+		{
+			name:               "FindBalance handler parameter invalid",
+			expectedStatusCode: http.StatusBadRequest,
+			args: args{
+				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
+				accountID:     "1",
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req, err := http.NewRequest(http.MethodGet, "/accounts/5e5282beba39bfc244dc4c4b/balance", nil)
+			uri := fmt.Sprintf("/accounts/%s/balance", tt.args.accountID)
+			req, err := http.NewRequest(http.MethodGet, uri, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
