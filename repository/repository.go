@@ -17,7 +17,8 @@ type AccountRepository interface {
 	Store(domain.Account) (domain.Account, error)
 	Update(bson.M, bson.M) error
 	FindAll() ([]domain.Account, error)
-	FindOne(bson.M, interface{}) (*domain.Account, error)
+	FindOne(bson.M) (*domain.Account, error)
+	FindOneWithSelector(bson.M, interface{}) (domain.Account, error)
 }
 
 //TransferRepository expõe os métodos disponíveis para as abstrações de repository

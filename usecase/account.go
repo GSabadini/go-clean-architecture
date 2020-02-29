@@ -28,13 +28,13 @@ func FindAllAccount(repository repository.AccountRepository) ([]domain.Account, 
 }
 
 //FindBalanceAccount retorna o saldo de uma conta
-func FindBalanceAccount(repository repository.AccountRepository, id string) (*domain.Account, error) {
+func FindBalanceAccount(repository repository.AccountRepository, id string) (domain.Account, error) {
 	var (
 		query    = bson.M{"_id": bson.ObjectIdHex(id)}
 		selector = bson.M{"balance": 1, "_id": 0}
 	)
 
-	result, err := repository.FindOne(query, selector)
+	result, err := repository.FindOneWithSelector(query, selector)
 	if err != nil {
 		return result, err
 	}

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
@@ -24,22 +23,22 @@ func TestCreate(t *testing.T) {
 		{
 			name: "Create account successful",
 			args: args{
-				repository: repository.AccountRepositoryMock{},
+				repository: repository.AccountRepositoryMockSuccess{},
 			},
 			expected: domain.Account{
-				ID:        "5e570851adcef50116aa7a5c",
-				Name:      "Test",
-				CPF:       "028.155.170-78",
-				Balance:   100,
-				CreatedAt: nil,
+				ID:      "5e570851adcef50116aa7a5c",
+				Name:    "Test",
+				CPF:     "028.155.170-78",
+				Balance: 100,
 			},
 		},
 		{
-			name: "Create account database error",
+			name: "Create account error",
 			args: args{
-				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
+				repository: repository.AccountRepositoryMockError{},
 			},
 			expectedError: "Error",
+			expected:      domain.Account{},
 		},
 	}
 
@@ -70,9 +69,9 @@ func TestFindAll(t *testing.T) {
 		expectedError interface{}
 	}{
 		{
-			name: "Success return list accounts",
+			name: "Success when returning the account list",
 			args: args{
-				repository: repository.AccountRepositoryMock{},
+				repository: repository.AccountRepositoryMockSuccess{},
 			},
 			expected: []domain.Account{
 				{
@@ -90,16 +89,9 @@ func TestFindAll(t *testing.T) {
 			},
 		},
 		{
-			name: "Empty return list accounts",
+			name: "Error when returning the list of accounts",
 			args: args{
-				repository: repository.NewAccount(database.MongoHandlerSuccessMock{}),
-			},
-			expected: []domain.Account{},
-		},
-		{
-			name: "Error database return list accounts",
-			args: args{
-				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
+				repository: repository.AccountRepositoryMockError{},
 			},
 			expectedError: "Error",
 			expected:      []domain.Account{},
@@ -131,27 +123,27 @@ func TestFindBalanceAccount(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          args
-		expected      *domain.Account
+		expected      domain.Account
 		expectedError interface{}
 	}{
-		//{
-		//	name: "Success return balance account",
-		//	args: args{
-		//		repository: repository.AccountRepositoryMock{},
-		//		id:         "5e519055ba39bfc244dc4625",
-		//	},
-		//	expected: &domain.Account{
-		//		Balance: 100.00,
-		//	},
-		//},
 		{
-			name: "Error database return balance account",
+			name: "Success when returning the account balance",
 			args: args{
-				repository: repository.NewAccount(database.MongoHandlerErrorMock{}),
+				repository: repository.AccountRepositoryMockSuccess{},
+				id:         "5e519055ba39bfc244dc4625",
+			},
+			expected: domain.Account{
+				Balance: 100.00,
+			},
+		},
+		{
+			name: "Error returning account balance",
+			args: args{
+				repository: repository.AccountRepositoryMockError{},
 				id:         "5e519055ba39bfc244dc4625",
 			},
 			expectedError: "Error",
-			expected:      &domain.Account{},
+			expected:      domain.Account{},
 		},
 	}
 

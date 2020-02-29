@@ -15,7 +15,7 @@ func StoreTransfer(
 	accountRepository repository.AccountRepository,
 	transfer domain.Transfer,
 ) (domain.Transfer, error) {
-	if err := transferAccountBalance(accountRepository, transfer); err != nil {
+	if err := processTransfer(accountRepository, transfer); err != nil {
 		return domain.Transfer{}, err
 	}
 
@@ -27,27 +27,27 @@ func StoreTransfer(
 	return result, nil
 }
 
-func transferAccountBalance(accountRepository repository.AccountRepository, transfer domain.Transfer) error {
-	accountOrigin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginID()})
+func processTransfer(accountRepository repository.AccountRepository, transfer domain.Transfer) error {
+	origin, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
 	}
 
-	if err := accountOrigin.Withdraw(transfer.GetAmount()); err != nil {
+	if err := origin.Withdraw(transfer.GetAmount()); err != nil {
 		return err
 	}
 
-	accountDestination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountDestinationID()})
+	destination, err := findAccount(accountRepository, bson.M{"_id": transfer.GetAccountDestinationID()})
 	if err != nil {
 		return err
 	}
 
-	accountDestination.Deposit(transfer.GetAmount())
+	destination.Deposit(transfer.GetAmount())
 
 	if err = updateAccountBalance(
 		accountRepository,
 		bson.M{"_id": transfer.GetAccountOriginID()},
-		bson.M{"$set": bson.M{"balance": accountOrigin.GetBalance()}},
+		bson.M{"$set": bson.M{"balance": origin.GetBalance()}},
 	); err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 	if err = updateAccountBalance(
 		accountRepository,
 		bson.M{"_id": transfer.GetAccountDestinationID()},
-		bson.M{"$set": bson.M{"balance": accountDestination.GetBalance()}},
+		bson.M{"$set": bson.M{"balance": destination.GetBalance()}},
 	); err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func transferAccountBalance(accountRepository repository.AccountRepository, tran
 }
 
 func findAccount(accountRepository repository.AccountRepository, query bson.M) (*domain.Account, error) {
-	account, err := accountRepository.FindOne(query, nil)
+	account, err := accountRepository.FindOne(query)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching account")
 	}

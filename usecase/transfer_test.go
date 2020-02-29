@@ -14,17 +14,18 @@ func TestStoreTransfer(t *testing.T) {
 		accountRepository  repository.AccountRepository
 		transfer           domain.Transfer
 	}
+
 	tests := []struct {
-		name     string
-		args     args
-		expected domain.Transfer
-		wantErr  bool
+		name          string
+		args          args
+		expected      domain.Transfer
+		expectedError string
 	}{
 		{
-			name: "Success store transfer",
+			name: "Create transfer successful",
 			args: args{
 				transferRepository: repository.TransferRepositoryMockSuccess{},
-				accountRepository:  repository.AccountRepositoryMock{},
+				accountRepository:  repository.AccountRepositoryMockSuccess{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
 					AccountDestinationID: "5e570851adcef50116aa7a5c",
@@ -35,17 +36,45 @@ func TestStoreTransfer(t *testing.T) {
 				ID:                   "5e570851adcef50116aa7a5a",
 				AccountOriginID:      "5e570851adcef50116aa7a5d",
 				AccountDestinationID: "5e570851adcef50116aa7a5c",
-				Amount:               100,
+				Amount:               20,
 				CreatedAt:            time.Time{},
 			},
+		},
+		{
+			name: "Create transfer error",
+			args: args{
+				transferRepository: repository.TransferRepositoryMockError{},
+				accountRepository:  repository.AccountRepositoryMockSuccess{},
+				transfer: domain.Transfer{
+					AccountOriginID:      "5e570851adcef50116aa7a5d",
+					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					Amount:               20,
+				},
+			},
+			expectedError: "Error",
+			expected:      domain.Transfer{},
+		},
+		{
+			name: "Create transfer error find account",
+			args: args{
+				transferRepository: repository.TransferRepositoryMockError{},
+				accountRepository:  repository.AccountRepositoryMockError{},
+				transfer: domain.Transfer{
+					AccountOriginID:      "5e570851adcef50116aa7a5d",
+					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					Amount:               20,
+				},
+			},
+			expectedError: "error fetching account: Error",
+			expected:      domain.Transfer{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := StoreTransfer(tt.args.transferRepository, tt.args.accountRepository, tt.args.transfer)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("StoreTransfer() error = %v, wantErr %v", err, tt.wantErr)
+			if (err != nil) && (err.Error() != tt.expectedError) {
+				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 				return
 			}
 

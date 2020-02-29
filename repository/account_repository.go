@@ -7,6 +7,8 @@ import (
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+
+	"github.com/pkg/errors"
 )
 
 const accountsCollectionName = "accounts"
@@ -49,19 +51,32 @@ func (a Account) FindAll() ([]domain.Account, error) {
 }
 
 //FindOne realiza uma busca no banco de dados através da implementação real do database
-func (a Account) FindOne(query bson.M, selector interface{}) (*domain.Account, error) {
+func (a Account) FindOne(query bson.M) (*domain.Account, error) {
 	var account = &domain.Account{}
 
-	if err := a.dbHandler.FindOne(accountsCollectionName, query, selector, &account); err != nil {
-		return &domain.Account{}, err
+	if err := a.dbHandler.FindOne(accountsCollectionName, query, nil, &account); err != nil {
+		return account, err
 	}
 
 	return account, nil
 }
 
-type AccountRepositoryMock struct{}
+//FindOneWithSelector realiza uma busca no banco de dados através da implementação real do database
+func (a Account) FindOneWithSelector(query bson.M, selector interface{}) (domain.Account, error) {
+	var account = domain.Account{}
 
-func (a AccountRepositoryMock) Store(_ domain.Account) (domain.Account, error) {
+	if err := a.dbHandler.FindOne(accountsCollectionName, query, selector, &account); err != nil {
+		return account, err
+	}
+
+	return account, nil
+}
+
+//AccountRepositoryMockSuccess
+type AccountRepositoryMockSuccess struct{}
+
+//Store
+func (a AccountRepositoryMockSuccess) Store(_ domain.Account) (domain.Account, error) {
 	return domain.Account{
 		ID:        "5e570851adcef50116aa7a5c",
 		Name:      "Test",
@@ -71,11 +86,13 @@ func (a AccountRepositoryMock) Store(_ domain.Account) (domain.Account, error) {
 	}, nil
 }
 
-func (a AccountRepositoryMock) Update(_ bson.M, _ bson.M) error {
+//Update
+func (a AccountRepositoryMockSuccess) Update(_ bson.M, _ bson.M) error {
 	return nil
 }
 
-func (a AccountRepositoryMock) FindAll() ([]domain.Account, error) {
+//FindAll
+func (a AccountRepositoryMockSuccess) FindAll() ([]domain.Account, error) {
 	var account = []domain.Account{
 		{
 			ID:      "5e570851adcef50116aa7a5c",
@@ -94,12 +111,47 @@ func (a AccountRepositoryMock) FindAll() ([]domain.Account, error) {
 	return account, nil
 }
 
-//FindOne realiza uma busca no banco de dados através da implementação real do database
-func (a AccountRepositoryMock) FindOne(_ bson.M, _ interface{}) (*domain.Account, error) {
+//FindOne
+func (a AccountRepositoryMockSuccess) FindOne(_ bson.M) (*domain.Account, error) {
 	return &domain.Account{
 		ID:      "5e570854adcef50116aa7a5d",
 		Name:    "Test-1",
 		CPF:     "028.155.170-78",
 		Balance: 50.25,
 	}, nil
+}
+
+//FindOneWithSelector
+func (a AccountRepositoryMockSuccess) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
+	return domain.Account{
+		Balance: 100.00,
+	}, nil
+}
+
+//AccountRepositoryMockError
+type AccountRepositoryMockError struct{}
+
+//Store
+func (a AccountRepositoryMockError) Store(_ domain.Account) (domain.Account, error) {
+	return domain.Account{}, errors.New("Error")
+}
+
+//Update
+func (a AccountRepositoryMockError) Update(_ bson.M, _ bson.M) error {
+	return errors.New("Error")
+}
+
+//FindAll
+func (a AccountRepositoryMockError) FindAll() ([]domain.Account, error) {
+	return []domain.Account{}, errors.New("Error")
+}
+
+//FindOne
+func (a AccountRepositoryMockError) FindOne(_ bson.M) (*domain.Account, error) {
+	return &domain.Account{}, errors.New("Error")
+}
+
+//FindOneWithSelector
+func (a AccountRepositoryMockError) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
+	return domain.Account{}, errors.New("Error")
 }
