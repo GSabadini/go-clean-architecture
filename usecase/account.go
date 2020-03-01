@@ -1,6 +1,9 @@
 package usecase
 
 import (
+	"strings"
+	"time"
+
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -9,12 +12,21 @@ import (
 
 //StoreAccount cria uma nova conta
 func StoreAccount(repository repository.AccountRepository, account domain.Account) (domain.Account, error) {
+	t := time.Now()
+	account.CreatedAt = &t
+	account.ID = bson.NewObjectId()
+	account.CPF = cleanCPF(account.CPF)
+
 	result, err := repository.Store(account)
 	if err != nil {
 		return domain.Account{}, err
 	}
 
 	return result, nil
+}
+
+func cleanCPF(cpf string) string {
+	return strings.Replace(strings.Replace(cpf, ".", "", -1), "-", "", -1)
 }
 
 //FindAllAccount retorna uma lista de contas

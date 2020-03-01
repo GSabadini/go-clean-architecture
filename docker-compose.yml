@@ -3,7 +3,7 @@ version: '3.3'
 services:
   go-bank-transfer:
     container_name: 'go-bank-transfer'
-    build: .
+    image: go-bank-transfer:dev
     ports:
       - '3001:3001'
     volumes:

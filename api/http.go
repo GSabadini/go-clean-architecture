@@ -68,8 +68,14 @@ func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
 		transferAction.Store(res, req)
 	}
 
+	var (
+		logging  = middleware.NewLogger(s.log).Logging
+		validate = middleware.NewValidateTransfer(s.log).Validate
+	)
+
 	return negroni.New(
-		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
+		negroni.HandlerFunc(logging),
+		negroni.HandlerFunc(validate),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
@@ -96,8 +102,14 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 		accountAction.Store(res, req)
 	}
 
+	var (
+		logging  = middleware.NewLogger(s.log).Logging
+		validate = middleware.NewValidateAccount(s.log).Validate
+	)
+
 	return negroni.New(
-		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
+		negroni.HandlerFunc(logging),
+		negroni.HandlerFunc(validate),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
