@@ -8,6 +8,90 @@
 
 ## Getting Started
 
+- Environment variables
+
+```sh
+create .env through .env.example
+```
+
+- Start API
+
+```sh
+make up
+```
+
+- Run tests in container (it is necessary to have the application started)
+
+```sh
+make test-container
+```
+
+- Run tests local (it is necessary to have golang installed)
+
+```sh
+make test
+```
+
+- View logs
+
+```sh
+make logs
+```
+
+- Enter in container
+
+```sh
+make enter-container
+```
+
+####Test endpoints API using Postman
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/38286dacebab6fa2975f)
+
+####Test endpoints API using curl
+
+- Creating new account
+
+```bash
+curl -i --request POST 'http://localhost:3001/api/accounts' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Test",
+    "cpf": "070.910.584-64",
+    "balance": 1.00
+}'
+```
+
+- Listing accounts
+
+```bash
+curl -i --request GET 'http://localhost:3001/api/accounts'
+```
+
+- Fetching account balance
+
+```bash
+curl -i --request GET 'http://localhost:3001/api/accounts/{{account_id}}/balance'
+```
+
+- Create transfer
+
+```bash
+curl -i --request POST 'http://localhost:3001/api/transfers' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+	"account_destination_id": "{account_id}",
+	"account_origin_id": "{account_id}",
+	"amount": 1.00
+}'
+```
+
+- Listing transfers
+
+```bash
+curl --location --request GET 'http://localhost:3001/api/transfers'
+```
+
 ## Git workflow
 - Gitflow
 
