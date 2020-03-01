@@ -5,7 +5,6 @@ import (
 	"net/http"
 )
 
-//TODO rever nomenclatura
 //Response armazena a estrutura de retorno da API
 type Response struct {
 	statusCode int

@@ -2,48 +2,48 @@ package database
 
 import "errors"
 
-//MongoHandlerSuccessMock
+//MongoHandlerSuccessMock implementa a interface de NoSQLDBHandler com resultados de sucesso
 type MongoHandlerSuccessMock struct{}
 
-//Store
+//Store retorna sucesso ao criar um recurso
 func (m MongoHandlerSuccessMock) Store(_ string, _ interface{}) error {
 	return nil
 }
 
-//Update
+//Update retorna sucesso ao atualizar um recurso
 func (m MongoHandlerSuccessMock) Update(_ string, _ interface{}, _ interface{}) error {
 	return nil
 }
 
-//FindAll
+//FindAll retorna sucesso ao listar recursos
 func (m MongoHandlerSuccessMock) FindAll(_ string, _ interface{}, _ interface{}) error {
 	return nil
 }
 
-//FindOne
+//FindOne retorna sucesso ao obter um recurso
 func (m MongoHandlerSuccessMock) FindOne(_ string, _ interface{}, _ interface{}, _ interface{}) error {
 	return nil
 }
 
-//MongoHandlerSuccessMock
+//MongoHandlerErrorMock implementa a interface de NoSQLDBHandler com resultados de sucesso
 type MongoHandlerErrorMock struct{}
 
-//Store
+//Store retorna erro ao criar um recurso
 func (m MongoHandlerErrorMock) Store(_ string, _ interface{}) error {
 	return errors.New("Error")
 }
 
-//Update
+//Update retorna erro ao atualizar um recurso
 func (m MongoHandlerErrorMock) Update(_ string, _ interface{}, _ interface{}) error {
 	return errors.New("Error")
 }
 
-//FindAll
+//FindAll retorna erro ao listar recursos
 func (m MongoHandlerErrorMock) FindAll(_ string, _ interface{}, _ interface{}) error {
 	return errors.New("Error")
 }
 
-//FindOne
+//FindOne retorna erro ao obter um recurso
 func (m MongoHandlerErrorMock) FindOne(_ string, _ interface{}, _ interface{}, _ interface{}) error {
 	return errors.New("Error")
 }

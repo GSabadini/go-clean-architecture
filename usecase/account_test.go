@@ -122,7 +122,7 @@ func TestFindBalanceAccount(t *testing.T) {
 
 	type args struct {
 		repository repository.AccountRepository
-		id         string
+		ID         string
 	}
 
 	tests := []struct {
@@ -135,7 +135,7 @@ func TestFindBalanceAccount(t *testing.T) {
 			name: "Success when returning the account balance",
 			args: args{
 				repository: repository.AccountRepositoryMockSuccess{},
-				id:         "5e519055ba39bfc244dc4625",
+				ID:         "5e519055ba39bfc244dc4625",
 			},
 			expected: domain.Account{
 				Balance: 100.00,
@@ -145,7 +145,7 @@ func TestFindBalanceAccount(t *testing.T) {
 			name: "Error returning account balance",
 			args: args{
 				repository: repository.AccountRepositoryMockError{},
-				id:         "5e519055ba39bfc244dc4625",
+				ID:         "5e519055ba39bfc244dc4625",
 			},
 			expectedError: "Error",
 			expected:      domain.Account{},
@@ -153,7 +153,7 @@ func TestFindBalanceAccount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result, err := FindBalanceAccount(tt.args.repository, tt.args.id)
+		result, err := FindBalanceAccount(tt.args.repository, tt.args.ID)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

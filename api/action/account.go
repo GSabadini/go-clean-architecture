@@ -94,8 +94,8 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_balance"
 
 	var vars = mux.Vars(r)
-	accountId, ok := vars["account_id"]
-	if !ok || !bson.IsObjectIdHex(accountId) {
+	accountID, ok := vars["account_id"]
+	if !ok || !bson.IsObjectIdHex(accountID) {
 		var err = errors.New("Parameter invalid")
 
 		a.logError(
@@ -111,7 +111,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	result, err := usecase.FindBalanceAccount(accountRepository, accountId)
+	result, err := usecase.FindBalanceAccount(accountRepository, accountID)
 	if err != nil {
 		switch err {
 		case repository.ErrNotFound:

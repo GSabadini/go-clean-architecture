@@ -35,13 +35,13 @@ func (s HTTPServer) Listen() {
 	var (
 		router         = mux.NewRouter()
 		negroniHandler = negroni.New()
-		address        = fmt.Sprintf(":%d", s.appConfig.ApiPort)
+		address        = fmt.Sprintf(":%d", s.appConfig.APIPort)
 	)
 
 	s.setAppHandlers(router)
 	negroniHandler.UseHandler(router)
 
-	s.log.Infoln("Starting HTTP server on the port", s.appConfig.ApiPort)
+	s.log.Infoln("Starting HTTP server on the port", s.appConfig.APIPort)
 	if err := http.ListenAndServe(address, negroniHandler); err != nil {
 		s.log.WithError(err).Fatalln("Error starting HTTP server")
 	}
