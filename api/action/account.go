@@ -18,12 +18,12 @@ import (
 
 //Account armazena as dependências de uma conta
 type Account struct {
-	dbHandler database.NoSQLDBHandler
+	dbHandler database.NoSQLDbHandler
 	logger    *logrus.Logger
 }
 
 //NewAccount constrói uma conta com suas dependências
-func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
+func NewAccount(dbHandler database.NoSQLDbHandler, log *logrus.Logger) Account {
 	return Account{dbHandler: dbHandler, logger: log}
 }
 

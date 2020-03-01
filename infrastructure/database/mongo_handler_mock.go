@@ -2,7 +2,7 @@ package database
 
 import "errors"
 
-//MongoHandlerSuccessMock implementa a interface de NoSQLDBHandler com resultados de sucesso
+//MongoHandlerSuccessMock implementa a interface de NoSQLDbHandler com resultados de sucesso
 type MongoHandlerSuccessMock struct{}
 
 //Store retorna sucesso ao criar um recurso
@@ -25,7 +25,7 @@ func (m MongoHandlerSuccessMock) FindOne(_ string, _ interface{}, _ interface{},
 	return nil
 }
 
-//MongoHandlerErrorMock implementa a interface de NoSQLDBHandler com resultados de sucesso
+//MongoHandlerErrorMock implementa a interface de NoSQLDbHandler com resultados de sucesso
 type MongoHandlerErrorMock struct{}
 
 //Store retorna erro ao criar um recurso

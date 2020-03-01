@@ -12,7 +12,6 @@ import (
 	"github.com/sirupsen/logrus/hooks/test"
 )
 
-//TODO REVER TESTES
 func TestTransferStore(t *testing.T) {
 	type args struct {
 		transferAction Transfer

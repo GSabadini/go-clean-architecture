@@ -14,12 +14,12 @@ import (
 
 //Transfer armazena as dependências de uma transferência
 type Transfer struct {
-	dbHandler database.NoSQLDBHandler
+	dbHandler database.NoSQLDbHandler
 	logger    *logrus.Logger
 }
 
 //NewTransfer constrói uma transferência com suas dependências
-func NewTransfer(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Transfer {
+func NewTransfer(dbHandler database.NoSQLDbHandler, log *logrus.Logger) Transfer {
 	return Transfer{dbHandler: dbHandler, logger: log}
 }
 

@@ -13,7 +13,7 @@ const transfersCollectionName = "transfers"
 type Transfer DbRepository
 
 //NewTransfer cria um repository com suas dependências
-func NewTransfer(dbHandler database.NoSQLDBHandler) Transfer {
+func NewTransfer(dbHandler database.NoSQLDbHandler) Transfer {
 	return Transfer{dbHandler: dbHandler}
 }
 
