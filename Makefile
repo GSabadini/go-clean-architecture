@@ -17,6 +17,9 @@ lint:
 test:
 	go test -cover ./...
 
+test-container:
+	docker-compose exec go-bank-transfer go test -cover ./...
+
 up:
 	docker-compose up -d
 
