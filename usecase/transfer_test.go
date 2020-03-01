@@ -1,11 +1,12 @@
 package usecase
 
 import (
-	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 func TestStoreTransfer(t *testing.T) {
@@ -81,7 +82,7 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			expectedError: "error fetching account: Error",
+			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
 	}

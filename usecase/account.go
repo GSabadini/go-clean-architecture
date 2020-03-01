@@ -19,7 +19,7 @@ func StoreAccount(repository repository.AccountRepository, account domain.Accoun
 
 	result, err := repository.Store(account)
 	if err != nil {
-		return domain.Account{}, err
+		return result, err
 	}
 
 	return result, nil
