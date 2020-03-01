@@ -1,5 +1,5 @@
-# Go Bank Transfer
-- API for transfer between internal bank accounts
+# Go Bank Transfer :bank: :money_with_wings:
+- Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
 
 ## Requirements/dependencies
 - Golang (not obligatory)
@@ -103,6 +103,13 @@ curl --location --request GET 'http://localhost:3001/api/transfers'
 ![Clean Architecture](cleanarch.png)
 
 -  This is an attempt to implement a clean architecture, in case you don't already know, here is a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+
+## Future activities
+
+- [ ] Improve API data validation.
+
+- [ ] Improve tests.
+
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
