@@ -32,7 +32,6 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
 
 	var account domain.Account
-	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
 		a.logError(
 			logKey,
@@ -44,6 +43,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
+	defer r.Body.Close()
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
@@ -70,6 +70,7 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
+
 	result, err := usecase.FindAllAccount(accountRepository)
 	if err != nil {
 		a.logError(
@@ -88,7 +89,6 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	Success(result, http.StatusOK).Send(w)
 }
 
-//TODO RETORNAR ERRO CORRETO QUANDO NÃO ENCONTRAR A CONTA
 //FindBalance é um handler para retornar o saldo de uma conta
 func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_balance"
@@ -113,15 +113,28 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 
 	result, err := usecase.FindBalanceAccount(accountRepository, accountId)
 	if err != nil {
-		a.logError(
-			logKey,
-			"error when returning account balance",
-			http.StatusInternalServerError,
-			err,
-		)
+		switch err {
+		case repository.ErrNotFound:
+			a.logError(
+				logKey,
+				"error fetching account",
+				http.StatusInternalServerError,
+				err,
+			)
 
-		ErrorMessage(err, http.StatusInternalServerError).Send(w)
-		return
+			ErrorMessage(err, http.StatusBadRequest).Send(w)
+			return
+		default:
+			a.logError(
+				logKey,
+				"error when returning account balance",
+				http.StatusInternalServerError,
+				err,
+			)
+
+			ErrorMessage(err, http.StatusInternalServerError).Send(w)
+			return
+		}
 	}
 
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)

@@ -28,7 +28,6 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 
 	var transfer domain.Transfer
-	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&transfer); err != nil {
 		t.logError(
 			logKey,
@@ -40,6 +39,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
+	defer r.Body.Close()
 
 	var (
 		transferRepository = repository.NewTransfer(t.dbHandler)

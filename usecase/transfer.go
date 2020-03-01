@@ -26,14 +26,14 @@ func StoreTransfer(
 
 	result, err := transferRepository.Store(transfer)
 	if err != nil {
-		return domain.Transfer{}, err
+		return result, err
 	}
 
 	return result, nil
 }
 
 func processTransfer(repository repository.AccountRepository, transfer domain.Transfer) error {
-	origin, err := findAccount(repository, bson.M{"_id": transfer.GetAccountOriginID()})
+	origin, err := repository.FindOne(bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func processTransfer(repository repository.AccountRepository, transfer domain.Tr
 		return err
 	}
 
-	destination, err := findAccount(repository, bson.M{"_id": transfer.GetAccountDestinationID()})
+	destination, err := repository.FindOne(bson.M{"_id": transfer.GetAccountDestinationID()})
 	if err != nil {
 		return err
 	}
@@ -66,15 +66,6 @@ func processTransfer(repository repository.AccountRepository, transfer domain.Tr
 	}
 
 	return nil
-}
-
-func findAccount(repository repository.AccountRepository, query bson.M) (*domain.Account, error) {
-	account, err := repository.FindOne(query)
-	if err != nil {
-		return nil, errors.Wrap(err, "error fetching account")
-	}
-
-	return account, nil
 }
 
 func updateAccount(repository repository.AccountRepository, query bson.M, update bson.M) error {
