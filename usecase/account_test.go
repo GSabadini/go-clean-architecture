@@ -9,6 +9,8 @@ import (
 )
 
 func TestCreate(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.AccountRepository
 		account    domain.Account
@@ -58,6 +60,8 @@ func TestCreate(t *testing.T) {
 }
 
 func TestFindAll(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.AccountRepository
 	}
@@ -114,6 +118,8 @@ func TestFindAll(t *testing.T) {
 }
 
 func TestFindBalanceAccount(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.AccountRepository
 		id         string

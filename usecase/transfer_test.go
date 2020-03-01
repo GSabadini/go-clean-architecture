@@ -9,6 +9,8 @@ import (
 )
 
 func TestStoreTransfer(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		transferRepository repository.TransferRepository
 		accountRepository  repository.AccountRepository
@@ -101,6 +103,8 @@ func TestStoreTransfer(t *testing.T) {
 }
 
 func TestFindAllTransfer(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.TransferRepository
 	}

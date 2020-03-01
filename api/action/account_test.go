@@ -15,6 +15,8 @@ import (
 
 //@TODO REVER TESTES
 func TestAccountStore(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		accountAction Account
 		rawPayload    []byte
@@ -83,6 +85,8 @@ func TestAccountStore(t *testing.T) {
 }
 
 func TestAccountIndex(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		accountAction Account
 	}
@@ -138,6 +142,8 @@ func TestAccountIndex(t *testing.T) {
 }
 
 func TestAccountFindBalance(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		accountAction Account
 		accountID     string

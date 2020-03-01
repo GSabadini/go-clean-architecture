@@ -1,5 +1,8 @@
 #!make
 
+dependencies:
+	go mod download
+
 code-review: fmt vet test
 
 fmt:
@@ -23,5 +26,5 @@ down:
 logs:
 	docker-compose logs -f go-bank-transfer
 
-enter:
+enter-container:
 	docker-compose exec go-bank-transfer bash
