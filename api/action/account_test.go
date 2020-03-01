@@ -15,6 +15,8 @@ import (
 
 //@TODO REVER TESTES
 func TestAccountStore(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		accountAction Account
 		rawPayload    []byte
@@ -51,14 +53,6 @@ func TestAccountStore(t *testing.T) {
 				rawPayload:    []byte(`{"name": }`),
 			},
 		},
-		{
-			name:               "Store handler invalid balance",
-			expectedStatusCode: http.StatusBadRequest,
-			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
-				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": -10 }`),
-			},
-		},
 	}
 
 	for _, tt := range tests {
@@ -91,6 +85,8 @@ func TestAccountStore(t *testing.T) {
 }
 
 func TestAccountIndex(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		accountAction Account
 	}
@@ -146,6 +142,8 @@ func TestAccountIndex(t *testing.T) {
 }
 
 func TestAccountFindBalance(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		accountAction Account
 		accountID     string

@@ -9,6 +9,8 @@ import (
 )
 
 func TestStoreTransfer(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		transferRepository repository.TransferRepository
 		accountRepository  repository.AccountRepository
@@ -55,6 +57,20 @@ func TestStoreTransfer(t *testing.T) {
 			expected:      domain.Transfer{},
 		},
 		{
+			name: "Create transfer amount not have sufficient",
+			args: args{
+				transferRepository: repository.TransferRepositoryMockError{},
+				accountRepository:  repository.AccountRepositoryMockSuccess{},
+				transfer: domain.Transfer{
+					AccountOriginID:      "5e570851adcef50116aa7a5d",
+					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					Amount:               200,
+				},
+			},
+			expectedError: "origin account does not have sufficient balance",
+			expected:      domain.Transfer{},
+		},
+		{
 			name: "Create transfer error find account",
 			args: args{
 				transferRepository: repository.TransferRepositoryMockError{},
@@ -69,6 +85,7 @@ func TestStoreTransfer(t *testing.T) {
 			expected:      domain.Transfer{},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := StoreTransfer(tt.args.transferRepository, tt.args.accountRepository, tt.args.transfer)
@@ -86,6 +103,8 @@ func TestStoreTransfer(t *testing.T) {
 }
 
 func TestFindAllTransfer(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.TransferRepository
 	}

@@ -9,6 +9,8 @@ import (
 )
 
 func TestCreate(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.AccountRepository
 		account    domain.Account
@@ -28,7 +30,7 @@ func TestCreate(t *testing.T) {
 			expected: domain.Account{
 				ID:      "5e570851adcef50116aa7a5c",
 				Name:    "Test",
-				CPF:     "028.155.170-78",
+				CPF:     "02815517078",
 				Balance: 100,
 			},
 		},
@@ -58,6 +60,8 @@ func TestCreate(t *testing.T) {
 }
 
 func TestFindAll(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.AccountRepository
 	}
@@ -77,13 +81,13 @@ func TestFindAll(t *testing.T) {
 				{
 					ID:      "5e570851adcef50116aa7a5c",
 					Name:    "Test-0",
-					CPF:     "028.155.170-78",
+					CPF:     "02815517078",
 					Balance: 0,
 				},
 				{
 					ID:      "5e570854adcef50116aa7a5d",
 					Name:    "Test-1",
-					CPF:     "028.155.170-78",
+					CPF:     "02815517078",
 					Balance: 50.25,
 				},
 			},
@@ -114,6 +118,8 @@ func TestFindAll(t *testing.T) {
 }
 
 func TestFindBalanceAccount(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		repository repository.AccountRepository
 		id         string

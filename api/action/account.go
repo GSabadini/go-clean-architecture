@@ -30,8 +30,9 @@ func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
 //Store é um handler para criação de conta
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
-	var account domain.Account
 
+	var account domain.Account
+	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
 		a.logError(
 			logKey,
@@ -40,12 +41,6 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 			err,
 		)
 
-		//ErrInvalidJson.Send(w)
-		ErrorMessage(err, http.StatusBadRequest).Send(w)
-		return
-	}
-
-	if err := account.ValidateBalance(); err != nil {
 		ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
@@ -73,8 +68,8 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 //Index é um handler para retornar a lista de contas
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
-	var accountRepository = repository.NewAccount(a.dbHandler)
 
+	var accountRepository = repository.NewAccount(a.dbHandler)
 	result, err := usecase.FindAllAccount(accountRepository)
 	if err != nil {
 		a.logError(
@@ -97,8 +92,8 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 //FindBalance é um handler para retornar o saldo de uma conta
 func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_balance"
-	var vars = mux.Vars(r)
 
+	var vars = mux.Vars(r)
 	accountId, ok := vars["account_id"]
 	if !ok || !bson.IsObjectIdHex(accountId) {
 		var err = errors.New("Parameter invalid")
