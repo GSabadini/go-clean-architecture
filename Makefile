@@ -8,6 +8,9 @@ fmt:
 vet:
 	go vet ./...
 
+lint:
+	golint ./...
+
 test:
 	go test -cover ./...
 
@@ -19,3 +22,6 @@ down:
 
 logs:
 	docker-compose logs -f go-bank-transfer
+
+enter:
+	docker-compose exec go-bank-transfer bash
