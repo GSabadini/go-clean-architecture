@@ -14,7 +14,7 @@
 create .env through .env.example
 ```
 
-- Start API
+- Starting API
 
 ```sh
 make up
@@ -74,7 +74,7 @@ curl -i --request GET 'http://localhost:3001/api/accounts'
 curl -i --request GET 'http://localhost:3001/api/accounts/{{account_id}}/balance'
 ```
 
-- Create transfer
+- Creating new transfer
 
 ```bash
 curl -i --request POST 'http://localhost:3001/api/transfers' \
