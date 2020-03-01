@@ -48,7 +48,6 @@ func (s HTTPServer) Listen() {
 }
 
 func (s HTTPServer) setAppHandlers(router *mux.Router) {
-	//@TODO REVER PREFIXO
 	api := router.PathPrefix("/api").Subrouter()
 
 	api.Handle("/transfers", s.buildActionStoreTransfer()).Methods(http.MethodPost)

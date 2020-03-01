@@ -15,7 +15,7 @@ func NewTransfer(dbHandler database.NoSQLDBHandler) Transfer {
 	return Transfer{dbHandler: dbHandler}
 }
 
-//Store cria uma transferência
+//Store cria uma transferência através da implementação real do database
 func (t Transfer) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	if err := t.dbHandler.Store(transfersCollectionName, &transfer); err != nil {
 		return domain.Transfer{}, err

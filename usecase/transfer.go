@@ -1,10 +1,12 @@
 package usecase
 
 import (
+	"time"
+
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
-	"gopkg.in/mgo.v2/bson"
-	"time"
 
 	"github.com/pkg/errors"
 )

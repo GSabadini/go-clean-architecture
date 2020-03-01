@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus/hooks/test"
 )
 
-//@TODO REVER TESTES
 func TestAccountStore(t *testing.T) {
 	t.Parallel()
 
