@@ -16,7 +16,7 @@
 
 ## Architecture
 
-![Clean Architecture](docs/cleanarch.png)
+![Clean Architecture](cleanarch.png)
 
 -  This is an attempt to implement a clean architecture, in case you don't already know, here is a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
