@@ -51,14 +51,6 @@ func TestAccountStore(t *testing.T) {
 				rawPayload:    []byte(`{"name": }`),
 			},
 		},
-		{
-			name:               "Store handler invalid balance",
-			expectedStatusCode: http.StatusBadRequest,
-			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
-				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": -10 }`),
-			},
-		},
 	}
 
 	for _, tt := range tests {

@@ -16,13 +16,13 @@ func (a AccountRepositoryMockSuccess) Store(_ domain.Account) (domain.Account, e
 	return domain.Account{
 		ID:        "5e570851adcef50116aa7a5c",
 		Name:      "Test",
-		CPF:       "028.155.170-78",
+		CPF:       "02815517078",
 		Balance:   100,
 		CreatedAt: nil,
 	}, nil
 }
 
-//Update atualiza
+//Update retorna sucesso ao atualizar uma conta
 func (a AccountRepositoryMockSuccess) Update(_ bson.M, _ bson.M) error {
 	return nil
 }
@@ -33,13 +33,13 @@ func (a AccountRepositoryMockSuccess) FindAll() ([]domain.Account, error) {
 		{
 			ID:      "5e570851adcef50116aa7a5c",
 			Name:    "Test-0",
-			CPF:     "028.155.170-78",
+			CPF:     "02815517078",
 			Balance: 0,
 		},
 		{
 			ID:      "5e570854adcef50116aa7a5d",
 			Name:    "Test-1",
-			CPF:     "028.155.170-78",
+			CPF:     "02815517078",
 			Balance: 50.25,
 		},
 	}
@@ -51,8 +51,8 @@ func (a AccountRepositoryMockSuccess) FindAll() ([]domain.Account, error) {
 func (a AccountRepositoryMockSuccess) FindOne(_ bson.M) (*domain.Account, error) {
 	return &domain.Account{
 		ID:      "5e570854adcef50116aa7a5d",
-		Name:    "Test-1",
-		CPF:     "028.155.170-78",
+		Name:    "Test",
+		CPF:     "02815517078",
 		Balance: 50.25,
 	}, nil
 }
