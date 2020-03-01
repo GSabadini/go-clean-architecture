@@ -112,7 +112,8 @@ curl --location --request GET 'http://localhost:3001/api/transfers'
 
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+Copyright © 2020 [GSabadini](https://github.com/GSabadini).<br />
+This project is [MIT](LICENSE) licensed.
 
 ## Credits
-- Gabriel S. Facina - [GSabadini](https://github.com/GSabadini)
+- Gabriel Sabadini Facina - [GSabadini](https://github.com/GSabadini)
