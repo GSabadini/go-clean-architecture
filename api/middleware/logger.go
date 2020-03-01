@@ -54,7 +54,7 @@ func getRequestPayload(r *http.Request) (string, error) {
 		return "", err
 	}
 
-	// re-adiciona o payload ao buffer da request para ser lido por outros handlers
+	// re-adiciona o payload ao buffer da request
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(payload))
 
 	return strings.TrimSpace(string(payload)), nil

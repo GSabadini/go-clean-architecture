@@ -29,7 +29,7 @@ func (a *Account) Deposit(amount float64) {
 //Withdraw remove um valor do saldo
 func (a *Account) Withdraw(amount float64) error {
 	if a.Balance < amount {
-		return errors.New("source account does not have sufficient balance")
+		return errors.New("origin account does not have sufficient balance")
 	}
 
 	a.Balance -= amount

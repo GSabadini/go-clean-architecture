@@ -57,7 +57,7 @@ func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next h
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("data invalid")
+		}).Error("balance invalid")
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
@@ -68,7 +68,18 @@ func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next h
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("data invalid")
+		}).Error("CPF invalid")
+
+		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		return
+	}
+
+	if err := account.validateName(); err != nil {
+		v.logger.WithFields(logrus.Fields{
+			"key":         logKey,
+			"http_status": http.StatusBadRequest,
+			"error":       err.Error(),
+		}).Error("name invalid")
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
@@ -86,7 +97,6 @@ type accountRequest struct {
 	Balance float64 `json:"balance"`
 }
 
-//ValidateBalance verifica se o saldo é valido
 func (a *accountRequest) validateBalance() error {
 	if a.Balance < 0 {
 		return errors.New("balance invalid")
@@ -95,12 +105,19 @@ func (a *accountRequest) validateBalance() error {
 	return nil
 }
 
-//ValidateCPF verifica se o CPF é valido
 func (a *accountRequest) validateCPF() error {
 	var CPFRegexp = regexp.MustCompile(`^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$`)
 
 	if !CPFRegexp.MatchString(a.CPF) {
 		return errors.New("CPF invalid")
+	}
+
+	return nil
+}
+
+func (a *accountRequest) validateName() error {
+	if a.Name == "" {
+		return errors.New("name invalid")
 	}
 
 	return nil

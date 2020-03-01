@@ -1,10 +1,10 @@
 package usecase
 
 import (
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
+	"gopkg.in/mgo.v2/bson"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -18,6 +18,9 @@ func StoreTransfer(
 	if err := processTransfer(accountRepository, transfer); err != nil {
 		return domain.Transfer{}, err
 	}
+
+	transfer.CreatedAt = time.Now()
+	transfer.ID = bson.NewObjectId()
 
 	result, err := transferRepository.Store(transfer)
 	if err != nil {

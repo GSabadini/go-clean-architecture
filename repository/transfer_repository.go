@@ -1,10 +1,6 @@
 package repository
 
 import (
-	"time"
-
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 )
@@ -21,9 +17,6 @@ func NewTransfer(dbHandler database.NoSQLDBHandler) Transfer {
 
 //Store cria uma transferência
 func (t Transfer) Store(transfer domain.Transfer) (domain.Transfer, error) {
-	transfer.CreatedAt = time.Now()
-	transfer.ID = bson.NewObjectId()
-
 	if err := t.dbHandler.Store(transfersCollectionName, &transfer); err != nil {
 		return domain.Transfer{}, err
 	}
