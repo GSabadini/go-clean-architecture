@@ -36,4 +36,3 @@ func (a *Account) Withdraw(amount float64) error {
 
 	return nil
 }
-

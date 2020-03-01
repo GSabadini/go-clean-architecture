@@ -69,7 +69,7 @@ func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
 	}
 
 	var (
-		logging = middleware.NewLogger(s.log).Logging
+		logging  = middleware.NewLogger(s.log).Logging
 		validate = middleware.NewValidateTransfer(s.log).Validate
 	)
 
@@ -103,7 +103,7 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 	}
 
 	var (
-		logging = middleware.NewLogger(s.log).Logging
+		logging  = middleware.NewLogger(s.log).Logging
 		validate = middleware.NewValidateAccount(s.log).Validate
 	)
 

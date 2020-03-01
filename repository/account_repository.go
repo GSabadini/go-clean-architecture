@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"time"
-
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -21,10 +19,6 @@ func NewAccount(dbHandler database.NoSQLDBHandler) Account {
 
 //Store realiza uma inserção no banco de dados através da implementação real do database
 func (a Account) Store(account domain.Account) (domain.Account, error) {
-	t := time.Now()
-	account.CreatedAt = &t
-	account.ID = bson.NewObjectId()
-
 	if err := a.dbHandler.Store(accountsCollectionName, &account); err != nil {
 		return domain.Account{}, err
 	}

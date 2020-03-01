@@ -84,4 +84,3 @@ func (t *transferRequest) validateAmount() error {
 
 	return nil
 }
-

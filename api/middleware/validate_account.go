@@ -81,9 +81,9 @@ func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next h
 }
 
 type accountRequest struct {
-	Name      string        `json:"name"`
-	CPF       string        `json:"cpf"`
-	Balance   float64       `json:"balance"`
+	Name    string  `json:"name"`
+	CPF     string  `json:"cpf"`
+	Balance float64 `json:"balance"`
 }
 
 //ValidateBalance verifica se o saldo é valido

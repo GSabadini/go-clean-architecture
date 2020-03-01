@@ -22,7 +22,6 @@ type Account struct {
 	logger    *logrus.Logger
 }
 
-
 //NewAccount constrói uma conta com suas dependências
 func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
 	return Account{dbHandler: dbHandler, logger: log}
