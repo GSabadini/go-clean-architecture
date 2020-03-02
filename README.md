@@ -51,13 +51,13 @@ make enter-container
 
 ## API Request
 
-| Endpoint        | HTTP Method           | Description     |
-| --------------- |:---------------------:| ---------------:|
-| `/api/accounts`   | `POST`                 | `Create accounts` |
-| `/api/accounts`   | `GET`                  | `List accounts`   |
+| Endpoint        | HTTP Method           | Description       |
+| --------------- | :---------------------: | :-----------------: |
+| `/api/accounts` | `POST`                | `Create accounts` |
+| `/api/accounts` | `GET`                 | `List accounts`   |
 | `/api/accounts/{{account_id}}/balance`   | `GET`                |    `Find balance account` |
-| `/api/transfers`  | `POST`                  | `Create transfer` |
-| `/api/transfers`  | `GET`                   | `List transfers`  |
+| `/api/transfers`| `POST`                | `Create transfer` |
+| `/api/transfers`| `GET`                 | `List transfers`  |
 
 #### Test endpoints API using Postman
 
