@@ -74,7 +74,7 @@ func (v ValidateTransfer) Validate(w http.ResponseWriter, r *http.Request, next 
 	next.ServeHTTP(w, r)
 }
 
-var errAmountInvalid = errors.New("amount invalid")
+var errAmountInvalid = errors.New("Amount invalid")
 
 type transferRequest struct {
 	AccountOriginID      bson.ObjectId `json:"account_origin_id"`

@@ -1,4 +1,4 @@
-# Go Bank Transfer :bank: :money_with_wings: 
+# Go Bank Transfer :bank: :money_with_wings: [![Build Status](https://travis-ci.org/GSabadini/go-bank-transfer.svg?branch=master)](https://travis-ci.org/GSabadini/go-bank-transfer)
 - Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
 
 ## Architecture
