@@ -1,8 +1,9 @@
-# Go Bank Transfer :bank: :money_with_wings:
+# Go Bank Transfer :bank: :money_with_wings: [![Build Status](https://travis-ci.org/GSabadini/go-bank-transfer.svg?branch=master)](https://travis-ci.org/GSabadini/go-bank-transfer)
+
 - Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
 
 ## Architecture
--  This is an attempt to implement a clean architecture, in case you don't already know, here is a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+-  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
 ![Clean Architecture](cleanarch.png)
 
@@ -49,9 +50,11 @@ make logs
 make enter-container
 ```
 
+## API Request
+
 #### Test endpoints API using Postman
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/38286dacebab6fa2975f)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/6f08b3fd0e5eb169f75a)
 
 #### Test endpoints API using curl
 
