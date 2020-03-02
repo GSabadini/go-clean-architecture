@@ -68,7 +68,7 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               200,
 				},
 			},
-			expectedError: "origin account does not have sufficient balance",
+			expectedError: "Origin account does not have sufficient balance",
 			expected:      domain.Transfer{},
 		},
 		{

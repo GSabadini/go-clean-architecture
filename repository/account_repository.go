@@ -20,8 +20,6 @@ func NewAccount(dbHandler database.NoSQLDbHandler) Account {
 	return Account{dbHandler: dbHandler}
 }
 
-var ErrNotFound = errors.New("Not found")
-
 //Store realiza a inserção de uma conta no banco de dados
 func (a Account) Store(account domain.Account) (domain.Account, error) {
 	if err := a.dbHandler.Store(accountsCollectionName, &account); err != nil {
@@ -54,7 +52,7 @@ func (a Account) FindOne(query bson.M) (*domain.Account, error) {
 	if err := a.dbHandler.FindOne(accountsCollectionName, query, nil, &account); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			return account, ErrNotFound
+			return account, domain.ErrNotFound
 		default:
 			return account, errors.Wrap(err, "error fetching account")
 		}
@@ -70,7 +68,7 @@ func (a Account) FindOneWithSelector(query bson.M, selector interface{}) (domain
 	if err := a.dbHandler.FindOne(accountsCollectionName, query, selector, &account); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			return account, ErrNotFound
+			return account, domain.ErrNotFound
 		default:
 			return account, errors.Wrap(err, "error fetching account")
 		}

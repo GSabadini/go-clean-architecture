@@ -48,15 +48,28 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 
 	result, err := usecase.StoreTransfer(transferRepository, accountRepository, transfer)
 	if err != nil {
-		t.logError(
-			logKey,
-			"error when creating a new transfer",
-			http.StatusInternalServerError,
-			err,
-		)
+		switch err {
+		case domain.ErrInsufficientBalance:
+			t.logError(
+				logKey,
+				"insufficient balance",
+				http.StatusUnprocessableEntity,
+				err,
+			)
 
-		ErrorMessage(err, http.StatusInternalServerError).Send(w)
-		return
+			ErrorMessage(err, http.StatusUnprocessableEntity).Send(w)
+			return
+		default:
+			t.logError(
+				logKey,
+				"error when creating a new transfer",
+				http.StatusInternalServerError,
+				err,
+			)
+
+			ErrorMessage(err, http.StatusInternalServerError).Send(w)
+			return
+		}
 	}
 
 	t.logSuccess(logKey, "success create transfer", http.StatusCreated)
@@ -88,19 +101,17 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	Success(result, http.StatusOK).Send(w)
 }
 
-func (t Transfer) logSuccess(key string, description string, httpStatus int) {
+func (t Transfer) logSuccess(key string, message string, httpStatus int) {
 	t.logger.WithFields(logrus.Fields{
 		"key":         key,
 		"http_status": httpStatus,
-		"description": description,
-	}).Info()
+	}).Info(message)
 }
 
-func (t Transfer) logError(key string, description string, httpStatus int, err error) {
+func (t Transfer) logError(key string, message string, httpStatus int, err error) {
 	t.logger.WithFields(logrus.Fields{
 		"key":         key,
 		"http_status": httpStatus,
-		"description": description,
 		"error":       err.Error(),
-	}).Error()
+	}).Error(message)
 }

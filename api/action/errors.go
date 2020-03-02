@@ -3,6 +3,12 @@ package action
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/pkg/errors"
+)
+
+var (
+	ErrParameterInvalid = errors.New("Parameter invalid")
 )
 
 //Error armazena a estrutura de error da API

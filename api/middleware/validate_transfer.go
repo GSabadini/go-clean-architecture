@@ -26,7 +26,10 @@ func NewValidateTransfer(log *logrus.Logger) ValidateTransfer {
 
 //Validate válida os dados de criação de transferência
 func (v ValidateTransfer) Validate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	const logKey = "validate_transfer_middleware"
+	const (
+		logKey              = "validate_transfer_middleware"
+		messageInvalidField = "Invalid field"
+	)
 
 	payload, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -59,7 +62,7 @@ func (v ValidateTransfer) Validate(w http.ResponseWriter, r *http.Request, next 
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("amount invalid")
+		}).Error(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
@@ -71,6 +74,8 @@ func (v ValidateTransfer) Validate(w http.ResponseWriter, r *http.Request, next 
 	next.ServeHTTP(w, r)
 }
 
+var errAmountInvalid = errors.New("amount invalid")
+
 type transferRequest struct {
 	AccountOriginID      bson.ObjectId `json:"account_origin_id"`
 	AccountDestinationID bson.ObjectId `json:"account_destination_id"`
@@ -79,7 +84,7 @@ type transferRequest struct {
 
 func (t *transferRequest) validateAmount() error {
 	if t.Amount < 0 {
-		return errors.New("amount invalid")
+		return errAmountInvalid
 	}
 
 	return nil

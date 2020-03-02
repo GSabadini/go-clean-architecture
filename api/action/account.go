@@ -2,7 +2,6 @@ package action
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"gopkg.in/mgo.v2/bson"
@@ -96,7 +95,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	var vars = mux.Vars(r)
 	accountID, ok := vars["account_id"]
 	if !ok || !bson.IsObjectIdHex(accountID) {
-		var err = errors.New("Parameter invalid")
+		var err = ErrParameterInvalid
 
 		a.logError(
 			logKey,
@@ -114,11 +113,11 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	result, err := usecase.FindBalanceAccount(accountRepository, accountID)
 	if err != nil {
 		switch err {
-		case repository.ErrNotFound:
+		case domain.ErrNotFound:
 			a.logError(
 				logKey,
 				"error fetching account",
-				http.StatusInternalServerError,
+				http.StatusBadRequest,
 				err,
 			)
 
