@@ -60,7 +60,7 @@ func TestStoreTransfer(t *testing.T) {
 		{
 			name: "Create transfer amount not have sufficient",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockError{},
+				transferRepository: repository.TransferRepositoryMockSuccess{},
 				accountRepository:  repository.AccountRepositoryMockSuccess{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
@@ -74,7 +74,7 @@ func TestStoreTransfer(t *testing.T) {
 		{
 			name: "Create transfer error find account",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockError{},
+				transferRepository: repository.TransferRepositoryMockSuccess{},
 				accountRepository:  repository.AccountRepositoryMockError{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
