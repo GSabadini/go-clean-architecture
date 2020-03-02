@@ -95,7 +95,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	var vars = mux.Vars(r)
 	accountID, ok := vars["account_id"]
 	if !ok || !bson.IsObjectIdHex(accountID) {
-		var err = ErrParameterInvalid
+		var err = errParameterInvalid
 
 		a.logError(
 			logKey,

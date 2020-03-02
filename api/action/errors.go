@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrParameterInvalid = errors.New("Parameter invalid")
+	errParameterInvalid = errors.New("Parameter invalid")
 )
 
 //Error armazena a estrutura de error da API
