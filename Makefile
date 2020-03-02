@@ -1,5 +1,11 @@
 #!make
 
+test:
+	go test -cover ./...
+
+test-container:
+	docker-compose exec go-bank-transfer go test -cover ./...
+
 dependencies:
 	go mod download
 
@@ -10,15 +16,6 @@ fmt:
 
 vet:
 	go vet ./...
-
-lint:
-	golint ./...
-
-test:
-	go test -cover ./...
-
-test-container:
-	docker-compose exec go-bank-transfer go test -cover ./...
 
 up:
 	docker-compose up -d
@@ -31,3 +28,16 @@ logs:
 
 enter-container:
 	docker-compose exec go-bank-transfer bash
+
+lint-prepare:
+	@echo "Installing golangci-lint"
+	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s latest
+
+lint:
+	./bin/golangci-lint run \
+		--exclude-use-default=false \
+		--enable=golint \
+		--enable=gocyclo \
+		--enable=goconst \
+		--enable=unconvert \
+		./...

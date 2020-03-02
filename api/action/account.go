@@ -2,7 +2,6 @@ package action
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"gopkg.in/mgo.v2/bson"
@@ -18,12 +17,12 @@ import (
 
 //Account armazena as dependências de uma conta
 type Account struct {
-	dbHandler database.NoSQLDBHandler
+	dbHandler database.NoSQLDbHandler
 	logger    *logrus.Logger
 }
 
 //NewAccount constrói uma conta com suas dependências
-func NewAccount(dbHandler database.NoSQLDBHandler, log *logrus.Logger) Account {
+func NewAccount(dbHandler database.NoSQLDbHandler, log *logrus.Logger) Account {
 	return Account{dbHandler: dbHandler, logger: log}
 }
 
@@ -32,7 +31,6 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
 
 	var account domain.Account
-	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
 		a.logError(
 			logKey,
@@ -44,6 +42,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
+	defer r.Body.Close()
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
@@ -70,6 +69,7 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
+
 	result, err := usecase.FindAllAccount(accountRepository)
 	if err != nil {
 		a.logError(
@@ -88,15 +88,14 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	Success(result, http.StatusOK).Send(w)
 }
 
-//TODO RETORNAR ERRO CORRETO QUANDO NÃO ENCONTRAR A CONTA
 //FindBalance é um handler para retornar o saldo de uma conta
 func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_balance"
 
 	var vars = mux.Vars(r)
-	accountId, ok := vars["account_id"]
-	if !ok || !bson.IsObjectIdHex(accountId) {
-		var err = errors.New("Parameter invalid")
+	accountID, ok := vars["account_id"]
+	if !ok || !bson.IsObjectIdHex(accountID) {
+		var err = errParameterInvalid
 
 		a.logError(
 			logKey,
@@ -111,17 +110,30 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 
 	var accountRepository = repository.NewAccount(a.dbHandler)
 
-	result, err := usecase.FindBalanceAccount(accountRepository, accountId)
+	result, err := usecase.FindBalanceAccount(accountRepository, accountID)
 	if err != nil {
-		a.logError(
-			logKey,
-			"error when returning account balance",
-			http.StatusInternalServerError,
-			err,
-		)
+		switch err {
+		case domain.ErrNotFound:
+			a.logError(
+				logKey,
+				"error fetching account",
+				http.StatusBadRequest,
+				err,
+			)
 
-		ErrorMessage(err, http.StatusInternalServerError).Send(w)
-		return
+			ErrorMessage(err, http.StatusBadRequest).Send(w)
+			return
+		default:
+			a.logError(
+				logKey,
+				"error when returning account balance",
+				http.StatusInternalServerError,
+				err,
+			)
+
+			ErrorMessage(err, http.StatusInternalServerError).Send(w)
+			return
+		}
 	}
 
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)

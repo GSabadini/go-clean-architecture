@@ -9,7 +9,7 @@ import (
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
 	AppName      string
-	ApiPort      int
+	APIPort      int
 	Logger       *logrus.Logger
 	DatabaseName string
 	DatabaseHost string
@@ -19,15 +19,14 @@ type Config struct {
 func NewConfig() Config {
 	return Config{
 		AppName:      "go-bank-transfer",
-		ApiPort:      3001,
-		Logger:       createLoggerApp(),
+		APIPort:      3001,
+		Logger:       getLogger(),
 		DatabaseName: getDatabaseName(),
 		DatabaseHost: getDatabaseHost(),
 	}
 }
 
-//TODO REVER LOCAL DE CRIAÇÃO DO LOGGER
-func createLoggerApp() *logrus.Logger {
+func getLogger() *logrus.Logger {
 	log := logrus.New()
 	log.SetFormatter(&logrus.JSONFormatter{})
 	return log

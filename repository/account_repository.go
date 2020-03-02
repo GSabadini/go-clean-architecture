@@ -1,10 +1,13 @@
 package repository
 
 import (
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+
+	"github.com/pkg/errors"
 )
 
 const accountsCollectionName = "accounts"
@@ -13,52 +16,62 @@ const accountsCollectionName = "accounts"
 type Account DbRepository
 
 //NewAccount constrói um repository com suas dependências
-func NewAccount(dbHandler database.NoSQLDBHandler) Account {
+func NewAccount(dbHandler database.NoSQLDbHandler) Account {
 	return Account{dbHandler: dbHandler}
 }
 
-//Store realiza uma inserção no banco de dados através da implementação real do database
+//Store realiza a inserção de uma conta no banco de dados
 func (a Account) Store(account domain.Account) (domain.Account, error) {
 	if err := a.dbHandler.Store(accountsCollectionName, &account); err != nil {
-		return domain.Account{}, err
+		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
 
 	return account, nil
 }
 
-//Update realiza uma atualização no banco de dados através da implementação real do database
+//Update realiza a atualização de uma conta no banco de dados
 func (a Account) Update(query bson.M, update bson.M) error {
 	return a.dbHandler.Update(accountsCollectionName, query, update)
 }
 
-//FindAll realiza uma busca no banco de dados através da implementação real do database
+//FindAll realiza a busca de todas as contas no banco de dados
 func (a Account) FindAll() ([]domain.Account, error) {
 	var account = make([]domain.Account, 0)
 
 	if err := a.dbHandler.FindAll(accountsCollectionName, nil, &account); err != nil {
-		return []domain.Account{}, err
+		return account, errors.Wrap(err, "error listing accounts")
 	}
 
 	return account, nil
 }
 
-//FindOne realiza uma busca no banco de dados através da implementação real do database
+//FindOne realiza a busca de uma conta no banco de dados
 func (a Account) FindOne(query bson.M) (*domain.Account, error) {
 	var account = &domain.Account{}
 
 	if err := a.dbHandler.FindOne(accountsCollectionName, query, nil, &account); err != nil {
-		return account, err
+		switch err {
+		case mgo.ErrNotFound:
+			return account, domain.ErrNotFound
+		default:
+			return account, errors.Wrap(err, "error fetching account")
+		}
 	}
 
 	return account, nil
 }
 
-//FindOneWithSelector realiza uma busca no banco de dados através da implementação real do database
+//FindOneWithSelector realiza a busca de uma conta com campos específicos no banco de dados
 func (a Account) FindOneWithSelector(query bson.M, selector interface{}) (domain.Account, error) {
 	var account = domain.Account{}
 
 	if err := a.dbHandler.FindOne(accountsCollectionName, query, selector, &account); err != nil {
-		return account, err
+		switch err {
+		case mgo.ErrNotFound:
+			return account, domain.ErrNotFound
+		default:
+			return account, errors.Wrap(err, "error fetching account")
+		}
 	}
 
 	return account, nil

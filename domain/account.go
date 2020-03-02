@@ -3,7 +3,6 @@ package domain
 import (
 	"time"
 
-	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -29,7 +28,7 @@ func (a *Account) Deposit(amount float64) {
 //Withdraw remove um valor do saldo
 func (a *Account) Withdraw(amount float64) error {
 	if a.Balance < amount {
-		return errors.New("origin account does not have sufficient balance")
+		return ErrInsufficientBalance
 	}
 
 	a.Balance -= amount

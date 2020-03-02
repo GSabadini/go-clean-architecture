@@ -38,7 +38,7 @@ func (mgo MongoHandler) Update(collection string, query interface{}, update inte
 	return mgo.Database.C(collection).With(session).Update(query, update)
 }
 
-//FindAll realiza uma busca no banco de dados por todos os registros
+//FindAll realiza uma busca por todos os registros no banco de dados
 func (mgo MongoHandler) FindAll(collection string, query interface{}, result interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
@@ -46,7 +46,7 @@ func (mgo MongoHandler) FindAll(collection string, query interface{}, result int
 	return mgo.Database.C(collection).With(session).Find(query).All(result)
 }
 
-//FindOne realiza uma busca específica no banco de dados
+//FindOne realiza a busca de um item específico no banco de dados
 func (mgo MongoHandler) FindOne(collection string, query interface{}, selector interface{}, result interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()

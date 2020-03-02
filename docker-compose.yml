@@ -1,11 +1,13 @@
-version: '3.3'
+version: "3.3"
 
 services:
   go-bank-transfer:
-    container_name: 'go-bank-transfer'
-    image: go-bank-transfer:dev
+    container_name: "go-bank-transfer"
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
-      - '3001:3001'
+      - 3001:3001
     volumes:
       - ./:/go-bank-transfer
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
@@ -15,9 +17,9 @@ services:
       - mongodb
 
   mongodb:
-    image: 'mongo:latest'
-    container_name: 'mongodb'
+    container_name: "mongodb"
+    image: "mongo:latest"
     ports:
-      - "27017:27017"
+      - 27017:27017
     volumes:
       - ./scripts/mongodb:/docker-entrypoint-initdb.d
