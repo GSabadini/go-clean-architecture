@@ -1,11 +1,12 @@
 package usecase
 
 import (
-	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 func TestStoreTransfer(t *testing.T) {
@@ -59,7 +60,7 @@ func TestStoreTransfer(t *testing.T) {
 		{
 			name: "Create transfer amount not have sufficient",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockError{},
+				transferRepository: repository.TransferRepositoryMockSuccess{},
 				accountRepository:  repository.AccountRepositoryMockSuccess{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
@@ -67,13 +68,13 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               200,
 				},
 			},
-			expectedError: "origin account does not have sufficient balance",
+			expectedError: "Origin account does not have sufficient balance",
 			expected:      domain.Transfer{},
 		},
 		{
 			name: "Create transfer error find account",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockError{},
+				transferRepository: repository.TransferRepositoryMockSuccess{},
 				accountRepository:  repository.AccountRepositoryMockError{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
@@ -81,7 +82,7 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			expectedError: "error fetching account: Error",
+			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
 	}

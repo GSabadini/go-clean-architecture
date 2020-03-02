@@ -12,7 +12,6 @@ import (
 	"github.com/sirupsen/logrus/hooks/test"
 )
 
-//TODO REVER TESTES
 func TestTransferStore(t *testing.T) {
 	type args struct {
 		transferAction Transfer
@@ -26,20 +25,6 @@ func TestTransferStore(t *testing.T) {
 		expectedStatusCode int
 		args               args
 	}{
-		//{
-		//	name: "Store handler success",
-		//	args: args{
-		//		transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, loggerMock),
-		//		rawPayload: []byte(
-		//			`{
-		//				"account_destination_id": "5e551c2c5bb0cb0107b058e1",
-		//				"account_origin_id": "5e551c315bb0cb0107b058e2",
-		//				"amount": 10
-		//			}`,
-		//		),
-		//	},
-		//	expectedStatusCode: http.StatusOK,
-		//},
 		{
 			name: "Store handler invalid ObjectID",
 			args: args{
@@ -63,6 +48,7 @@ func TestTransferStore(t *testing.T) {
 			expectedStatusCode: http.StatusInternalServerError,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var body = bytes.NewReader(tt.args.rawPayload)

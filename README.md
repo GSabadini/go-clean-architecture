@@ -1,5 +1,10 @@
-# Go Bank Transfer :bank: :money_with_wings:
+# Go Bank Transfer :bank: :money_with_wings: [![Build Status](https://travis-ci.org/GSabadini/go-bank-transfer.svg?branch=master)](https://travis-ci.org/GSabadini/go-bank-transfer)
 - Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
+
+## Architecture
+-  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+
+![Clean Architecture](cleanarch.png)
 
 ## Requirements/dependencies
 - Golang (not obligatory)
@@ -44,9 +49,19 @@ make logs
 make enter-container
 ```
 
+## API Request
+
+| Endpoint        | HTTP Method           | Description       |
+| --------------- | :---------------------: | :-----------------: |
+| `/api/accounts` | `POST`                | `Create accounts` |
+| `/api/accounts` | `GET`                 | `List accounts`   |
+| `/api/accounts/{{account_id}}/balance`   | `GET`                |    `Find balance account` |
+| `/api/transfers`| `POST`                | `Create transfer` |
+| `/api/transfers`| `GET`                 | `List transfers`  |
+
 #### Test endpoints API using Postman
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/38286dacebab6fa2975f)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/6f08b3fd0e5eb169f75a)
 
 #### Test endpoints API using curl
 
@@ -80,8 +95,8 @@ curl -i --request GET 'http://localhost:3001/api/accounts/{{account_id}}/balance
 curl -i --request POST 'http://localhost:3001/api/transfers' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-	"account_destination_id": "{account_id}",
-	"account_origin_id": "{account_id}",
+	"account_destination_id": "{{account_id}}",
+	"account_origin_id": "{{account_id}}",
 	"amount": 1.00
 }'
 ```
@@ -89,7 +104,7 @@ curl -i --request POST 'http://localhost:3001/api/transfers' \
 - Listing transfers
 
 ```bash
-curl --location --request GET 'http://localhost:3001/api/transfers'
+curl -i --request GET 'http://localhost:3001/api/transfers'
 ```
 
 ## Git workflow
@@ -98,22 +113,9 @@ curl --location --request GET 'http://localhost:3001/api/transfers'
 ## Code status
 - Development
 
-## Architecture
-
-![Clean Architecture](cleanarch.png)
-
--  This is an attempt to implement a clean architecture, in case you don't already know, here is a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
-
-## Future activities
-
-- [ ] Improve API data validation.
-
-- [ ] Improve tests.
-
+## Author
+- Gabriel Sabadini Facina - [GSabadini](https://github.com/GSabadini)
 
 ## License
 Copyright © 2020 [GSabadini](https://github.com/GSabadini).<br />
 This project is [MIT](LICENSE) licensed.
-
-## Credits
-- Gabriel Sabadini Facina - [GSabadini](https://github.com/GSabadini)

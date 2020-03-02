@@ -18,7 +18,7 @@ func (r *Response) Send(w http.ResponseWriter) error {
 	return json.NewEncoder(w).Encode(r.result)
 }
 
-//Success constrói um response
+//Success constrói uma estrutura de response
 func Success(result interface{}, status int) *Response {
 	return &Response{
 		statusCode: status,

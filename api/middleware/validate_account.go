@@ -3,10 +3,11 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/gsabadini/go-bank-transfer/api/action"
 	"io/ioutil"
 	"net/http"
 	"regexp"
+
+	"github.com/gsabadini/go-bank-transfer/api/action"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -24,7 +25,10 @@ func NewValidateAccount(log *logrus.Logger) ValidateAccount {
 
 //Validate válida os dados de criação de conta
 func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	const logKey = "validate_account_middleware"
+	const (
+		logKey              = "validate_account_middleware"
+		messageInvalidField = "Invalid field"
+	)
 
 	payload, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -57,7 +61,7 @@ func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next h
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("balance invalid")
+		}).Error(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
@@ -68,7 +72,7 @@ func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next h
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("CPF invalid")
+		}).Error(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
@@ -79,7 +83,7 @@ func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next h
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("name invalid")
+		}).Error(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
@@ -91,6 +95,12 @@ func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next h
 	next.ServeHTTP(w, r)
 }
 
+var (
+	errBalanceInvalid = errors.New("Balance invalid")
+	errCPFInvalid     = errors.New("CPF invalid")
+	errNameInvalid    = errors.New("Name invalid")
+)
+
 type accountRequest struct {
 	Name    string  `json:"name"`
 	CPF     string  `json:"cpf"`
@@ -99,7 +109,7 @@ type accountRequest struct {
 
 func (a *accountRequest) validateBalance() error {
 	if a.Balance < 0 {
-		return errors.New("balance invalid")
+		return errBalanceInvalid
 	}
 
 	return nil
@@ -109,7 +119,7 @@ func (a *accountRequest) validateCPF() error {
 	var CPFRegexp = regexp.MustCompile(`^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$`)
 
 	if !CPFRegexp.MatchString(a.CPF) {
-		return errors.New("CPF invalid")
+		return errCPFInvalid
 	}
 
 	return nil
@@ -117,7 +127,7 @@ func (a *accountRequest) validateCPF() error {
 
 func (a *accountRequest) validateName() error {
 	if a.Name == "" {
-		return errors.New("name invalid")
+		return errNameInvalid
 	}
 
 	return nil

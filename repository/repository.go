@@ -9,10 +9,10 @@ import (
 
 //DbRepository encapsula um repositório que contém um handler para determinado banco de dados
 type DbRepository struct {
-	dbHandler database.NoSQLDBHandler
+	dbHandler database.NoSQLDbHandler
 }
 
-//AccountRepository expõe os métodos disponíveis para as abstrações de repository
+//AccountRepository expõe os métodos disponíveis para as abstrações do repositório de contas
 type AccountRepository interface {
 	Store(domain.Account) (domain.Account, error)
 	Update(bson.M, bson.M) error
@@ -21,7 +21,7 @@ type AccountRepository interface {
 	FindOneWithSelector(bson.M, interface{}) (domain.Account, error)
 }
 
-//TransferRepository expõe os métodos disponíveis para as abstrações de repository
+//TransferRepository expõe os métodos disponíveis para as abstrações do repositório de transferências
 type TransferRepository interface {
 	Store(domain.Transfer) (domain.Transfer, error)
 	FindAll() ([]domain.Transfer, error)
