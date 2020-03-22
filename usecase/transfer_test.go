@@ -6,35 +6,33 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/repository/stub"
 )
 
 func TestStoreTransfer(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		transferRepository repository.TransferRepository
-		accountRepository  repository.AccountRepository
-		transfer           domain.Transfer
+		transfer domain.Transfer
 	}
 
 	tests := []struct {
 		name          string
 		args          args
+		usecase       TransferUseCase
 		expected      domain.Transfer
 		expectedError string
 	}{
 		{
 			name: "Create transfer successful",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockSuccess{},
-				accountRepository:  repository.AccountRepositoryMockSuccess{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
 					AccountDestinationID: "5e570851adcef50116aa7a5c",
 					Amount:               20,
 				},
 			},
+			usecase: NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expected: domain.Transfer{
 				ID:                   "5e570851adcef50116aa7a5a",
 				AccountOriginID:      "5e570851adcef50116aa7a5d",
@@ -46,42 +44,39 @@ func TestStoreTransfer(t *testing.T) {
 		{
 			name: "Create transfer error",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockError{},
-				accountRepository:  repository.AccountRepositoryMockSuccess{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
 					AccountDestinationID: "5e570851adcef50116aa7a5c",
 					Amount:               20,
 				},
 			},
+			usecase:       NewTransferService(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
 		{
 			name: "Create transfer amount not have sufficient",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockSuccess{},
-				accountRepository:  repository.AccountRepositoryMockSuccess{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
 					AccountDestinationID: "5e570851adcef50116aa7a5c",
 					Amount:               200,
 				},
 			},
+			usecase:       NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expectedError: "Origin account does not have sufficient balance",
 			expected:      domain.Transfer{},
 		},
 		{
 			name: "Create transfer error find account",
 			args: args{
-				transferRepository: repository.TransferRepositoryMockSuccess{},
-				accountRepository:  repository.AccountRepositoryMockError{},
 				transfer: domain.Transfer{
 					AccountOriginID:      "5e570851adcef50116aa7a5d",
 					AccountDestinationID: "5e570851adcef50116aa7a5c",
 					Amount:               20,
 				},
 			},
+			usecase:       NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
@@ -89,7 +84,7 @@ func TestStoreTransfer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := StoreTransfer(tt.args.transferRepository, tt.args.accountRepository, tt.args.transfer)
+			got, err := tt.usecase.StoreTransfer(tt.args.transfer)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -106,21 +101,15 @@ func TestStoreTransfer(t *testing.T) {
 func TestFindAllTransfer(t *testing.T) {
 	t.Parallel()
 
-	type args struct {
-		repository repository.TransferRepository
-	}
-
 	tests := []struct {
 		name          string
-		args          args
 		expected      []domain.Transfer
+		usecase       TransferUseCase
 		expectedError string
 	}{
 		{
-			name: "Success when returning the transfer list",
-			args: args{
-				repository: repository.TransferRepositoryMockSuccess{},
-			},
+			name:    "Success when returning the transfer list",
+			usecase: NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expected: []domain.Transfer{
 				{
 					ID:                   "5e570851adcef50116aa7a5a",
@@ -139,10 +128,8 @@ func TestFindAllTransfer(t *testing.T) {
 			},
 		},
 		{
-			name: "Error when returning the transfer list",
-			args: args{
-				repository: repository.TransferRepositoryMockError{},
-			},
+			name:          "Error when returning the transfer list",
+			usecase:       NewTransferService(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      []domain.Transfer{},
 		},
@@ -150,7 +137,7 @@ func TestFindAllTransfer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := FindAllTransfer(tt.args.repository)
+			result, err := tt.usecase.FindAllTransfer()
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

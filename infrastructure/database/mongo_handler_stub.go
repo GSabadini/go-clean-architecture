@@ -26,7 +26,9 @@ func (m MongoHandlerSuccessMock) FindOne(_ string, _ interface{}, _ interface{},
 }
 
 //MongoHandlerErrorMock implementa a interface de NoSQLDbHandler com resultados de sucesso
-type MongoHandlerErrorMock struct{}
+type MongoHandlerErrorMock struct {
+	TypeErr error
+}
 
 //Store retorna erro ao criar um recurso
 func (m MongoHandlerErrorMock) Store(_ string, _ interface{}) error {
@@ -45,5 +47,8 @@ func (m MongoHandlerErrorMock) FindAll(_ string, _ interface{}, _ interface{}) e
 
 //FindOne retorna erro ao obter um recurso
 func (m MongoHandlerErrorMock) FindOne(_ string, _ interface{}, _ interface{}, _ interface{}) error {
+	if m.TypeErr != nil {
+		return m.TypeErr
+	}
 	return errors.New("Error")
 }

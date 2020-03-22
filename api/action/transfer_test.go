@@ -6,7 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/domain"
+	stubTransfer "github.com/gsabadini/go-bank-transfer/usecase/stub"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus/hooks/test"
@@ -26,17 +27,21 @@ func TestTransferStore(t *testing.T) {
 		args               args
 	}{
 		{
-			name: "Store handler invalid ObjectID",
+			name: "Store action success",
 			args: args{
-				transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, loggerMock),
-				rawPayload:     []byte(`{"account_destination_id": "test","account_origin_id": "test", "amount": 10 }`),
+				transferAction: NewTransfer(stubTransfer.TransferUseCaseStubSuccess{}, loggerMock),
+				rawPayload: []byte(`{
+					"account_destination_id": "5e570851adcef50116aa7a5c",
+					"account_origin_id": "5e570851adcef50116aa7a5a",
+					"amount": 10 
+				}`),
 			},
-			expectedStatusCode: http.StatusBadRequest,
+			expectedStatusCode: http.StatusCreated,
 		},
 		{
-			name: "Store handler database error",
+			name: "Store action error",
 			args: args{
-				transferAction: NewTransfer(database.MongoHandlerErrorMock{}, loggerMock),
+				transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
 				rawPayload: []byte(
 					`{
 						"account_destination_id": "5e551c2c5bb0cb0107b058e1",
@@ -46,6 +51,51 @@ func TestTransferStore(t *testing.T) {
 				),
 			},
 			expectedStatusCode: http.StatusInternalServerError,
+		},
+		{
+			name: "Store action insufficient balance",
+			args: args{
+				transferAction: NewTransfer(
+					stubTransfer.TransferUseCaseStubError{TypeErr: domain.ErrInsufficientBalance},
+					loggerMock,
+				),
+				rawPayload: []byte(
+					`{
+						"account_destination_id": "5e551c2c5bb0cb0107b058e1",
+						"account_origin_id": "5e551c315bb0cb0107b058e2",
+						"amount": 10
+					}`,
+				),
+			},
+			expectedStatusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "Store action invalid ObjectID",
+			args: args{
+				transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
+				rawPayload: []byte(
+					`{
+						"account_destination_id": "test",
+						"account_origin_id": "test", 
+						"amount": 10 
+					}`,
+				),
+			},
+			expectedStatusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Store action invalid JSON",
+			args: args{
+				transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
+				rawPayload: []byte(
+					`{
+						"account_destination_id": ,
+						"account_origin_id": ,
+						"amount": 
+					}`,
+				),
+			},
+			expectedStatusCode: http.StatusBadRequest,
 		},
 	}
 
@@ -91,17 +141,17 @@ func TestTransferIndex(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Index handler database success",
+			name:               "Index action success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				transferAction: NewTransfer(database.MongoHandlerSuccessMock{}, loggerMock),
+				transferAction: NewTransfer(stubTransfer.TransferUseCaseStubSuccess{}, loggerMock),
 			},
 		},
 		{
-			name:               "Index handler database error",
+			name:               "Index action error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				transferAction: NewTransfer(database.MongoHandlerErrorMock{}, loggerMock),
+				transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
 			},
 		},
 	}

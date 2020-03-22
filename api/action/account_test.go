@@ -3,11 +3,12 @@ package action
 import (
 	"bytes"
 	"fmt"
+	"github.com/gsabadini/go-bank-transfer/domain"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	mock "github.com/gsabadini/go-bank-transfer/usecase/stub"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus/hooks/test"
@@ -29,27 +30,43 @@ func TestAccountStore(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Store handler database success",
+			name:               "Store action success",
 			expectedStatusCode: http.StatusCreated,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
-				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": 10 }`),
+				accountAction: NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
+				rawPayload: []byte(
+					`{
+						"name": "test",
+						"cpf": "44451598087", 
+						"balance": 10 
+					}`,
+				),
 			},
 		},
 		{
-			name:               "Store handler database error",
+			name:               "Store action error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
-				rawPayload:    []byte(`{"name": "test","cpf": "44451598087", "balance": 10 }`),
+				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
+				rawPayload: []byte(
+					`{
+						"name": "test",
+						"cpf": "44451598087", 
+						"balance": 10 
+					}`,
+				),
 			},
 		},
 		{
-			name:               "Store handler invalid JSON",
+			name:               "Store action invalid JSON",
 			expectedStatusCode: http.StatusBadRequest,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
-				rawPayload:    []byte(`{"name": }`),
+				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
+				rawPayload: []byte(
+					`{
+						"name": 
+					}`,
+				),
 			},
 		},
 	}
@@ -98,17 +115,17 @@ func TestAccountIndex(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "Index handler database success",
+			name:               "Index handler success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
+				accountAction: NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
 			},
 		},
 		{
-			name:               "Index handler database error",
+			name:               "Index handler error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
+				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 			},
 		},
 	}
@@ -156,27 +173,35 @@ func TestAccountFindBalance(t *testing.T) {
 		args               args
 	}{
 		{
-			name:               "FindBalance handler database success",
+			name:               "FindBalance action success",
 			expectedStatusCode: http.StatusOK,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerSuccessMock{}, loggerMock),
+				accountAction: NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
 				accountID:     "5e5282beba39bfc244dc4c4b",
 			},
 		},
 		{
-			name:               "FindBalance handler database error",
+			name:               "FindBalance action error",
 			expectedStatusCode: http.StatusInternalServerError,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
+				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 				accountID:     "5e5282beba39bfc244dc4c4b",
 			},
 		},
 		{
-			name:               "FindBalance handler parameter invalid",
+			name:               "FindBalance action parameter invalid",
 			expectedStatusCode: http.StatusBadRequest,
 			args: args{
-				accountAction: NewAccount(database.MongoHandlerErrorMock{}, loggerMock),
+				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 				accountID:     "1",
+			},
+		},
+		{
+			name:               "FindBalance action error fetching account",
+			expectedStatusCode: http.StatusBadRequest,
+			args: args{
+				accountAction: NewAccount(mock.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, loggerMock),
+				accountID:     "5e5282beba39bfc244dc4c4b",
 			},
 		},
 	}

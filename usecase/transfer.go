@@ -11,20 +11,31 @@ import (
 	"github.com/pkg/errors"
 )
 
-//StoreTransfer cria uma nova transferência
-func StoreTransfer(
+type TransferService struct {
+	transferRepository repository.TransferRepository
+	accountRepository  repository.AccountRepository
+}
+
+func NewTransferService(
 	transferRepository repository.TransferRepository,
 	accountRepository repository.AccountRepository,
-	transfer domain.Transfer,
-) (domain.Transfer, error) {
-	if err := processTransfer(accountRepository, transfer); err != nil {
+) TransferService {
+	return TransferService{
+		transferRepository: transferRepository,
+		accountRepository:  accountRepository,
+	}
+}
+
+//StoreTransfer cria uma nova transferência
+func (t TransferService) StoreTransfer(transfer domain.Transfer) (domain.Transfer, error) {
+	if err := t.processTransfer(transfer); err != nil {
 		return domain.Transfer{}, err
 	}
 
 	transfer.CreatedAt = time.Now()
 	transfer.ID = bson.NewObjectId()
 
-	result, err := transferRepository.Store(transfer)
+	result, err := t.transferRepository.Store(transfer)
 	if err != nil {
 		return result, err
 	}
@@ -32,8 +43,8 @@ func StoreTransfer(
 	return result, nil
 }
 
-func processTransfer(repository repository.AccountRepository, transfer domain.Transfer) error {
-	origin, err := repository.FindOne(bson.M{"_id": transfer.GetAccountOriginID()})
+func (t TransferService) processTransfer(transfer domain.Transfer) error {
+	origin, err := t.accountRepository.FindOne(bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
 	}
@@ -42,23 +53,21 @@ func processTransfer(repository repository.AccountRepository, transfer domain.Tr
 		return err
 	}
 
-	destination, err := repository.FindOne(bson.M{"_id": transfer.GetAccountDestinationID()})
+	destination, err := t.accountRepository.FindOne(bson.M{"_id": transfer.GetAccountDestinationID()})
 	if err != nil {
 		return err
 	}
 
 	destination.Deposit(transfer.GetAmount())
 
-	if err = updateAccount(
-		repository,
+	if err = t.updateAccount(
 		bson.M{"_id": transfer.GetAccountOriginID()},
 		bson.M{"$set": bson.M{"balance": origin.GetBalance()}},
 	); err != nil {
 		return err
 	}
 
-	if err = updateAccount(
-		repository,
+	if err = t.updateAccount(
 		bson.M{"_id": transfer.GetAccountDestinationID()},
 		bson.M{"$set": bson.M{"balance": destination.GetBalance()}},
 	); err != nil {
@@ -68,8 +77,8 @@ func processTransfer(repository repository.AccountRepository, transfer domain.Tr
 	return nil
 }
 
-func updateAccount(repository repository.AccountRepository, query bson.M, update bson.M) error {
-	if err := repository.Update(query, update); err != nil {
+func (t TransferService) updateAccount(query bson.M, update bson.M) error {
+	if err := t.accountRepository.Update(query, update); err != nil {
 		return errors.Wrap(err, "error updating account")
 	}
 
@@ -77,8 +86,8 @@ func updateAccount(repository repository.AccountRepository, query bson.M, update
 }
 
 //FindAllTransfer retorna uma lista de transferências
-func FindAllTransfer(repository repository.TransferRepository) ([]domain.Transfer, error) {
-	result, err := repository.FindAll()
+func (t TransferService) FindAllTransfer() ([]domain.Transfer, error) {
+	result, err := t.transferRepository.FindAll()
 	if err != nil {
 		return result, err
 	}
