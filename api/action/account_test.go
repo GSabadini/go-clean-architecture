@@ -18,8 +18,7 @@ func TestAccountStore(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		accountAction Account
-		rawPayload    []byte
+		rawPayload []byte
 	}
 
 	var loggerMock, _ = test.NewNullLogger()
@@ -27,13 +26,14 @@ func TestAccountStore(t *testing.T) {
 	tests := []struct {
 		name               string
 		expectedStatusCode int
+		accountAction      Account
 		args               args
 	}{
 		{
 			name:               "Store action success",
 			expectedStatusCode: http.StatusCreated,
+			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
 			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
 				rawPayload: []byte(
 					`{
 						"name": "test",
@@ -46,8 +46,8 @@ func TestAccountStore(t *testing.T) {
 		{
 			name:               "Store action error",
 			expectedStatusCode: http.StatusInternalServerError,
+			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 				rawPayload: []byte(
 					`{
 						"name": "test",
@@ -60,8 +60,8 @@ func TestAccountStore(t *testing.T) {
 		{
 			name:               "Store action invalid JSON",
 			expectedStatusCode: http.StatusBadRequest,
+			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 				rawPayload: []byte(
 					`{
 						"name": 
@@ -74,7 +74,6 @@ func TestAccountStore(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var body = bytes.NewReader(tt.args.rawPayload)
-
 			req, err := http.NewRequest(http.MethodPost, "/accounts", body)
 			if err != nil {
 				t.Fatal(err)
@@ -85,7 +84,7 @@ func TestAccountStore(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts", tt.args.accountAction.Store).Methods(http.MethodPost)
+			r.HandleFunc("/accounts", tt.accountAction.Store).Methods(http.MethodPost)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
@@ -103,30 +102,22 @@ func TestAccountStore(t *testing.T) {
 func TestAccountIndex(t *testing.T) {
 	t.Parallel()
 
-	type args struct {
-		accountAction Account
-	}
-
 	var loggerMock, _ = test.NewNullLogger()
 
 	tests := []struct {
 		name               string
 		expectedStatusCode int
-		args               args
+		accountAction      Account
 	}{
 		{
 			name:               "Index handler success",
 			expectedStatusCode: http.StatusOK,
-			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
-			},
+			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
 		},
 		{
 			name:               "Index handler error",
 			expectedStatusCode: http.StatusInternalServerError,
-			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
-			},
+			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 		},
 	}
 
@@ -142,7 +133,7 @@ func TestAccountIndex(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts", tt.args.accountAction.Index).Methods(http.MethodGet)
+			r.HandleFunc("/accounts", tt.accountAction.Index).Methods(http.MethodGet)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
@@ -161,8 +152,7 @@ func TestAccountFindBalance(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		accountAction Account
-		accountID     string
+		accountID string
 	}
 
 	var loggerMock, _ = test.NewNullLogger()
@@ -170,38 +160,39 @@ func TestAccountFindBalance(t *testing.T) {
 	tests := []struct {
 		name               string
 		expectedStatusCode int
+		accountAction      Account
 		args               args
 	}{
 		{
 			name:               "FindBalance action success",
 			expectedStatusCode: http.StatusOK,
+			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
 			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
-				accountID:     "5e5282beba39bfc244dc4c4b",
+				accountID: "5e5282beba39bfc244dc4c4b",
 			},
 		},
 		{
 			name:               "FindBalance action error",
 			expectedStatusCode: http.StatusInternalServerError,
+			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
-				accountID:     "5e5282beba39bfc244dc4c4b",
+				accountID: "5e5282beba39bfc244dc4c4b",
 			},
 		},
 		{
 			name:               "FindBalance action parameter invalid",
 			expectedStatusCode: http.StatusBadRequest,
+			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
 			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
-				accountID:     "1",
+				accountID: "1",
 			},
 		},
 		{
 			name:               "FindBalance action error fetching account",
 			expectedStatusCode: http.StatusBadRequest,
+			accountAction:      NewAccount(mock.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, loggerMock),
 			args: args{
-				accountAction: NewAccount(mock.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, loggerMock),
-				accountID:     "5e5282beba39bfc244dc4c4b",
+				accountID: "5e5282beba39bfc244dc4c4b",
 			},
 		},
 	}
@@ -221,7 +212,7 @@ func TestAccountFindBalance(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/accounts/{account_id}/balance", tt.args.accountAction.FindBalance).Methods(http.MethodGet)
+			r.HandleFunc("/accounts/{account_id}/balance", tt.accountAction.FindBalance).Methods(http.MethodGet)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {

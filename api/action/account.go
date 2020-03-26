@@ -42,7 +42,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	result, err := a.usecase.StoreAccount(account)
+	result, err := a.usecase.Store(account)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -64,7 +64,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 
-	result, err := a.usecase.FindAllAccount()
+	result, err := a.usecase.FindAll()
 	if err != nil {
 		a.logError(
 			logKey,
@@ -102,7 +102,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := a.usecase.FindBalanceAccount(accountID)
+	result, err := a.usecase.FindBalance(accountID)
 	if err != nil {
 		switch err {
 		case domain.ErrNotFound:

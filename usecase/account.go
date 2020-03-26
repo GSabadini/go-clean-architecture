@@ -10,16 +10,18 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
-type AccountService struct {
+//Account armazena as depedências para ações de uma conta
+type Account struct {
 	repository repository.AccountRepository
 }
 
-func NewAccountService(repository repository.AccountRepository) AccountService {
-	return AccountService{repository: repository}
+//NewAccount cria uma conta com suas dependências
+func NewAccount(repository repository.AccountRepository) Account {
+	return Account{repository: repository}
 }
 
-//StoreAccount cria uma nova conta
-func (a AccountService) StoreAccount(account domain.Account) (domain.Account, error) {
+//Store cria uma nova conta
+func (a Account) Store(account domain.Account) (domain.Account, error) {
 	t := time.Now()
 	account.CreatedAt = &t
 	account.ID = bson.NewObjectId()
@@ -33,12 +35,8 @@ func (a AccountService) StoreAccount(account domain.Account) (domain.Account, er
 	return result, nil
 }
 
-func (a AccountService) cleanCPF(cpf string) string {
-	return strings.Replace(strings.Replace(cpf, ".", "", -1), "-", "", -1)
-}
-
-//FindAllAccount retorna uma lista de contas
-func (a AccountService) FindAllAccount() ([]domain.Account, error) {
+//FindAll retorna uma lista de contas
+func (a Account) FindAll() ([]domain.Account, error) {
 	result, err := a.repository.FindAll()
 	if err != nil {
 		return result, err
@@ -47,8 +45,8 @@ func (a AccountService) FindAllAccount() ([]domain.Account, error) {
 	return result, nil
 }
 
-//FindBalanceAccount retorna o saldo de uma conta
-func (a AccountService) FindBalanceAccount(ID string) (domain.Account, error) {
+//FindBalance retorna o saldo de uma conta
+func (a Account) FindBalance(ID string) (domain.Account, error) {
 	var (
 		query    = bson.M{"_id": bson.ObjectIdHex(ID)}
 		selector = bson.M{"balance": 1, "_id": 0}
@@ -60,4 +58,8 @@ func (a AccountService) FindBalanceAccount(ID string) (domain.Account, error) {
 	}
 
 	return result, nil
+}
+
+func (a Account) cleanCPF(cpf string) string {
+	return strings.Replace(strings.Replace(cpf, ".", "", -1), "-", "", -1)
 }

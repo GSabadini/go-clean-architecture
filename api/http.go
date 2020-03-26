@@ -27,7 +27,7 @@ type HTTPServer struct {
 func NewHTTPServer(config config.Config) HTTPServer {
 	return HTTPServer{
 		appConfig:          config,
-		databaseConnection: createDatabaseConnection(config),
+		databaseConnection: config.DatabaseConnection,
 		log:                config.Logger,
 	}
 }
@@ -67,7 +67,7 @@ func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
 		var (
 			transferRepository = repository.NewTransfer(s.databaseConnection)
 			accountRepository  = repository.NewAccount(s.databaseConnection)
-			transferUseCase    = usecase.NewTransferService(transferRepository, accountRepository)
+			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 		)
 
 		var transferAction = action.NewTransfer(transferUseCase, s.log)
@@ -76,8 +76,8 @@ func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
 	}
 
 	var (
-		logging  = middleware.NewLogger(s.log).Logging
-		validate = middleware.NewValidateTransfer(s.log).Validate
+		logging  = middleware.NewLogger(s.log).Execute
+		validate = middleware.NewValidateTransfer(s.log).Execute
 	)
 
 	return negroni.New(
@@ -93,7 +93,7 @@ func (s HTTPServer) buildActionIndexTransfer() *negroni.Negroni {
 		var (
 			transferRepository = repository.NewTransfer(s.databaseConnection)
 			accountRepository  = repository.NewAccount(s.databaseConnection)
-			transferUseCase    = usecase.NewTransferService(transferRepository, accountRepository)
+			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 		)
 
 		var transferAction = action.NewTransfer(transferUseCase, s.log)
@@ -102,7 +102,7 @@ func (s HTTPServer) buildActionIndexTransfer() *negroni.Negroni {
 	}
 
 	return negroni.New(
-		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Execute),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
@@ -112,7 +112,7 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			accountRepostory = repository.NewAccount(s.databaseConnection)
-			accountUseCase   = usecase.NewAccountService(accountRepostory)
+			accountUseCase   = usecase.NewAccount(accountRepostory)
 			accountAction    = action.NewAccount(accountUseCase, s.log)
 		)
 
@@ -120,8 +120,8 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 	}
 
 	var (
-		logging  = middleware.NewLogger(s.log).Logging
-		validate = middleware.NewValidateAccount(s.log).Validate
+		logging  = middleware.NewLogger(s.log).Execute
+		validate = middleware.NewValidateAccount(s.log).Execute
 	)
 
 	return negroni.New(
@@ -136,7 +136,7 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			accountRepostory = repository.NewAccount(s.databaseConnection)
-			accountUseCase   = usecase.NewAccountService(accountRepostory)
+			accountUseCase   = usecase.NewAccount(accountRepostory)
 			accountAction    = action.NewAccount(accountUseCase, s.log)
 		)
 
@@ -144,7 +144,7 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	}
 
 	return negroni.New(
-		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Execute),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
@@ -154,7 +154,7 @@ func (s HTTPServer) buildActionFindBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			accountRepostory = repository.NewAccount(s.databaseConnection)
-			accountUseCase   = usecase.NewAccountService(accountRepostory)
+			accountUseCase   = usecase.NewAccount(accountRepostory)
 			accountAction    = action.NewAccount(accountUseCase, s.log)
 		)
 
@@ -162,22 +162,8 @@ func (s HTTPServer) buildActionFindBalanceAccount() *negroni.Negroni {
 	}
 
 	return negroni.New(
-		negroni.HandlerFunc(middleware.NewLogger(s.log).Logging),
+		negroni.HandlerFunc(middleware.NewLogger(s.log).Execute),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
-}
-
-func createDatabaseConnection(c config.Config) *database.MongoHandler {
-	handler, err := database.NewMongoHandler(c.DatabaseHost, c.DatabaseName)
-	if err != nil {
-		c.Logger.Infoln("Could not make a connection to the database")
-
-		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
-		panic(err)
-	}
-
-	c.Logger.Infoln("Successfully connected to the database")
-
-	return handler
 }

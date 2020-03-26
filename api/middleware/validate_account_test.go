@@ -75,8 +75,7 @@ func TestValidateAccount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var body = bytes.NewReader(tt.rawPayload)
-
-			req, err := http.NewRequest(http.MethodPost, "/", body)
+			req, err := http.NewRequest(http.MethodPost, "/accounts", body)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -87,7 +86,7 @@ func TestValidateAccount(t *testing.T) {
 			middlewareHandler := func(w http.ResponseWriter, r *http.Request) {
 				next := func(w http.ResponseWriter, r *http.Request) {}
 				middleware := NewValidateAccount(loggerMock)
-				middleware.Validate(w, r, next)
+				middleware.Execute(w, r, next)
 			}
 
 			var (
@@ -95,7 +94,7 @@ func TestValidateAccount(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/", middlewareHandler).Methods(http.MethodPost)
+			r.HandleFunc("/accounts", middlewareHandler).Methods(http.MethodPost)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {

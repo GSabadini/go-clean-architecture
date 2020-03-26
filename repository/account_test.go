@@ -1,13 +1,14 @@
 package repository
 
 import (
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"reflect"
 	"testing"
 
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database/stub"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 )
 
 func TestAccountStore(t *testing.T) {
@@ -27,12 +28,12 @@ func TestAccountStore(t *testing.T) {
 			name:       "Success to create account",
 			args:       args{account: domain.Account{}},
 			expected:   domain.Account{},
-			repository: NewAccount(database.MongoHandlerSuccessMock{}),
+			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
 		},
 		{
 			name:        "Error to create account",
 			args:        args{account: domain.Account{}},
-			repository:  NewAccount(database.MongoHandlerErrorMock{}),
+			repository:  NewAccount(stub.MongoHandlerErrorStub{}),
 			expectedErr: true,
 		},
 	}
@@ -67,7 +68,7 @@ func TestAccountUpdate(t *testing.T) {
 	}{
 		{
 			name:       "Success to account update",
-			repository: NewAccount(database.MongoHandlerSuccessMock{}),
+			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
 			args: args{
 				query:  bson.M{},
 				update: bson.M{},
@@ -75,7 +76,7 @@ func TestAccountUpdate(t *testing.T) {
 		},
 		{
 			name:       "Error to account update",
-			repository: NewAccount(database.MongoHandlerErrorMock{}),
+			repository: NewAccount(stub.MongoHandlerErrorStub{}),
 			args: args{
 				query:  bson.M{},
 				update: bson.M{},
@@ -102,13 +103,13 @@ func TestAccountFindAll(t *testing.T) {
 	}{
 		{
 			name:       "Success in finding all accounts",
-			repository: NewAccount(database.MongoHandlerSuccessMock{}),
+			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
 
 			expected: []domain.Account{},
 		},
 		{
 			name:        "Error in finding all accounts",
-			repository:  NewAccount(database.MongoHandlerErrorMock{}),
+			repository:  NewAccount(stub.MongoHandlerErrorStub{}),
 			expected:    []domain.Account{},
 			expectedErr: true,
 		},
@@ -144,20 +145,20 @@ func TestAccountFindOne(t *testing.T) {
 	}{
 		{
 			name:       "Success to find account",
-			repository: NewAccount(database.MongoHandlerSuccessMock{}),
+			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
 			args:       args{query: bson.M{}},
 			expected:   &domain.Account{},
 		},
 		{
 			name:        "Error to find account",
-			repository:  NewAccount(database.MongoHandlerErrorMock{}),
+			repository:  NewAccount(stub.MongoHandlerErrorStub{}),
 			args:        args{query: bson.M{}},
 			expected:    &domain.Account{},
 			expectedErr: true,
 		},
 		{
 			name:        "Account not found",
-			repository:  NewAccount(database.MongoHandlerErrorMock{TypeErr: mgo.ErrNotFound}),
+			repository:  NewAccount(stub.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
 			args:        args{query: bson.M{}},
 			expected:    &domain.Account{},
 			expectedErr: true,
@@ -195,18 +196,18 @@ func TestAccountFindOneWithSelector(t *testing.T) {
 	}{
 		{
 			name:       "Success to find account with selector",
-			repository: NewAccount(database.MongoHandlerSuccessMock{}),
+			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
 			expected:   domain.Account{},
 		},
 		{
 			name:        "Error to find account with selector",
-			repository:  NewAccount(database.MongoHandlerErrorMock{}),
+			repository:  NewAccount(stub.MongoHandlerErrorStub{}),
 			expected:    domain.Account{},
 			expectedErr: true,
 		},
 		{
 			name:        "Account with selector not found",
-			repository:  NewAccount(database.MongoHandlerErrorMock{TypeErr: mgo.ErrNotFound}),
+			repository:  NewAccount(stub.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
 			args:        args{query: bson.M{}},
 			expected:    domain.Account{},
 			expectedErr: true,

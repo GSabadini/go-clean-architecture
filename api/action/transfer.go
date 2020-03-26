@@ -39,7 +39,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	result, err := t.usecase.StoreTransfer(transfer)
+	result, err := t.usecase.Store(transfer)
 	if err != nil {
 		switch err {
 		case domain.ErrInsufficientBalance:
@@ -74,7 +74,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_transfer"
 
-	result, err := t.usecase.FindAllTransfer()
+	result, err := t.usecase.FindAll()
 	if err != nil {
 		t.logError(
 			logKey,

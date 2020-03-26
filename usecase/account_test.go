@@ -27,7 +27,7 @@ func TestStoreAccount(t *testing.T) {
 			args: args{
 				account: domain.Account{},
 			},
-			usecase: NewAccountService(stub.AccountRepositoryStubSuccess{}),
+			usecase: NewAccount(stub.AccountRepositoryStubSuccess{}),
 			expected: domain.Account{
 				ID:      "5e570851adcef50116aa7a5c",
 				Name:    "Test",
@@ -38,7 +38,7 @@ func TestStoreAccount(t *testing.T) {
 		{
 			name:          "Create account error",
 			args:          args{account: domain.Account{}},
-			usecase:       NewAccountService(stub.AccountRepositoryStubError{}),
+			usecase:       NewAccount(stub.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      domain.Account{},
 		},
@@ -46,7 +46,7 @@ func TestStoreAccount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.usecase.StoreAccount(tt.args.account)
+			result, err := tt.usecase.Store(tt.args.account)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -70,7 +70,7 @@ func TestFindAllAccount(t *testing.T) {
 	}{
 		{
 			name:    "Success when returning the account list",
-			usecase: NewAccountService(stub.AccountRepositoryStubSuccess{}),
+			usecase: NewAccount(stub.AccountRepositoryStubSuccess{}),
 			expected: []domain.Account{
 				{
 					ID:      "5e570851adcef50116aa7a5c",
@@ -88,7 +88,7 @@ func TestFindAllAccount(t *testing.T) {
 		},
 		{
 			name:          "Error when returning the list of accounts",
-			usecase:       NewAccountService(stub.AccountRepositoryStubError{}),
+			usecase:       NewAccount(stub.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      []domain.Account{},
 		},
@@ -96,7 +96,7 @@ func TestFindAllAccount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.usecase.FindAllAccount()
+			result, err := tt.usecase.FindAll()
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -128,7 +128,7 @@ func TestFindBalanceAccount(t *testing.T) {
 			args: args{
 				ID: "5e519055ba39bfc244dc4625",
 			},
-			usecase: NewAccountService(stub.AccountRepositoryStubSuccess{}),
+			usecase: NewAccount(stub.AccountRepositoryStubSuccess{}),
 			expected: domain.Account{
 				Balance: 100.00,
 			},
@@ -138,14 +138,14 @@ func TestFindBalanceAccount(t *testing.T) {
 			args: args{
 				ID: "5e519055ba39bfc244dc4625",
 			},
-			usecase:       NewAccountService(stub.AccountRepositoryStubError{}),
+			usecase:       NewAccount(stub.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      domain.Account{},
 		},
 	}
 
 	for _, tt := range tests {
-		result, err := tt.usecase.FindBalanceAccount(tt.args.ID)
+		result, err := tt.usecase.FindBalance(tt.args.ID)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

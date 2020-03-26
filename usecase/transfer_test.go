@@ -32,7 +32,7 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase: NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
+			usecase: NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expected: domain.Transfer{
 				ID:                   "5e570851adcef50116aa7a5a",
 				AccountOriginID:      "5e570851adcef50116aa7a5d",
@@ -50,7 +50,7 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase:       NewTransferService(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
@@ -63,7 +63,7 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               200,
 				},
 			},
-			usecase:       NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expectedError: "Origin account does not have sufficient balance",
 			expected:      domain.Transfer{},
 		},
@@ -76,7 +76,7 @@ func TestStoreTransfer(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase:       NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubError{}),
+			usecase:       NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
@@ -84,7 +84,7 @@ func TestStoreTransfer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.usecase.StoreTransfer(tt.args.transfer)
+			got, err := tt.usecase.Store(tt.args.transfer)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -109,7 +109,7 @@ func TestFindAllTransfer(t *testing.T) {
 	}{
 		{
 			name:    "Success when returning the transfer list",
-			usecase: NewTransferService(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
+			usecase: NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expected: []domain.Transfer{
 				{
 					ID:                   "5e570851adcef50116aa7a5a",
@@ -129,7 +129,7 @@ func TestFindAllTransfer(t *testing.T) {
 		},
 		{
 			name:          "Error when returning the transfer list",
-			usecase:       NewTransferService(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      []domain.Transfer{},
 		},
@@ -137,7 +137,7 @@ func TestFindAllTransfer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.usecase.FindAllTransfer()
+			result, err := tt.usecase.FindAll()
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

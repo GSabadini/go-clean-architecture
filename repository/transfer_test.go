@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database/stub"
 )
 
 func TestTransferStore(t *testing.T) {
@@ -23,13 +23,13 @@ func TestTransferStore(t *testing.T) {
 		{
 			name:       "Success to create transfer",
 			args:       args{transfer: domain.Transfer{}},
-			repository: NewTransfer(database.MongoHandlerSuccessMock{}),
+			repository: NewTransfer(stub.MongoHandlerSuccessStub{}),
 			expected:   domain.Transfer{},
 		},
 		{
 			name:        "Error to create transfer",
 			args:        args{transfer: domain.Transfer{}},
-			repository:  NewTransfer(database.MongoHandlerErrorMock{}),
+			repository:  NewTransfer(stub.MongoHandlerErrorStub{}),
 			expected:    domain.Transfer{},
 			expectedErr: true,
 		},
@@ -60,12 +60,12 @@ func TestTransferFindAll(t *testing.T) {
 	}{
 		{
 			name:       "Success to find all the transfers",
-			repository: NewTransfer(database.MongoHandlerSuccessMock{}),
+			repository: NewTransfer(stub.MongoHandlerSuccessStub{}),
 			expected:   []domain.Transfer{},
 		},
 		{
 			name:        "Error to find all the transfers",
-			repository:  NewTransfer(database.MongoHandlerErrorMock{}),
+			repository:  NewTransfer(stub.MongoHandlerErrorStub{}),
 			expected:    []domain.Transfer{},
 			expectedErr: true,
 		},

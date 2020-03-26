@@ -5,12 +5,12 @@ import (
 )
 
 type AccountUseCase interface {
-	StoreAccount(domain.Account) (domain.Account, error)
-	FindAllAccount() ([]domain.Account, error)
-	FindBalanceAccount(string) (domain.Account, error)
+	Store(domain.Account) (domain.Account, error)
+	FindAll() ([]domain.Account, error)
+	FindBalance(string) (domain.Account, error)
 }
 
 type TransferUseCase interface {
-	FindAllTransfer() ([]domain.Transfer, error)
-	StoreTransfer(domain.Transfer) (domain.Transfer, error)
+	Store(domain.Transfer) (domain.Transfer, error)
+	FindAll() ([]domain.Transfer, error)
 }

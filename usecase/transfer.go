@@ -11,23 +11,25 @@ import (
 	"github.com/pkg/errors"
 )
 
-type TransferService struct {
+//Transfer armazena as depedências para ações de uma transferência
+type Transfer struct {
 	transferRepository repository.TransferRepository
 	accountRepository  repository.AccountRepository
 }
 
-func NewTransferService(
+//NewTransfer cria uma transferência com suas dependências
+func NewTransfer(
 	transferRepository repository.TransferRepository,
 	accountRepository repository.AccountRepository,
-) TransferService {
-	return TransferService{
+) Transfer {
+	return Transfer{
 		transferRepository: transferRepository,
 		accountRepository:  accountRepository,
 	}
 }
 
-//StoreTransfer cria uma nova transferência
-func (t TransferService) StoreTransfer(transfer domain.Transfer) (domain.Transfer, error) {
+//Store cria uma nova transferência
+func (t Transfer) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	if err := t.processTransfer(transfer); err != nil {
 		return domain.Transfer{}, err
 	}
@@ -43,7 +45,7 @@ func (t TransferService) StoreTransfer(transfer domain.Transfer) (domain.Transfe
 	return result, nil
 }
 
-func (t TransferService) processTransfer(transfer domain.Transfer) error {
+func (t Transfer) processTransfer(transfer domain.Transfer) error {
 	origin, err := t.accountRepository.FindOne(bson.M{"_id": transfer.GetAccountOriginID()})
 	if err != nil {
 		return err
@@ -77,7 +79,7 @@ func (t TransferService) processTransfer(transfer domain.Transfer) error {
 	return nil
 }
 
-func (t TransferService) updateAccount(query bson.M, update bson.M) error {
+func (t Transfer) updateAccount(query bson.M, update bson.M) error {
 	if err := t.accountRepository.Update(query, update); err != nil {
 		return errors.Wrap(err, "error updating account")
 	}
@@ -85,8 +87,8 @@ func (t TransferService) updateAccount(query bson.M, update bson.M) error {
 	return nil
 }
 
-//FindAllTransfer retorna uma lista de transferências
-func (t TransferService) FindAllTransfer() ([]domain.Transfer, error) {
+//FindAll retorna uma lista de transferências
+func (t Transfer) FindAll() ([]domain.Transfer, error) {
 	result, err := t.transferRepository.FindAll()
 	if err != nil {
 		return result, err

@@ -49,12 +49,22 @@ func TestValidateTransfer(t *testing.T) {
 			),
 			expectedStatusCode: http.StatusBadRequest,
 		},
+		{
+			name: "Invalid account origin equals destination",
+			rawPayload: []byte(
+				`{
+					"account_destination_id": "5e5282beba39bfc244dc4c4b",
+					"account_origin_id": "5e5282beba39bfc244dc4c4b",
+					"amount": 1.00
+				}`,
+			),
+			expectedStatusCode: http.StatusBadRequest,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var body = bytes.NewReader(tt.rawPayload)
-
-			req, err := http.NewRequest(http.MethodPost, "/", body)
+			req, err := http.NewRequest(http.MethodPost, "/transfers", body)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -65,7 +75,7 @@ func TestValidateTransfer(t *testing.T) {
 			middlewareHandler := func(w http.ResponseWriter, r *http.Request) {
 				next := func(w http.ResponseWriter, r *http.Request) {}
 				middleware := NewValidateTransfer(loggerMock)
-				middleware.Validate(w, r, next)
+				middleware.Execute(w, r, next)
 			}
 
 			var (
@@ -73,7 +83,7 @@ func TestValidateTransfer(t *testing.T) {
 				r  = mux.NewRouter()
 			)
 
-			r.HandleFunc("/", middlewareHandler).Methods(http.MethodPost)
+			r.HandleFunc("/transfers", middlewareHandler).Methods(http.MethodPost)
 			r.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
