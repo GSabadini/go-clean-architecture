@@ -1,4 +1,4 @@
-package repository
+package stub
 
 import (
 	"gopkg.in/mgo.v2/bson"
@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-//AccountRepositoryMockSuccess implementa a interface de AccountRepository com resultados de sucesso
-type AccountRepositoryMockSuccess struct{}
+//AccountRepositoryStubSuccess implementa a interface de AccountRepository com resultados de sucesso
+type AccountRepositoryStubSuccess struct{}
 
 //Store cria uma conta pré-definida
-func (a AccountRepositoryMockSuccess) Store(_ domain.Account) (domain.Account, error) {
+func (a AccountRepositoryStubSuccess) Store(_ domain.Account) (domain.Account, error) {
 	return domain.Account{
 		ID:        "5e570851adcef50116aa7a5c",
 		Name:      "Test",
@@ -23,12 +23,12 @@ func (a AccountRepositoryMockSuccess) Store(_ domain.Account) (domain.Account, e
 }
 
 //Update retorna sucesso ao atualizar uma conta
-func (a AccountRepositoryMockSuccess) Update(_ bson.M, _ bson.M) error {
+func (a AccountRepositoryStubSuccess) Update(_ bson.M, _ bson.M) error {
 	return nil
 }
 
 //FindAll retorna uma lista de contas pré-definidas
-func (a AccountRepositoryMockSuccess) FindAll() ([]domain.Account, error) {
+func (a AccountRepositoryStubSuccess) FindAll() ([]domain.Account, error) {
 	var account = []domain.Account{
 		{
 			ID:      "5e570851adcef50116aa7a5c",
@@ -48,7 +48,7 @@ func (a AccountRepositoryMockSuccess) FindAll() ([]domain.Account, error) {
 }
 
 //FindOne retorna uma conta pré-definida
-func (a AccountRepositoryMockSuccess) FindOne(_ bson.M) (*domain.Account, error) {
+func (a AccountRepositoryStubSuccess) FindOne(_ bson.M) (*domain.Account, error) {
 	return &domain.Account{
 		ID:      "5e570854adcef50116aa7a5d",
 		Name:    "Test",
@@ -58,36 +58,36 @@ func (a AccountRepositoryMockSuccess) FindOne(_ bson.M) (*domain.Account, error)
 }
 
 //FindOneWithSelector retorna apenas o saldo da conta
-func (a AccountRepositoryMockSuccess) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
+func (a AccountRepositoryStubSuccess) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
 	return domain.Account{
 		Balance: 100.00,
 	}, nil
 }
 
-//AccountRepositoryMockError implementa a interface de AccountRepository com resultados de erro
-type AccountRepositoryMockError struct{}
+//AccountRepositoryStubError implementa a interface de AccountRepository com resultados de erro
+type AccountRepositoryStubError struct{}
 
 //Store retorna um error ao criar uma conta
-func (a AccountRepositoryMockError) Store(_ domain.Account) (domain.Account, error) {
+func (a AccountRepositoryStubError) Store(_ domain.Account) (domain.Account, error) {
 	return domain.Account{}, errors.New("Error")
 }
 
 //Update retorna um error ao atualizar uma conta
-func (a AccountRepositoryMockError) Update(_ bson.M, _ bson.M) error {
+func (a AccountRepositoryStubError) Update(_ bson.M, _ bson.M) error {
 	return errors.New("Error")
 }
 
 //FindAll retorna um error ao atualizar uma conta
-func (a AccountRepositoryMockError) FindAll() ([]domain.Account, error) {
+func (a AccountRepositoryStubError) FindAll() ([]domain.Account, error) {
 	return []domain.Account{}, errors.New("Error")
 }
 
 //FindOne retorna um error ao buscar uma conta
-func (a AccountRepositoryMockError) FindOne(_ bson.M) (*domain.Account, error) {
+func (a AccountRepositoryStubError) FindOne(_ bson.M) (*domain.Account, error) {
 	return &domain.Account{}, errors.New("Error")
 }
 
 //FindOneWithSelector retorna um error ao buscar uma conta com campo específico
-func (a AccountRepositoryMockError) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
+func (a AccountRepositoryStubError) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
 	return domain.Account{}, errors.New("Error")
 }

@@ -5,9 +5,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/urfave/negroni"
 )
 
 //Logger armazena a estrutura de logger para entrada e saídas da API
@@ -20,9 +22,15 @@ func NewLogger(log *logrus.Logger) Logger {
 	return Logger{logger: log}
 }
 
-//Logging cria logs de entrada e saída da API
-func (l Logger) Logging(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	const logKey = "logger_middleware"
+//Execute cria logs de entrada e saída da API
+func (l Logger) Execute(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	start := time.Now()
+
+	const (
+		logKey      = "logger_middleware"
+		requestKey  = "api_request"
+		responseKey = "api_response"
+	)
 
 	body, err := getRequestPayload(r)
 	if err != nil {
@@ -36,19 +44,23 @@ func (l Logger) Logging(w http.ResponseWriter, r *http.Request, next http.Handle
 	}
 
 	l.logger.WithFields(logrus.Fields{
-		"key":         "api_request",
+		"key":         requestKey,
 		"payload":     body,
 		"url":         r.URL.Path,
 		"http_method": r.Method,
-	}).Info("request received by the API")
+	}).Info("started handling request")
 
 	next.ServeHTTP(w, r)
 
+	end := time.Since(start).Seconds()
+	res := w.(negroni.ResponseWriter)
 	l.logger.WithFields(logrus.Fields{
-		"key":         "api_response",
-		"url":         r.URL.Path,
-		"http_method": r.Method,
-	}).Info("response returned from the API")
+		"key":           responseKey,
+		"url":           r.URL.Path,
+		"http_method":   r.Method,
+		"http_status":   res.Status(),
+		"response_time": end,
+	}).Info("completed handling request")
 }
 
 func getRequestPayload(r *http.Request) (string, error) {

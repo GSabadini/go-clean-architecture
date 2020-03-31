@@ -1,4 +1,4 @@
-package repository
+package stub
 
 import (
 	"time"
@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-//TransferRepositoryMockSuccess implementa a interface de TransferRepository com resultados de sucesso
-type TransferRepositoryMockSuccess struct{}
+//TransferRepositoryStubSuccess implementa a interface de TransferRepository com resultados de sucesso
+type TransferRepositoryStubSuccess struct{}
 
 //Store cria uma transferência pré-definida
-func (t TransferRepositoryMockSuccess) Store(_ domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepositoryStubSuccess) Store(_ domain.Transfer) (domain.Transfer, error) {
 	return domain.Transfer{
 		ID:                   "5e570851adcef50116aa7a5a",
 		AccountOriginID:      "5e570851adcef50116aa7a5d",
@@ -23,7 +23,7 @@ func (t TransferRepositoryMockSuccess) Store(_ domain.Transfer) (domain.Transfer
 }
 
 //FindAll retorna uma lista de transferências pré-definidas
-func (t TransferRepositoryMockSuccess) FindAll() ([]domain.Transfer, error) {
+func (t TransferRepositoryStubSuccess) FindAll() ([]domain.Transfer, error) {
 	return []domain.Transfer{
 		{
 			ID:                   "5e570851adcef50116aa7a5a",
@@ -43,14 +43,14 @@ func (t TransferRepositoryMockSuccess) FindAll() ([]domain.Transfer, error) {
 }
 
 //TransferRepositoryMockError implementa a interface de TransferRepository com resultados de erro
-type TransferRepositoryMockError struct{}
+type TransferRepositoryStubError struct{}
 
 //Store retorna um error ao criar uma transferência
-func (t TransferRepositoryMockError) Store(_ domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepositoryStubError) Store(_ domain.Transfer) (domain.Transfer, error) {
 	return domain.Transfer{}, errors.New("Error")
 }
 
 //FindAll retorna um error ao listar as transferências
-func (t TransferRepositoryMockError) FindAll() ([]domain.Transfer, error) {
+func (t TransferRepositoryStubError) FindAll() ([]domain.Transfer, error) {
 	return []domain.Transfer{}, errors.New("Error")
 }
