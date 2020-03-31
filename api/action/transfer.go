@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
 	"github.com/sirupsen/logrus"
@@ -14,13 +12,13 @@ import (
 
 //Transfer armazena as dependências de uma transferência
 type Transfer struct {
-	dbHandler database.NoSQLDbHandler
-	logger    *logrus.Logger
+	logger  *logrus.Logger
+	usecase usecase.TransferUseCase
 }
 
 //NewTransfer constrói uma transferência com suas dependências
-func NewTransfer(dbHandler database.NoSQLDbHandler, log *logrus.Logger) Transfer {
-	return Transfer{dbHandler: dbHandler, logger: log}
+func NewTransfer(usecase usecase.TransferUseCase, log *logrus.Logger) Transfer {
+	return Transfer{usecase: usecase, logger: log}
 }
 
 //Store é um handler para criação de transferência
@@ -41,12 +39,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	var (
-		transferRepository = repository.NewTransfer(t.dbHandler)
-		accountRepository  = repository.NewAccount(t.dbHandler)
-	)
-
-	result, err := usecase.StoreTransfer(transferRepository, accountRepository, transfer)
+	result, err := t.usecase.Store(transfer)
 	if err != nil {
 		switch err {
 		case domain.ErrInsufficientBalance:
@@ -81,9 +74,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_transfer"
 
-	var transferRepository = repository.NewTransfer(t.dbHandler)
-
-	result, err := usecase.FindAllTransfer(transferRepository)
+	result, err := t.usecase.FindAll()
 	if err != nil {
 		t.logError(
 			logKey,

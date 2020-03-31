@@ -24,8 +24,8 @@ func NewValidateTransfer(log *logrus.Logger) ValidateTransfer {
 	return ValidateTransfer{logger: log}
 }
 
-//Validate válida os dados de criação de transferência
-func (v ValidateTransfer) Validate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+//Execute válida os dados de criação de transferência
+func (v ValidateTransfer) Execute(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	const (
 		logKey              = "validate_transfer_middleware"
 		messageInvalidField = "Invalid field"
@@ -68,13 +68,27 @@ func (v ValidateTransfer) Validate(w http.ResponseWriter, r *http.Request, next 
 		return
 	}
 
+	if err := transfer.validateOriginEqualsDestination(); err != nil {
+		v.logger.WithFields(logrus.Fields{
+			"key":         logKey,
+			"http_status": http.StatusBadRequest,
+			"error":       err.Error(),
+		}).Error(messageInvalidField)
+
+		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		return
+	}
+
 	// re-adiciona o payload ao buffer da request
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(payload))
 
 	next.ServeHTTP(w, r)
 }
 
-var errAmountInvalid = errors.New("Amount invalid")
+var (
+	errAmountInvalid                  = errors.New("Amount invalid")
+	errAccountOriginEqualsDestination = errors.New("Account origin equals destination account")
+)
 
 type transferRequest struct {
 	AccountOriginID      bson.ObjectId `json:"account_origin_id"`
@@ -85,6 +99,14 @@ type transferRequest struct {
 func (t *transferRequest) validateAmount() error {
 	if t.Amount < 0 {
 		return errAmountInvalid
+	}
+
+	return nil
+}
+
+func (t *transferRequest) validateOriginEqualsDestination() error {
+	if t.AccountOriginID == t.AccountDestinationID {
+		return errAccountOriginEqualsDestination
 	}
 
 	return nil

@@ -1,4 +1,5 @@
-#!make
+build:
+	go build -a --installsuffix cgo --ldflags="-s" -o main
 
 test:
 	go test -cover ./...

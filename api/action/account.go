@@ -7,8 +7,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
 	"github.com/gorilla/mux"
@@ -17,13 +15,13 @@ import (
 
 //Account armazena as dependências de uma conta
 type Account struct {
-	dbHandler database.NoSQLDbHandler
-	logger    *logrus.Logger
+	usecase usecase.AccountUseCase
+	logger  *logrus.Logger
 }
 
 //NewAccount constrói uma conta com suas dependências
-func NewAccount(dbHandler database.NoSQLDbHandler, log *logrus.Logger) Account {
-	return Account{dbHandler: dbHandler, logger: log}
+func NewAccount(usecase usecase.AccountUseCase, log *logrus.Logger) Account {
+	return Account{usecase: usecase, logger: log}
 }
 
 //Store é um handler para criação de conta
@@ -44,9 +42,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	var accountRepository = repository.NewAccount(a.dbHandler)
-
-	result, err := usecase.StoreAccount(accountRepository, account)
+	result, err := a.usecase.Store(account)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -68,9 +64,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 
-	var accountRepository = repository.NewAccount(a.dbHandler)
-
-	result, err := usecase.FindAllAccount(accountRepository)
+	result, err := a.usecase.FindAll()
 	if err != nil {
 		a.logError(
 			logKey,
@@ -108,9 +102,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var accountRepository = repository.NewAccount(a.dbHandler)
-
-	result, err := usecase.FindBalanceAccount(accountRepository, accountID)
+	result, err := a.usecase.FindBalance(accountID)
 	if err != nil {
 		switch err {
 		case domain.ErrNotFound:

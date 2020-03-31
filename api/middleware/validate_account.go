@@ -23,8 +23,8 @@ func NewValidateAccount(log *logrus.Logger) ValidateAccount {
 	return ValidateAccount{logger: log}
 }
 
-//Validate válida os dados de criação de conta
-func (v ValidateAccount) Validate(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+//Execute válida os dados de criação de conta
+func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	const (
 		logKey              = "validate_account_middleware"
 		messageInvalidField = "Invalid field"
