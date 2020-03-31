@@ -1,26 +1,21 @@
-FROM golang:1.14.0-alpine3.11 as builder
+FROM golang:alpine as builder
 
-RUN apk add --no-cache --virtual .build-deps \
-    bash \
-    gcc \
-    git \
-    musl-dev
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64 \
+    MONGODB_HOST=mongodb \
+    MONGODB_DATABASE=bank
 
-RUN mkdir /go-bank-transfer
-COPY . /go-bank-transfer
-WORKDIR /go-bank-transfer
-
+WORKDIR /build
+COPY . .
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main .
-RUN adduser -S -D -H -h /go-bank-transfer main
-USER main
+RUN go build -a --installsuffix cgo --ldflags="-s" -o main
 
 FROM scratch
 
-COPY --from=builder /go-bank-transfer /go-bank-transfer
+COPY --from=builder /build .
 
-WORKDIR /go-bank-transfer
+ENTRYPOINT ["./main"]
 
 EXPOSE 3001
-
-CMD ["./main"]

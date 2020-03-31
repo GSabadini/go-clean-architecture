@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
 	"github.com/gsabadini/go-bank-transfer/api/middleware"
@@ -11,6 +12,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
@@ -43,8 +45,15 @@ func (s HTTPServer) Listen() {
 	s.setAppHandlers(router)
 	negroniHandler.UseHandler(router)
 
+	srv := &http.Server{
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Addr:         address,
+		Handler:      context.ClearHandler(http.DefaultServeMux),
+	}
+
 	s.log.Infoln("Starting HTTP server on the port", s.appConfig.APIPort)
-	if err := http.ListenAndServe(address, negroniHandler); err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		s.log.WithError(err).Fatalln("Error starting HTTP server")
 	}
 }
