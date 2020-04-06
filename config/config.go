@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
@@ -66,4 +67,26 @@ func getDatabaseName() string {
 	}
 
 	panic("Environment variable 'MONGODB_DATABASE' has not been defined")
+}
+
+func getDatabaseConnection1(logger *logrus.Logger) *database.PostgresHandler {
+	ds := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_PORT"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_DATABASE"),
+		os.Getenv("POSTGRES_DATABASE"),
+	)
+
+	handler, err := database.NewPostgresHandler(ds)
+	if err != nil {
+		logger.Infoln("Could not make a connection to the database")
+
+		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
+		panic(err)
+	}
+
+	logger.Infoln("Successfully connected to the database")
+
+	return handler
 }

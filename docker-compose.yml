@@ -15,6 +15,7 @@ services:
       - .env
     depends_on:
       - mongodb
+      - postgres
 
   mongodb:
     container_name: "mongodb"
@@ -23,3 +24,15 @@ services:
       - 27017:27017
     volumes:
       - ./scripts/mongodb:/docker-entrypoint-initdb.d
+
+  postgres:
+    container_name: "postgres"
+    image: "postgres:12.2-alpine"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: bank
+    volumes:
+      - ./scripts/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
