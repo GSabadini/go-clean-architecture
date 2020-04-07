@@ -3,7 +3,6 @@ package repository
 import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-
 	"github.com/pkg/errors"
 )
 
@@ -13,7 +12,7 @@ const transfersCollectionName = "transfers"
 type Transfer DbRepository
 
 //NewTransfer cria um repository com suas dependências
-func NewTransfer(dbHandler database.NoSQLDbHandler) Transfer {
+func NewTransfer(dbHandler database.DbHandler) Transfer {
 	return Transfer{dbHandler: dbHandler}
 }
 

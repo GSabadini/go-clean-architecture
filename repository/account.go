@@ -1,13 +1,12 @@
 package repository
 
 import (
+	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-
-	"github.com/pkg/errors"
 )
 
 const accountsCollectionName = "accounts"
@@ -16,7 +15,7 @@ const accountsCollectionName = "accounts"
 type Account DbRepository
 
 //NewAccount constrói um repository com suas dependências
-func NewAccount(dbHandler database.NoSQLDbHandler) Account {
+func NewAccount(dbHandler database.DbHandler) Account {
 	return Account{dbHandler: dbHandler}
 }
 
@@ -29,9 +28,18 @@ func (a Account) Store(account domain.Account) (domain.Account, error) {
 	return account, nil
 }
 
-//Update realiza a atualização de uma conta no banco de dados
-func (a Account) Update(query bson.M, update bson.M) error {
-	return a.dbHandler.Update(accountsCollectionName, query, update)
+//UpdateBalance realiza a atualização do saldo de uma conta no banco de dados
+func (a Account) UpdateBalance(ID string, balance float64) error {
+	var (
+		query  = bson.M{"id": ID}
+		update = bson.M{"$set": bson.M{"balance": balance}}
+	)
+
+	if err := a.dbHandler.Update(accountsCollectionName, query, update); err != nil {
+		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
+	}
+
+	return nil
 }
 
 //FindAll realiza a busca de todas as contas no banco de dados
@@ -46,13 +54,16 @@ func (a Account) FindAll() ([]domain.Account, error) {
 }
 
 //FindOne realiza a busca de uma conta no banco de dados
-func (a Account) FindOne(query bson.M) (*domain.Account, error) {
-	var account = &domain.Account{}
+func (a Account) FindOne(ID string) (*domain.Account, error) {
+	var (
+		account = &domain.Account{}
+		query   = bson.M{"id": ID}
+	)
 
 	if err := a.dbHandler.FindOne(accountsCollectionName, query, nil, &account); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			return account, domain.ErrNotFound
+			return account, errors.Wrap(domain.ErrNotFound, "error fetching account")
 		default:
 			return account, errors.Wrap(err, "error fetching account")
 		}
@@ -61,16 +72,20 @@ func (a Account) FindOne(query bson.M) (*domain.Account, error) {
 	return account, nil
 }
 
-//FindOneWithSelector realiza a busca de uma conta com campos específicos no banco de dados
-func (a Account) FindOneWithSelector(query bson.M, selector interface{}) (domain.Account, error) {
-	var account = domain.Account{}
+//FindBalance realiza a busca do saldo de uma conta no banco de dados
+func (a Account) FindBalance(ID string) (domain.Account, error) {
+	var (
+		account  = domain.Account{}
+		query    = bson.M{"id": ID}
+		selector = bson.M{"balance": 1, "_id": 0}
+	)
 
 	if err := a.dbHandler.FindOne(accountsCollectionName, query, selector, &account); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			return account, domain.ErrNotFound
+			return account, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
 		default:
-			return account, errors.Wrap(err, "error fetching account")
+			return account, errors.Wrap(err, "error fetching account balance")
 		}
 	}
 

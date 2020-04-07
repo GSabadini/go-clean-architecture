@@ -20,8 +20,8 @@ func TestValidateTransfer(t *testing.T) {
 			name: "Valid transfer",
 			rawPayload: []byte(
 				`{
-					"account_destination_id": "5e5282beba39bfc244dc4c4b" ,
-					"account_origin_id": "5e5282beba39bfc244dc4c4a",
+					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680" ,
+					"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
 					"amount": 1.00
 				}`,
 			),
@@ -42,8 +42,8 @@ func TestValidateTransfer(t *testing.T) {
 			name: "Invalid amount",
 			rawPayload: []byte(
 				`{
-					"account_destination_id": "5e5282beba39bfc244dc4c4b",
-					"account_origin_id": "5e5282beba39bfc244dc4c4a",
+					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+					"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
 					"amount": -1.00
 				}`,
 			),
@@ -53,8 +53,8 @@ func TestValidateTransfer(t *testing.T) {
 			name: "Invalid account origin equals destination",
 			rawPayload: []byte(
 				`{
-					"account_destination_id": "5e5282beba39bfc244dc4c4b",
-					"account_origin_id": "5e5282beba39bfc244dc4c4b",
+					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+					"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
 					"amount": 1.00
 				}`,
 			),

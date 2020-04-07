@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
@@ -88,7 +86,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 
 	var vars = mux.Vars(r)
 	accountID, ok := vars["account_id"]
-	if !ok || !bson.IsObjectIdHex(accountID) {
+	if !ok {
 		var err = errParameterInvalid
 
 		a.logError(

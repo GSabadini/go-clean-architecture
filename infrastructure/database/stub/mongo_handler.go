@@ -6,22 +6,22 @@ import "errors"
 type MongoHandlerSuccessStub struct{}
 
 //Store retorna sucesso ao criar um recurso
-func (m MongoHandlerSuccessStub) Store(_ string, _ interface{}) error {
+func (m MongoHandlerSuccessStub) Store(_ string, _ ...interface{}) error {
 	return nil
 }
 
 //Update retorna sucesso ao atualizar um recurso
-func (m MongoHandlerSuccessStub) Update(_ string, _ interface{}, _ interface{}) error {
+func (m MongoHandlerSuccessStub) Update(_ string, _ ...interface{}) error {
 	return nil
 }
 
 //FindAll retorna sucesso ao listar recursos
-func (m MongoHandlerSuccessStub) FindAll(_ string, _ interface{}, _ interface{}) error {
+func (m MongoHandlerSuccessStub) FindAll(_ string, _ ...interface{}) error {
 	return nil
 }
 
 //FindOne retorna sucesso ao obter um recurso
-func (m MongoHandlerSuccessStub) FindOne(_ string, _ interface{}, _ interface{}, _ interface{}) error {
+func (m MongoHandlerSuccessStub) FindOne(_ string, _ ...interface{}) error {
 	return nil
 }
 
@@ -31,22 +31,22 @@ type MongoHandlerErrorStub struct {
 }
 
 //Store retorna erro ao criar um recurso
-func (m MongoHandlerErrorStub) Store(_ string, _ interface{}) error {
+func (m MongoHandlerErrorStub) Store(_ string, _ ...interface{}) error {
 	return errors.New("Error")
 }
 
 //Update retorna erro ao atualizar um recurso
-func (m MongoHandlerErrorStub) Update(_ string, _ interface{}, _ interface{}) error {
+func (m MongoHandlerErrorStub) Update(_ string, _ ...interface{}) error {
 	return errors.New("Error")
 }
 
 //FindAll retorna erro ao listar recursos
-func (m MongoHandlerErrorStub) FindAll(_ string, _ interface{}, _ interface{}) error {
+func (m MongoHandlerErrorStub) FindAll(_ string, _ ...interface{}) error {
 	return errors.New("Error")
 }
 
 //FindOne retorna erro ao obter um recurso
-func (m MongoHandlerErrorStub) FindOne(_ string, _ interface{}, _ interface{}, _ interface{}) error {
+func (m MongoHandlerErrorStub) FindOne(_ string, _ ...interface{}) error {
 	if m.TypeErr != nil {
 		return m.TypeErr
 	}

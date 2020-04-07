@@ -1,8 +1,6 @@
 package stub
 
 import (
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/gsabadini/go-bank-transfer/domain"
 
 	"github.com/pkg/errors"
@@ -14,7 +12,7 @@ type AccountRepositoryStubSuccess struct{}
 //Store cria uma conta pré-definida
 func (a AccountRepositoryStubSuccess) Store(_ domain.Account) (domain.Account, error) {
 	return domain.Account{
-		ID:        "5e570851adcef50116aa7a5c",
+		ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 		Name:      "Test",
 		CPF:       "02815517078",
 		Balance:   100,
@@ -22,8 +20,8 @@ func (a AccountRepositoryStubSuccess) Store(_ domain.Account) (domain.Account, e
 	}, nil
 }
 
-//Update retorna sucesso ao atualizar uma conta
-func (a AccountRepositoryStubSuccess) Update(_ bson.M, _ bson.M) error {
+//UpdateBalance retorna sucesso ao atualizar uma conta
+func (a AccountRepositoryStubSuccess) UpdateBalance(_ string, _ float64) error {
 	return nil
 }
 
@@ -31,13 +29,13 @@ func (a AccountRepositoryStubSuccess) Update(_ bson.M, _ bson.M) error {
 func (a AccountRepositoryStubSuccess) FindAll() ([]domain.Account, error) {
 	var account = []domain.Account{
 		{
-			ID:      "5e570851adcef50116aa7a5c",
+			ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 			Name:    "Test-0",
 			CPF:     "02815517078",
 			Balance: 0,
 		},
 		{
-			ID:      "5e570854adcef50116aa7a5d",
+			ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 			Name:    "Test-1",
 			CPF:     "02815517078",
 			Balance: 50.25,
@@ -48,17 +46,17 @@ func (a AccountRepositoryStubSuccess) FindAll() ([]domain.Account, error) {
 }
 
 //FindOne retorna uma conta pré-definida
-func (a AccountRepositoryStubSuccess) FindOne(_ bson.M) (*domain.Account, error) {
+func (a AccountRepositoryStubSuccess) FindOne(_ string) (*domain.Account, error) {
 	return &domain.Account{
-		ID:      "5e570854adcef50116aa7a5d",
+		ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 		Name:    "Test",
 		CPF:     "02815517078",
 		Balance: 50.25,
 	}, nil
 }
 
-//FindOneWithSelector retorna apenas o saldo da conta
-func (a AccountRepositoryStubSuccess) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
+//FindBalance retorna apenas o saldo da conta
+func (a AccountRepositoryStubSuccess) FindBalance(_ string) (domain.Account, error) {
 	return domain.Account{
 		Balance: 100.00,
 	}, nil
@@ -72,8 +70,8 @@ func (a AccountRepositoryStubError) Store(_ domain.Account) (domain.Account, err
 	return domain.Account{}, errors.New("Error")
 }
 
-//Update retorna um error ao atualizar uma conta
-func (a AccountRepositoryStubError) Update(_ bson.M, _ bson.M) error {
+//UpdateBalance retorna um error ao atualizar uma conta
+func (a AccountRepositoryStubError) UpdateBalance(_ string, _ float64) error {
 	return errors.New("Error")
 }
 
@@ -83,11 +81,11 @@ func (a AccountRepositoryStubError) FindAll() ([]domain.Account, error) {
 }
 
 //FindOne retorna um error ao buscar uma conta
-func (a AccountRepositoryStubError) FindOne(_ bson.M) (*domain.Account, error) {
+func (a AccountRepositoryStubError) FindOne(_ string) (*domain.Account, error) {
 	return &domain.Account{}, errors.New("Error")
 }
 
-//FindOneWithSelector retorna um error ao buscar uma conta com campo específico
-func (a AccountRepositoryStubError) FindOneWithSelector(_ bson.M, _ interface{}) (domain.Account, error) {
+//FindBalance retorna um error ao buscar uma conta com campo específico
+func (a AccountRepositoryStubError) FindBalance(_ string) (domain.Account, error) {
 	return domain.Account{}, errors.New("Error")
 }

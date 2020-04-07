@@ -1,11 +1,11 @@
 package usecase
 
 import (
-	"github.com/gsabadini/go-bank-transfer/repository/stub"
 	"reflect"
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/repository/stub"
 )
 
 func TestStoreAccount(t *testing.T) {
@@ -29,7 +29,7 @@ func TestStoreAccount(t *testing.T) {
 			},
 			usecase: NewAccount(stub.AccountRepositoryStubSuccess{}),
 			expected: domain.Account{
-				ID:      "5e570851adcef50116aa7a5c",
+				ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:    "Test",
 				CPF:     "02815517078",
 				Balance: 100,
@@ -73,13 +73,13 @@ func TestFindAllAccount(t *testing.T) {
 			usecase: NewAccount(stub.AccountRepositoryStubSuccess{}),
 			expected: []domain.Account{
 				{
-					ID:      "5e570851adcef50116aa7a5c",
+					ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:    "Test-0",
 					CPF:     "02815517078",
 					Balance: 0,
 				},
 				{
-					ID:      "5e570854adcef50116aa7a5d",
+					ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:    "Test-1",
 					CPF:     "02815517078",
 					Balance: 50.25,
@@ -126,7 +126,7 @@ func TestFindBalanceAccount(t *testing.T) {
 		{
 			name: "Success when returning the account balance",
 			args: args{
-				ID: "5e519055ba39bfc244dc4625",
+				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			usecase: NewAccount(stub.AccountRepositoryStubSuccess{}),
 			expected: domain.Account{
@@ -136,7 +136,7 @@ func TestFindBalanceAccount(t *testing.T) {
 		{
 			name: "Error returning account balance",
 			args: args{
-				ID: "5e519055ba39bfc244dc4625",
+				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			usecase:       NewAccount(stub.AccountRepositoryStubError{}),
 			expectedError: "Error",

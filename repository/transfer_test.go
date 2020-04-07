@@ -8,7 +8,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database/stub"
 )
 
-func TestTransferStore(t *testing.T) {
+func TestStoreTransfer(t *testing.T) {
 	type args struct {
 		transfer domain.Transfer
 	}
@@ -51,7 +51,7 @@ func TestTransferStore(t *testing.T) {
 	}
 }
 
-func TestTransferFindAll(t *testing.T) {
+func TestFindAllTransfer(t *testing.T) {
 	tests := []struct {
 		name        string
 		repository  Transfer

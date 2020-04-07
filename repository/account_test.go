@@ -4,14 +4,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database/stub"
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-
-	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-func TestAccountStore(t *testing.T) {
+func TestStoreAccount(t *testing.T) {
 	type args struct {
 		account domain.Account
 	}
@@ -54,10 +52,10 @@ func TestAccountStore(t *testing.T) {
 	}
 }
 
-func TestAccountUpdate(t *testing.T) {
+func TestUpdateBalanceAccount(t *testing.T) {
 	type args struct {
-		query  bson.M
-		update bson.M
+		ID      string
+		balance float64
 	}
 
 	tests := []struct {
@@ -70,16 +68,16 @@ func TestAccountUpdate(t *testing.T) {
 			name:       "Success to account update",
 			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
 			args: args{
-				query:  bson.M{},
-				update: bson.M{},
+				ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				balance: 100.00,
 			},
 		},
 		{
 			name:       "Error to account update",
 			repository: NewAccount(stub.MongoHandlerErrorStub{}),
 			args: args{
-				query:  bson.M{},
-				update: bson.M{},
+				ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				balance: 1.00,
 			},
 			expectedErr: true,
 		},
@@ -87,14 +85,14 @@ func TestAccountUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.repository.Update(tt.args.query, tt.args.update); (err != nil) != tt.expectedErr {
+			if err := tt.repository.UpdateBalance(tt.args.ID, tt.args.balance); (err != nil) != tt.expectedErr {
 				t.Errorf("[TestCase '%s'] Error: '%v' | ExpectedErr: '%v'", tt.name, err, tt.expectedErr)
 			}
 		})
 	}
 }
 
-func TestAccountFindAll(t *testing.T) {
+func TestFindAllAccount(t *testing.T) {
 	tests := []struct {
 		name        string
 		repository  Account
@@ -131,9 +129,9 @@ func TestAccountFindAll(t *testing.T) {
 	}
 }
 
-func TestAccountFindOne(t *testing.T) {
+func TestFindOneAccount(t *testing.T) {
 	type args struct {
-		query bson.M
+		ID string
 	}
 
 	tests := []struct {
@@ -146,20 +144,20 @@ func TestAccountFindOne(t *testing.T) {
 		{
 			name:       "Success to find account",
 			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
-			args:       args{query: bson.M{}},
+			args:       args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:   &domain.Account{},
 		},
 		{
 			name:        "Error to find account",
 			repository:  NewAccount(stub.MongoHandlerErrorStub{}),
-			args:        args{query: bson.M{}},
+			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    &domain.Account{},
 			expectedErr: true,
 		},
 		{
 			name:        "Account not found",
 			repository:  NewAccount(stub.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
-			args:        args{query: bson.M{}},
+			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    &domain.Account{},
 			expectedErr: true,
 		},
@@ -167,7 +165,7 @@ func TestAccountFindOne(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.repository.FindOne(tt.args.query)
+			got, err := tt.repository.FindOne(tt.args.ID)
 
 			if (err != nil) != tt.expectedErr {
 				t.Errorf("[TestCase '%s'] Error: '%v' | ExpectedErr: '%v'", tt.name, err, tt.expectedErr)
@@ -181,10 +179,9 @@ func TestAccountFindOne(t *testing.T) {
 	}
 }
 
-func TestAccountFindOneWithSelector(t *testing.T) {
+func TestFindBalanceAccount(t *testing.T) {
 	type args struct {
-		query    bson.M
-		selector interface{}
+		ID string
 	}
 
 	tests := []struct {
@@ -195,20 +192,22 @@ func TestAccountFindOneWithSelector(t *testing.T) {
 		expectedErr bool
 	}{
 		{
-			name:       "Success to find account with selector",
+			name:       "Success to find account balance",
 			repository: NewAccount(stub.MongoHandlerSuccessStub{}),
+			args:       args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:   domain.Account{},
 		},
 		{
-			name:        "Error to find account with selector",
+			name:        "Error to find account balance",
 			repository:  NewAccount(stub.MongoHandlerErrorStub{}),
+			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    domain.Account{},
 			expectedErr: true,
 		},
 		{
-			name:        "Account with selector not found",
+			name:        "Account balance not found",
 			repository:  NewAccount(stub.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
-			args:        args{query: bson.M{}},
+			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    domain.Account{},
 			expectedErr: true,
 		},
@@ -216,7 +215,7 @@ func TestAccountFindOneWithSelector(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.repository.FindOneWithSelector(tt.args.query, tt.args.selector)
+			got, err := tt.repository.FindBalance(tt.args.ID)
 
 			if (err != nil) != tt.expectedErr {
 				t.Errorf("[TestCase '%s'] Error: '%v' | ExpectedErr: '%v'", tt.name, err, tt.expectedErr)

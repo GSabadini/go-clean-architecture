@@ -2,8 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
 type PostgresHandler struct {
@@ -15,9 +16,8 @@ func NewPostgresHandler(dataSource string) (*PostgresHandler, error) {
 	if err != nil {
 		return &PostgresHandler{}, err
 	}
-	//defer db.Close()
 
-	return &PostgresHandler{Database:db}, nil
+	return &PostgresHandler{Database: db}, nil
 }
 
 func (p PostgresHandler) Store(statement string, args ...interface{}) error {
@@ -27,15 +27,15 @@ func (p PostgresHandler) Store(statement string, args ...interface{}) error {
 	//	RETURNING id`
 
 	//time := time.Now()
-	id := 0
-	err := p.Database.QueryRow(statement, args...).Scan(&id)
+	//id := 0
+	_, err := p.Database.Exec(statement, args...)
 	if err != nil {
 		return err
 	}
 
 	//p.Database.
 
-	fmt.Println("New record ID is:", id)
+	//fmt.Println("New record ID is:", id)
 	return nil
 }
 

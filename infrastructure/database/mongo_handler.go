@@ -22,34 +22,46 @@ func NewMongoHandler(host, databaseName string) (*MongoHandler, error) {
 	return handler, nil
 }
 
-//Store realiza uma inserção no banco de dados
-func (mgo MongoHandler) Store(collection string, data interface{}) error {
+func (mgo MongoHandler) Store(collection string, args ...interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
 
-	return mgo.Database.C(collection).With(session).Insert(data)
+	return mgo.Database.C(collection).With(session).Insert(args...)
 }
 
-//Update realiza uma atualização no banco de dados
-func (mgo MongoHandler) Update(collection string, query interface{}, update interface{}) error {
+func (mgo MongoHandler) Update(collection string, args ...interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
+
+	var (
+		query  = args[0]
+		update = args[1]
+	)
 
 	return mgo.Database.C(collection).With(session).Update(query, update)
 }
 
-//FindAll realiza uma busca por todos os registros no banco de dados
-func (mgo MongoHandler) FindAll(collection string, query interface{}, result interface{}) error {
+func (mgo MongoHandler) FindAll(collection string, args ...interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
+
+	var (
+		query  = args[0]
+		result = args[1]
+	)
 
 	return mgo.Database.C(collection).With(session).Find(query).All(result)
 }
 
-//FindOne realiza a busca de um item específico no banco de dados
-func (mgo MongoHandler) FindOne(collection string, query interface{}, selector interface{}, result interface{}) error {
+func (mgo MongoHandler) FindOne(collection string, args ...interface{}) error {
 	session := mgo.Session.Clone()
 	defer session.Close()
+
+	var (
+		query    = args[0]
+		selector = args[1]
+		result   = args[2]
+	)
 
 	return mgo.Database.C(collection).With(session).Find(query).Select(selector).One(result)
 }

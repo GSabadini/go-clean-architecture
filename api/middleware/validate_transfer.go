@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/gsabadini/go-bank-transfer/api/action"
 
 	"github.com/pkg/errors"
@@ -86,14 +84,14 @@ func (v ValidateTransfer) Execute(w http.ResponseWriter, r *http.Request, next h
 }
 
 var (
-	errAmountInvalid                  = errors.New("Amount invalid")
-	errAccountOriginEqualsDestination = errors.New("Account origin equals destination account")
+	errAmountInvalid                  = errors.New("amount invalid")
+	errAccountOriginEqualsDestination = errors.New("account origin equals destination account")
 )
 
 type transferRequest struct {
-	AccountOriginID      bson.ObjectId `json:"account_origin_id"`
-	AccountDestinationID bson.ObjectId `json:"account_destination_id"`
-	Amount               float64       `json:"amount"`
+	AccountOriginID      string  `json:"account_origin_id"`
+	AccountDestinationID string  `json:"account_destination_id"`
+	Amount               float64 `json:"amount"`
 }
 
 func (t *transferRequest) validateAmount() error {

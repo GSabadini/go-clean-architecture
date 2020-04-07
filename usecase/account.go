@@ -2,9 +2,6 @@ package usecase
 
 import (
 	"strings"
-	"time"
-
-	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
@@ -21,11 +18,8 @@ func NewAccount(repository repository.AccountRepository) Account {
 }
 
 //Store cria uma nova conta
-func (a Account) Store(account domain.Account) (domain.Account, error) {
-	t := time.Now()
-	account.CreatedAt = &t
-	account.ID = bson.NewObjectId()
-	account.CPF = a.cleanCPF(account.CPF)
+func (a Account) Store(data domain.Account) (domain.Account, error) {
+	var account = domain.NewAccount(data.Name, a.cleanCPF(data.CPF), data.Balance)
 
 	result, err := a.repository.Store(account)
 	if err != nil {
@@ -47,12 +41,7 @@ func (a Account) FindAll() ([]domain.Account, error) {
 
 //FindBalance retorna o saldo de uma conta
 func (a Account) FindBalance(ID string) (domain.Account, error) {
-	var (
-		query    = bson.M{"_id": bson.ObjectIdHex(ID)}
-		selector = bson.M{"balance": 1, "_id": 0}
-	)
-
-	result, err := a.repository.FindOneWithSelector(query, selector)
+	result, err := a.repository.FindBalance(ID)
 	if err != nil {
 		return result, err
 	}
