@@ -1,12 +1,13 @@
 package repository
 
 import (
-	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+
+	"github.com/pkg/errors"
 )
 
 const accountsCollectionName = "accounts"
@@ -44,17 +45,17 @@ func (a Account) UpdateBalance(ID string, balance float64) error {
 
 //FindAll realiza a busca de todas as contas no banco de dados
 func (a Account) FindAll() ([]domain.Account, error) {
-	var account = make([]domain.Account, 0)
+	var accounts = make([]domain.Account, 0)
 
-	if err := a.dbHandler.FindAll(accountsCollectionName, nil, &account); err != nil {
-		return account, errors.Wrap(err, "error listing accounts")
+	if err := a.dbHandler.FindAll(accountsCollectionName, nil, &accounts); err != nil {
+		return accounts, errors.Wrap(err, "error listing accounts")
 	}
 
-	return account, nil
+	return accounts, nil
 }
 
-//FindOne realiza a busca de uma conta no banco de dados
-func (a Account) FindOne(ID string) (*domain.Account, error) {
+//FindByID realiza a busca de uma conta no banco de dados
+func (a Account) FindByID(ID string) (*domain.Account, error) {
 	var (
 		account = &domain.Account{}
 		query   = bson.M{"id": ID}

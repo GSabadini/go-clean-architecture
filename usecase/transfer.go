@@ -39,7 +39,7 @@ func (t Transfer) Store(data domain.Transfer) (domain.Transfer, error) {
 }
 
 func (t Transfer) processTransfer(transfer domain.Transfer) error {
-	origin, err := t.accountRepository.FindOne(transfer.GetAccountOriginID())
+	origin, err := t.accountRepository.FindByID(transfer.GetAccountOriginID())
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (t Transfer) processTransfer(transfer domain.Transfer) error {
 		return err
 	}
 
-	destination, err := t.accountRepository.FindOne(transfer.GetAccountDestinationID())
+	destination, err := t.accountRepository.FindByID(transfer.GetAccountDestinationID())
 	if err != nil {
 		return err
 	}

@@ -165,7 +165,7 @@ func TestFindOneAccount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.repository.FindOne(tt.args.ID)
+			got, err := tt.repository.FindByID(tt.args.ID)
 
 			if (err != nil) != tt.expectedErr {
 				t.Errorf("[TestCase '%s'] Error: '%v' | ExpectedErr: '%v'", tt.name, err, tt.expectedErr)

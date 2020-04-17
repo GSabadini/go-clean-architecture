@@ -15,7 +15,7 @@ type AccountRepository interface {
 	Store(domain.Account) (domain.Account, error)
 	UpdateBalance(string, float64) error
 	FindAll() ([]domain.Account, error)
-	FindOne(string) (*domain.Account, error)
+	FindByID(string) (*domain.Account, error)
 	FindBalance(string) (domain.Account, error)
 }
 

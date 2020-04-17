@@ -20,7 +20,7 @@ func (m MongoHandlerSuccessStub) FindAll(_ string, _ ...interface{}) error {
 	return nil
 }
 
-//FindOne retorna sucesso ao obter um recurso
+//FindByID retorna sucesso ao obter um recurso
 func (m MongoHandlerSuccessStub) FindOne(_ string, _ ...interface{}) error {
 	return nil
 }
@@ -45,7 +45,7 @@ func (m MongoHandlerErrorStub) FindAll(_ string, _ ...interface{}) error {
 	return errors.New("Error")
 }
 
-//FindOne retorna erro ao obter um recurso
+//FindByID retorna erro ao obter um recurso
 func (m MongoHandlerErrorStub) FindOne(_ string, _ ...interface{}) error {
 	if m.TypeErr != nil {
 		return m.TypeErr

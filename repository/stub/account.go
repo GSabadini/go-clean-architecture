@@ -45,8 +45,8 @@ func (a AccountRepositoryStubSuccess) FindAll() ([]domain.Account, error) {
 	return account, nil
 }
 
-//FindOne retorna uma conta pré-definida
-func (a AccountRepositoryStubSuccess) FindOne(_ string) (*domain.Account, error) {
+//FindByID retorna uma conta pré-definida
+func (a AccountRepositoryStubSuccess) FindByID(_ string) (*domain.Account, error) {
 	return &domain.Account{
 		ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 		Name:    "Test",
@@ -80,8 +80,8 @@ func (a AccountRepositoryStubError) FindAll() ([]domain.Account, error) {
 	return []domain.Account{}, errors.New("Error")
 }
 
-//FindOne retorna um error ao buscar uma conta
-func (a AccountRepositoryStubError) FindOne(_ string) (*domain.Account, error) {
+//FindByID retorna um error ao buscar uma conta
+func (a AccountRepositoryStubError) FindByID(_ string) (*domain.Account, error) {
 	return &domain.Account{}, errors.New("Error")
 }
 
