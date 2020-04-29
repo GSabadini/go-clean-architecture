@@ -16,7 +16,7 @@ const accountsCollectionName = "accounts"
 type Account DbRepository
 
 //NewAccount constrói um repository com suas dependências
-func NewAccount(dbHandler database.DbHandler) Account {
+func NewAccount(dbHandler database.NoSQLDbHandler) Account {
 	return Account{dbHandler: dbHandler}
 }
 

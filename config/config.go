@@ -5,24 +5,27 @@ import (
 	"os"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+
 	"github.com/sirupsen/logrus"
 )
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
-	AppName            string
-	APIPort            int
-	Logger             *logrus.Logger
-	DatabaseConnection *database.PostgresHandler
+	AppName                 string
+	APIPort                 int
+	Logger                  *logrus.Logger
+	DatabaseSQLConnection   database.SQLDbHandler
+	DatabaseNOSQLConnection database.NoSQLDbHandler
 }
 
 //NewConfig retorna a configuração da aplicação
 func NewConfig() Config {
 	return Config{
-		AppName:            "go-bank-transfer",
-		APIPort:            3001,
-		Logger:             getLogger(),
-		DatabaseConnection: getConnectionPostgres(getLogger()),
+		AppName:                 "go-bank-transfer",
+		APIPort:                 3001,
+		Logger:                  getLogger(),
+		DatabaseSQLConnection:   getConnectionPostgres(getLogger()),
+		DatabaseNOSQLConnection: getConnectionMongoDB(getLogger()),
 	}
 }
 

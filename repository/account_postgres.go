@@ -1,18 +1,19 @@
 package repository
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+
 	"github.com/pkg/errors"
 )
 
 type AccountPostgres struct {
-	handler *sql.DB
+	handler database.SQLDbHandler
 }
 
-func NewAccountPostgres(handler *sql.DB) AccountPostgres {
+func NewAccountPostgres(handler database.SQLDbHandler) AccountPostgres {
 	return AccountPostgres{handler: handler}
 }
 
@@ -24,15 +25,14 @@ func (a AccountPostgres) Store(account domain.Account) (domain.Account, error) {
 			($1, $2, $3, $4, $5)
 	`
 
-	_, err := a.handler.Exec(
+	if err := a.handler.Execute(
 		query,
 		account.ID,
 		account.Name,
 		account.CPF,
 		account.Balance,
 		account.CreatedAt,
-	)
-	if err != nil {
+	); err != nil {
 		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
 
@@ -42,7 +42,7 @@ func (a AccountPostgres) Store(account domain.Account) (domain.Account, error) {
 func (a AccountPostgres) UpdateBalance(ID string, balance float64) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
-	if _, err := a.handler.Exec(query, balance, ID); err != nil {
+	if err := a.handler.Execute(query, balance, ID); err != nil {
 		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
 	}
 
@@ -98,7 +98,13 @@ func (a AccountPostgres) FindByID(ID string) (*domain.Account, error) {
 		createdAt *time.Time
 	)
 
-	if err := a.handler.QueryRow(query, ID).Scan(&id, &name, &CPF, &balance, &createdAt); err != nil {
+	row, err := a.handler.Query(query, ID)
+	if err != nil {
+		return account, errors.Wrap(err, "error fetching account")
+	}
+
+	row.Next()
+	if err = row.Scan(&id, &name, &CPF, &balance, &createdAt); err != nil {
 		return account, errors.Wrap(err, "error fetching account")
 	}
 
@@ -118,7 +124,13 @@ func (a AccountPostgres) FindBalance(ID string) (domain.Account, error) {
 		balance float64
 	)
 
-	if err := a.handler.QueryRow(query, ID).Scan(&balance); err != nil {
+	row, err := a.handler.Query(query, ID)
+	if err != nil {
+		return account, errors.Wrap(err, "error fetching account balance")
+	}
+
+	row.Next()
+	if err := row.Scan(&balance); err != nil {
 		return account, errors.Wrap(err, "error fetching account balance")
 	}
 

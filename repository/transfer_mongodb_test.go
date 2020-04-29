@@ -15,7 +15,7 @@ func TestStoreTransfer(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		repository  Transfer
+		repository  TransferMongoDB
 		args        args
 		expected    domain.Transfer
 		expectedErr bool
@@ -23,13 +23,13 @@ func TestStoreTransfer(t *testing.T) {
 		{
 			name:       "Success to create transfer",
 			args:       args{transfer: domain.Transfer{}},
-			repository: NewTransfer(stub.MongoHandlerSuccessStub{}),
+			repository: NewTransferMongoDB(stub.MongoHandlerSuccessStub{}),
 			expected:   domain.Transfer{},
 		},
 		{
 			name:        "Error to create transfer",
 			args:        args{transfer: domain.Transfer{}},
-			repository:  NewTransfer(stub.MongoHandlerErrorStub{}),
+			repository:  NewTransferMongoDB(stub.MongoHandlerErrorStub{}),
 			expected:    domain.Transfer{},
 			expectedErr: true,
 		},
@@ -54,18 +54,18 @@ func TestStoreTransfer(t *testing.T) {
 func TestFindAllTransfer(t *testing.T) {
 	tests := []struct {
 		name        string
-		repository  Transfer
+		repository  TransferMongoDB
 		expected    []domain.Transfer
 		expectedErr bool
 	}{
 		{
 			name:       "Success to find all the transfers",
-			repository: NewTransfer(stub.MongoHandlerSuccessStub{}),
+			repository: NewTransferMongoDB(stub.MongoHandlerSuccessStub{}),
 			expected:   []domain.Transfer{},
 		},
 		{
 			name:        "Error to find all the transfers",
-			repository:  NewTransfer(stub.MongoHandlerErrorStub{}),
+			repository:  NewTransferMongoDB(stub.MongoHandlerErrorStub{}),
 			expected:    []domain.Transfer{},
 			expectedErr: true,
 		},

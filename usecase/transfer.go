@@ -44,12 +44,12 @@ func (t Transfer) processTransfer(transfer domain.Transfer) error {
 		return err
 	}
 
-	if err := origin.Withdraw(transfer.GetAmount()); err != nil {
+	destination, err := t.accountRepository.FindByID(transfer.GetAccountDestinationID())
+	if err != nil {
 		return err
 	}
 
-	destination, err := t.accountRepository.FindByID(transfer.GetAccountDestinationID())
-	if err != nil {
+	if err := origin.Withdraw(transfer.GetAmount()); err != nil {
 		return err
 	}
 

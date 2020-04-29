@@ -7,7 +7,7 @@ import (
 
 //DbRepository encapsula um repositório que contém um handler para determinado banco de dados
 type DbRepository struct {
-	dbHandler database.DbHandler
+	dbHandler database.NoSQLDbHandler
 }
 
 //AccountRepository expõe os métodos disponíveis para as abstrações do repositório de contas

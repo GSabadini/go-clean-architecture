@@ -1,21 +1,25 @@
 package repository
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+
 	"github.com/pkg/errors"
 )
 
+//TransferPostgres representa um repositório de dados para transferências utilizando Postgres
 type TransferPostgres struct {
-	handler *sql.DB
+	handler database.SQLDbHandler
 }
 
-func NewTransferPostgres(handler *sql.DB) TransferPostgres {
+//NewTransferPostgres cria um repositório utilizando Postgres
+func NewTransferPostgres(handler database.SQLDbHandler) TransferPostgres {
 	return TransferPostgres{handler: handler}
 }
 
+//Store cria uma transferência
 func (t TransferPostgres) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	query := `
 		INSERT INTO 
@@ -24,21 +28,21 @@ func (t TransferPostgres) Store(transfer domain.Transfer) (domain.Transfer, erro
 			($1, $2, $3, $4, $5)
 	`
 
-	_, err := t.handler.Exec(
+	if err := t.handler.Execute(
 		query,
 		transfer.ID,
 		transfer.AccountOriginID,
 		transfer.AccountDestinationID,
 		transfer.Amount,
 		transfer.CreatedAt,
-	)
-	if err != nil {
+	); err != nil {
 		return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
 	}
 
 	return transfer, nil
 }
 
+//FindAll retorna uma lista de transferências
 func (t TransferPostgres) FindAll() ([]domain.Transfer, error) {
 	var (
 		transfers = make([]domain.Transfer, 0)
