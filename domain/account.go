@@ -11,9 +11,17 @@ type Account struct {
 	CreatedAt *time.Time `json:"created_at,omitempty" bson:"created_at"`
 }
 
+//NewAccount cria uma conta
 func NewAccount(name string, CPF string, balance float64) Account {
 	timeNow := time.Now()
-	return Account{ID: uuid(), Name: name, CPF: CPF, Balance: balance, CreatedAt: &timeNow}
+
+	return Account{
+		ID:        uuid(),
+		Name:      name,
+		CPF:       CPF,
+		Balance:   balance,
+		CreatedAt: &timeNow,
+	}
 }
 
 //GetBalance retorna o saldo

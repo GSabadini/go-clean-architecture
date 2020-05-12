@@ -8,7 +8,9 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database/stub"
 )
 
-func TestStoreTransfer(t *testing.T) {
+func TestTransferMongoDB_Store(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		transfer domain.Transfer
 	}
@@ -51,7 +53,9 @@ func TestStoreTransfer(t *testing.T) {
 	}
 }
 
-func TestFindAllTransfer(t *testing.T) {
+func TestTransferMongoDB_FindAll(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name        string
 		repository  TransferMongoDB

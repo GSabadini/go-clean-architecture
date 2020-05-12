@@ -6,21 +6,22 @@ import (
 	"github.com/pkg/errors"
 )
 
-const transfersCollectionName = "transfers"
+//const transfersCollectionName = "transfers"
 
-//TransferMongoDB representa um repositório de dados para transferências utilizando MongoDB
+//TransferMongoDB representa um repositório para manipulação de dados de transferências utilizando MongoDB
 type TransferMongoDB struct {
-	handler database.NoSQLDbHandler
+	handler        database.NoSQLHandler
+	collectionName string
 }
 
-//NewTransfer cria um repository com suas dependências
-func NewTransferMongoDB(handler database.NoSQLDbHandler) TransferMongoDB {
-	return TransferMongoDB{handler: handler}
+//NewTransferMongoDB cria um repository com suas dependências
+func NewTransferMongoDB(handler database.NoSQLHandler) TransferMongoDB {
+	return TransferMongoDB{handler: handler, collectionName: "transfers"}
 }
 
 //Store cria uma transferência através da implementação real do database
 func (t TransferMongoDB) Store(transfer domain.Transfer) (domain.Transfer, error) {
-	if err := t.handler.Store(transfersCollectionName, &transfer); err != nil {
+	if err := t.handler.Store(t.collectionName, &transfer); err != nil {
 		return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
 	}
 
@@ -31,7 +32,7 @@ func (t TransferMongoDB) Store(transfer domain.Transfer) (domain.Transfer, error
 func (t TransferMongoDB) FindAll() ([]domain.Transfer, error) {
 	var transfer = make([]domain.Transfer, 0)
 
-	if err := t.handler.FindAll(transfersCollectionName, nil, &transfer); err != nil {
+	if err := t.handler.FindAll(t.collectionName, nil, &transfer); err != nil {
 		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 	}
 

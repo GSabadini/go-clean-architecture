@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/usecase"
-
-	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
@@ -86,13 +85,13 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 
 	var vars = mux.Vars(r)
 	accountID, ok := vars["account_id"]
-	if !ok {
+	if !ok || !domain.IsValidUUID(accountID) {
 		var err = errParameterInvalid
 
 		a.logError(
 			logKey,
 			"parameter invalid",
-			http.StatusNotFound,
+			http.StatusBadRequest,
 			err,
 		)
 

@@ -9,13 +9,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-//TransferPostgres representa um repositório de dados para transferências utilizando Postgres
+//TransferPostgres representa um repositório para manipulação de dados de transferências utilizando Postgres
 type TransferPostgres struct {
-	handler database.SQLDbHandler
+	handler database.SQLHandler
 }
 
 //NewTransferPostgres cria um repositório utilizando Postgres
-func NewTransferPostgres(handler database.SQLDbHandler) TransferPostgres {
+func NewTransferPostgres(handler database.SQLHandler) TransferPostgres {
 	return TransferPostgres{handler: handler}
 }
 

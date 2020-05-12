@@ -20,8 +20,8 @@ import (
 //HTTPServer armazena as dependências do servidor HTTP
 type HTTPServer struct {
 	appConfig               config.Config
-	databaseSQLConnection   database.SQLDbHandler
-	databaseNOSQLConnection database.NoSQLDbHandler
+	databaseSQLConnection   database.SQLHandler
+	databaseNOSQLConnection database.NoSQLHandler
 	log                     *logrus.Logger
 }
 

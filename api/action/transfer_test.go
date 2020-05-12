@@ -13,7 +13,9 @@ import (
 	"github.com/sirupsen/logrus/hooks/test"
 )
 
-func TestStoreTransfer(t *testing.T) {
+func TestTransfer_Store(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		rawPayload []byte
 	}
@@ -127,7 +129,9 @@ func TestStoreTransfer(t *testing.T) {
 	}
 }
 
-func TestIndexTransfer(t *testing.T) {
+func TestTransfer_Index(t *testing.T) {
+	t.Parallel()
+
 	var loggerMock, _ = test.NewNullLogger()
 
 	tests := []struct {

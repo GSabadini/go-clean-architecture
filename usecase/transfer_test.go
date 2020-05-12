@@ -9,7 +9,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository/stub"
 )
 
-func TestStoreTransfer(t *testing.T) {
+func TestTransfer_Store(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -98,7 +98,7 @@ func TestStoreTransfer(t *testing.T) {
 	}
 }
 
-func TestFindAllTransfer(t *testing.T) {
+func TestTransfer_FindAll(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {

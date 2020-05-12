@@ -1,22 +1,27 @@
 package repository
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	//"github.com/lib/pq"
 
 	"github.com/pkg/errors"
 )
 
+//AccountPostgres representa um repositório para manipulação de dados de uma conta
 type AccountPostgres struct {
-	handler database.SQLDbHandler
+	handler database.SQLHandler
 }
 
-func NewAccountPostgres(handler database.SQLDbHandler) AccountPostgres {
+//NewAccount constrói um repository com suas dependências
+func NewAccountPostgres(handler database.SQLHandler) AccountPostgres {
 	return AccountPostgres{handler: handler}
 }
 
+//Store realiza a inserção de uma conta no banco de dados
 func (a AccountPostgres) Store(account domain.Account) (domain.Account, error) {
 	query := `
 		INSERT INTO 
@@ -24,6 +29,7 @@ func (a AccountPostgres) Store(account domain.Account) (domain.Account, error) {
 		VALUES 
 			($1, $2, $3, $4, $5)
 	`
+	//err.(*pq.PGError)
 
 	if err := a.handler.Execute(
 		query,
@@ -39,6 +45,7 @@ func (a AccountPostgres) Store(account domain.Account) (domain.Account, error) {
 	return account, nil
 }
 
+//UpdateBalance realiza a atualização do saldo de uma conta no banco de dados
 func (a AccountPostgres) UpdateBalance(ID string, balance float64) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
@@ -49,6 +56,7 @@ func (a AccountPostgres) UpdateBalance(ID string, balance float64) error {
 	return nil
 }
 
+//FindAll realiza a busca de todas as contas no banco de dados
 func (a AccountPostgres) FindAll() ([]domain.Account, error) {
 	var (
 		accounts = make([]domain.Account, 0)
@@ -84,9 +92,14 @@ func (a AccountPostgres) FindAll() ([]domain.Account, error) {
 		accounts = append(accounts, account)
 	}
 
+	if err = rows.Err(); err != nil {
+		fmt.Println(err)
+	}
+
 	return accounts, nil
 }
 
+//FindByID realiza a busca de uma conta no banco de dados
 func (a AccountPostgres) FindByID(ID string) (*domain.Account, error) {
 	var (
 		account   = &domain.Account{}
@@ -117,6 +130,7 @@ func (a AccountPostgres) FindByID(ID string) (*domain.Account, error) {
 	return account, nil
 }
 
+//FindBalance realiza a busca do saldo de uma conta no banco de dados
 func (a AccountPostgres) FindBalance(ID string) (domain.Account, error) {
 	var (
 		account = domain.Account{}

@@ -14,8 +14,8 @@ type Config struct {
 	AppName                 string
 	APIPort                 int
 	Logger                  *logrus.Logger
-	DatabaseSQLConnection   database.SQLDbHandler
-	DatabaseNOSQLConnection database.NoSQLDbHandler
+	DatabaseSQLConnection   database.SQLHandler
+	DatabaseNOSQLConnection database.NoSQLHandler
 }
 
 //NewConfig retorna a configuração da aplicação

@@ -10,7 +10,9 @@ import (
 	"github.com/sirupsen/logrus/hooks/test"
 )
 
-func TestValidateAccount(t *testing.T) {
+func TestValidateAccount_Execute(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name               string
 		rawPayload         []byte

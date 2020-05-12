@@ -72,3 +72,8 @@ func (pr PostgresRow) Scan(dest ...interface{}) error {
 func (pr PostgresRow) Next() bool {
 	return pr.Rows.Next()
 }
+
+//Next
+func (pr PostgresRow) Err() error {
+	return pr.Rows.Err()
+}
