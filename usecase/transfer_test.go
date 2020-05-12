@@ -9,7 +9,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository/stub"
 )
 
-func TestStoreTransfer(t *testing.T) {
+func TestTransfer_Store(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -27,16 +27,16 @@ func TestStoreTransfer(t *testing.T) {
 			name: "Create transfer successful",
 			args: args{
 				transfer: domain.Transfer{
-					AccountOriginID:      "5e570851adcef50116aa7a5d",
-					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 					Amount:               20,
 				},
 			},
 			usecase: NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expected: domain.Transfer{
-				ID:                   "5e570851adcef50116aa7a5a",
-				AccountOriginID:      "5e570851adcef50116aa7a5d",
-				AccountDestinationID: "5e570851adcef50116aa7a5c",
+				ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 				Amount:               20,
 				CreatedAt:            time.Time{},
 			},
@@ -45,8 +45,8 @@ func TestStoreTransfer(t *testing.T) {
 			name: "Create transfer error",
 			args: args{
 				transfer: domain.Transfer{
-					AccountOriginID:      "5e570851adcef50116aa7a5d",
-					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 					Amount:               20,
 				},
 			},
@@ -58,21 +58,21 @@ func TestStoreTransfer(t *testing.T) {
 			name: "Create transfer amount not have sufficient",
 			args: args{
 				transfer: domain.Transfer{
-					AccountOriginID:      "5e570851adcef50116aa7a5d",
-					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 					Amount:               200,
 				},
 			},
 			usecase:       NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
-			expectedError: "Origin account does not have sufficient balance",
+			expectedError: "origin account does not have sufficient balance",
 			expected:      domain.Transfer{},
 		},
 		{
 			name: "Create transfer error find account",
 			args: args{
 				transfer: domain.Transfer{
-					AccountOriginID:      "5e570851adcef50116aa7a5d",
-					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 					Amount:               20,
 				},
 			},
@@ -98,7 +98,7 @@ func TestStoreTransfer(t *testing.T) {
 	}
 }
 
-func TestFindAllTransfer(t *testing.T) {
+func TestTransfer_FindAll(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -112,16 +112,16 @@ func TestFindAllTransfer(t *testing.T) {
 			usecase: NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
 			expected: []domain.Transfer{
 				{
-					ID:                   "5e570851adcef50116aa7a5a",
-					AccountOriginID:      "5e570851adcef50116aa7a5d",
-					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 					Amount:               100,
 					CreatedAt:            time.Time{},
 				},
 				{
-					ID:                   "5e570851adcef50116aa7a5b",
-					AccountOriginID:      "5e570851adcef50116aa7a5d",
-					AccountDestinationID: "5e570851adcef50116aa7a5c",
+					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 					Amount:               500,
 					CreatedAt:            time.Time{},
 				},

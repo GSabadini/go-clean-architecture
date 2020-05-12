@@ -8,14 +8,16 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database/stub"
 )
 
-func TestTransferStore(t *testing.T) {
+func TestTransferMongoDB_Store(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		transfer domain.Transfer
 	}
 
 	tests := []struct {
 		name        string
-		repository  Transfer
+		repository  TransferMongoDB
 		args        args
 		expected    domain.Transfer
 		expectedErr bool
@@ -23,13 +25,13 @@ func TestTransferStore(t *testing.T) {
 		{
 			name:       "Success to create transfer",
 			args:       args{transfer: domain.Transfer{}},
-			repository: NewTransfer(stub.MongoHandlerSuccessStub{}),
+			repository: NewTransferMongoDB(stub.MongoHandlerSuccessStub{}),
 			expected:   domain.Transfer{},
 		},
 		{
 			name:        "Error to create transfer",
 			args:        args{transfer: domain.Transfer{}},
-			repository:  NewTransfer(stub.MongoHandlerErrorStub{}),
+			repository:  NewTransferMongoDB(stub.MongoHandlerErrorStub{}),
 			expected:    domain.Transfer{},
 			expectedErr: true,
 		},
@@ -51,21 +53,23 @@ func TestTransferStore(t *testing.T) {
 	}
 }
 
-func TestTransferFindAll(t *testing.T) {
+func TestTransferMongoDB_FindAll(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name        string
-		repository  Transfer
+		repository  TransferMongoDB
 		expected    []domain.Transfer
 		expectedErr bool
 	}{
 		{
 			name:       "Success to find all the transfers",
-			repository: NewTransfer(stub.MongoHandlerSuccessStub{}),
+			repository: NewTransferMongoDB(stub.MongoHandlerSuccessStub{}),
 			expected:   []domain.Transfer{},
 		},
 		{
 			name:        "Error to find all the transfers",
-			repository:  NewTransfer(stub.MongoHandlerErrorStub{}),
+			repository:  NewTransferMongoDB(stub.MongoHandlerErrorStub{}),
 			expected:    []domain.Transfer{},
 			expectedErr: true,
 		},

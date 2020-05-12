@@ -1,31 +1,31 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+
 	"github.com/sirupsen/logrus"
 )
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
-	AppName            string
-	APIPort            int
-	Logger             *logrus.Logger
-	DatabaseConnection *database.MongoHandler
-	DatabaseName       string
-	DatabaseHost       string
+	AppName                 string
+	APIPort                 int
+	Logger                  *logrus.Logger
+	DatabaseSQLConnection   database.SQLHandler
+	DatabaseNOSQLConnection database.NoSQLHandler
 }
 
 //NewConfig retorna a configuração da aplicação
 func NewConfig() Config {
 	return Config{
-		AppName:            "go-bank-transfer",
-		APIPort:            3001,
-		Logger:             getLogger(),
-		DatabaseName:       getDatabaseName(),
-		DatabaseHost:       getDatabaseHost(),
-		DatabaseConnection: getDatabaseConnection(getLogger()),
+		AppName:                 "go-bank-transfer",
+		APIPort:                 3001,
+		Logger:                  getLogger(),
+		DatabaseSQLConnection:   getConnectionPostgres(getLogger()),
+		DatabaseNOSQLConnection: getConnectionMongoDB(getLogger()),
 	}
 }
 
@@ -38,8 +38,12 @@ func getLogger() *logrus.Logger {
 	return log
 }
 
-func getDatabaseConnection(logger *logrus.Logger) *database.MongoHandler {
-	handler, err := database.NewMongoHandler(getDatabaseHost(), getDatabaseName())
+func getConnectionMongoDB(logger *logrus.Logger) *database.MongoHandler {
+	handler, err := database.NewMongoHandler(
+		verifyExistEnvironmentParams("MONGODB_HOST"),
+		verifyExistEnvironmentParams("MONGODB_DATABASE"),
+	)
+
 	if err != nil {
 		logger.Infoln("Could not make a connection to the database")
 
@@ -52,18 +56,32 @@ func getDatabaseConnection(logger *logrus.Logger) *database.MongoHandler {
 	return handler
 }
 
-func getDatabaseHost() string {
-	if host := os.Getenv("MONGODB_HOST"); host != "" {
-		return host
+func getConnectionPostgres(logger *logrus.Logger) *database.PostgresHandler {
+	ds := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
+		verifyExistEnvironmentParams("POSTGRES_HOST"),
+		verifyExistEnvironmentParams("POSTGRES_PORT"),
+		verifyExistEnvironmentParams("POSTGRES_USER"),
+		verifyExistEnvironmentParams("POSTGRES_DATABASE"),
+		verifyExistEnvironmentParams("POSTGRES_PASSWORD"),
+	)
+
+	handler, err := database.NewPostgresHandler(ds)
+	if err != nil {
+		logger.Infoln("Could not make a connection to the database")
+
+		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
+		panic(err)
 	}
 
-	panic("Environment variable 'MONGODB_HOST' has not been defined")
+	logger.Infoln("Successfully connected to the database")
+
+	return handler
 }
 
-func getDatabaseName() string {
-	if name := os.Getenv("MONGODB_DATABASE"); name != "" {
-		return name
+func verifyExistEnvironmentParams(parameter string) string {
+	if value := os.Getenv(parameter); value != "" {
+		return value
 	}
 
-	panic("Environment variable 'MONGODB_DATABASE' has not been defined")
+	panic(fmt.Sprintf("Environment variable '%s' has not been defined", parameter))
 }

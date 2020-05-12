@@ -12,7 +12,6 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
-	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
@@ -20,17 +19,19 @@ import (
 
 //HTTPServer armazena as dependências do servidor HTTP
 type HTTPServer struct {
-	appConfig          config.Config
-	databaseConnection database.NoSQLDbHandler
-	log                *logrus.Logger
+	appConfig               config.Config
+	databaseSQLConnection   database.SQLHandler
+	databaseNOSQLConnection database.NoSQLHandler
+	log                     *logrus.Logger
 }
 
 //NewHTTPServer constrói um HTTPServer com suas dependências
 func NewHTTPServer(config config.Config) HTTPServer {
 	return HTTPServer{
-		appConfig:          config,
-		databaseConnection: config.DatabaseConnection,
-		log:                config.Logger,
+		appConfig:               config,
+		databaseSQLConnection:   config.DatabaseSQLConnection,
+		databaseNOSQLConnection: config.DatabaseNOSQLConnection,
+		log:                     config.Logger,
 	}
 }
 
@@ -45,15 +46,15 @@ func (s HTTPServer) Listen() {
 	s.setAppHandlers(router)
 	negroniHandler.UseHandler(router)
 
-	srv := &http.Server{
+	server := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		Addr:         address,
-		Handler:      context.ClearHandler(http.DefaultServeMux),
+		Handler:      negroniHandler,
 	}
 
 	s.log.Infoln("Starting HTTP server on the port", s.appConfig.APIPort)
-	if err := srv.ListenAndServe(); err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		s.log.WithError(err).Fatalln("Error starting HTTP server")
 	}
 }
@@ -74,8 +75,8 @@ func (s HTTPServer) setAppHandlers(router *mux.Router) {
 func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferRepository = repository.NewTransfer(s.databaseConnection)
-			accountRepository  = repository.NewAccount(s.databaseConnection)
+			transferRepository = repository.NewTransferPostgres(s.databaseSQLConnection)
+			accountRepository  = repository.NewAccountPostgres(s.databaseSQLConnection)
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 		)
 
@@ -100,8 +101,8 @@ func (s HTTPServer) buildActionStoreTransfer() *negroni.Negroni {
 func (s HTTPServer) buildActionIndexTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferRepository = repository.NewTransfer(s.databaseConnection)
-			accountRepository  = repository.NewAccount(s.databaseConnection)
+			transferRepository = repository.NewTransferPostgres(s.databaseSQLConnection)
+			accountRepository  = repository.NewAccountPostgres(s.databaseSQLConnection)
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 		)
 
@@ -120,9 +121,9 @@ func (s HTTPServer) buildActionIndexTransfer() *negroni.Negroni {
 func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountRepostory = repository.NewAccount(s.databaseConnection)
-			accountUseCase   = usecase.NewAccount(accountRepostory)
-			accountAction    = action.NewAccount(accountUseCase, s.log)
+			accountRepository = repository.NewAccountPostgres(s.databaseSQLConnection)
+			accountUseCase    = usecase.NewAccount(accountRepository)
+			accountAction     = action.NewAccount(accountUseCase, s.log)
 		)
 
 		accountAction.Store(res, req)
@@ -144,9 +145,9 @@ func (s HTTPServer) buildActionStoreAccount() *negroni.Negroni {
 func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountRepostory = repository.NewAccount(s.databaseConnection)
-			accountUseCase   = usecase.NewAccount(accountRepostory)
-			accountAction    = action.NewAccount(accountUseCase, s.log)
+			accountRepository = repository.NewAccountPostgres(s.databaseSQLConnection)
+			accountUseCase    = usecase.NewAccount(accountRepository)
+			accountAction     = action.NewAccount(accountUseCase, s.log)
 		)
 
 		accountAction.Index(res, req)
@@ -162,9 +163,9 @@ func (s HTTPServer) buildActionIndexAccount() *negroni.Negroni {
 func (s HTTPServer) buildActionFindBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountRepostory = repository.NewAccount(s.databaseConnection)
-			accountUseCase   = usecase.NewAccount(accountRepostory)
-			accountAction    = action.NewAccount(accountUseCase, s.log)
+			accountRepository = repository.NewAccountPostgres(s.databaseSQLConnection)
+			accountUseCase    = usecase.NewAccount(accountRepository)
+			accountAction     = action.NewAccount(accountUseCase, s.log)
 		)
 
 		accountAction.FindBalance(res, req)

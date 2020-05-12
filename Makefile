@@ -12,6 +12,9 @@ dependencies:
 
 code-review: fmt vet test
 
+init:
+	cp .env.example .env
+
 fmt:
 	go fmt ./...
 

@@ -32,17 +32,17 @@ type MongoHandlerErrorStub struct {
 
 //Store retorna erro ao criar um recurso
 func (m MongoHandlerErrorStub) Store(_ string, _ interface{}) error {
-	return errors.New("Error")
+	return errors.New("error")
 }
 
 //Update retorna erro ao atualizar um recurso
 func (m MongoHandlerErrorStub) Update(_ string, _ interface{}, _ interface{}) error {
-	return errors.New("Error")
+	return errors.New("error")
 }
 
 //FindAll retorna erro ao listar recursos
 func (m MongoHandlerErrorStub) FindAll(_ string, _ interface{}, _ interface{}) error {
-	return errors.New("Error")
+	return errors.New("error")
 }
 
 //FindOne retorna erro ao obter um recurso
@@ -50,5 +50,5 @@ func (m MongoHandlerErrorStub) FindOne(_ string, _ interface{}, _ interface{}, _
 	if m.TypeErr != nil {
 		return m.TypeErr
 	}
-	return errors.New("Error")
+	return errors.New("error")
 }
