@@ -2,26 +2,34 @@ package domain
 
 import (
 	"time"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
-	ID                   bson.ObjectId `json:"id" bson:"_id"`
-	AccountOriginID      bson.ObjectId `json:"account_origin_id" bson:"account_origin_id"`
-	AccountDestinationID bson.ObjectId `json:"account_destination_id" bson:"account_destination_id"`
-	Amount               float64       `json:"amount" bson:"amount"`
-	CreatedAt            time.Time     `json:"created_at" bson:"created_at"`
+	ID                   string    `json:"id" bson:"id"`
+	AccountOriginID      string    `json:"account_origin_id" bson:"account_origin_id"`
+	AccountDestinationID string    `json:"account_destination_id" bson:"account_destination_id"`
+	Amount               float64   `json:"amount" bson:"amount"`
+	CreatedAt            time.Time `json:"created_at" bson:"created_at"`
+}
+
+func NewTransfer(accountOriginID string, accountDestinationID string, amount float64) Transfer {
+	return Transfer{
+		ID:                   uuid(),
+		AccountOriginID:      accountOriginID,
+		AccountDestinationID: accountDestinationID,
+		Amount:               amount,
+		CreatedAt:            time.Now(),
+	}
 }
 
 //GetAccountOriginID retorna o id da conta de origem
-func (t *Transfer) GetAccountOriginID() bson.ObjectId {
+func (t *Transfer) GetAccountOriginID() string {
 	return t.AccountOriginID
 }
 
 //GetAccountDestinationID retorna o id da conta de destino
-func (t *Transfer) GetAccountDestinationID() bson.ObjectId {
+func (t *Transfer) GetAccountDestinationID() string {
 	return t.AccountDestinationID
 }
 

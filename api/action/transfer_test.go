@@ -13,7 +13,9 @@ import (
 	"github.com/sirupsen/logrus/hooks/test"
 )
 
-func TestTransferStore(t *testing.T) {
+func TestTransfer_Store(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		rawPayload []byte
 	}
@@ -31,8 +33,8 @@ func TestTransferStore(t *testing.T) {
 			transferAction: NewTransfer(stubTransfer.TransferUseCaseStubSuccess{}, loggerMock),
 			args: args{
 				rawPayload: []byte(`{
-					"account_destination_id": "5e570851adcef50116aa7a5c",
-					"account_origin_id": "5e570851adcef50116aa7a5a",
+					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+					"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
 					"amount": 10 
 				}`),
 			},
@@ -44,8 +46,8 @@ func TestTransferStore(t *testing.T) {
 			args: args{
 				rawPayload: []byte(
 					`{
-						"account_destination_id": "5e551c2c5bb0cb0107b058e1",
-						"account_origin_id": "5e551c315bb0cb0107b058e2",
+						"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+						"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
 						"amount": 10
 					}`,
 				),
@@ -61,28 +63,28 @@ func TestTransferStore(t *testing.T) {
 			args: args{
 				rawPayload: []byte(
 					`{
-						"account_destination_id": "5e551c2c5bb0cb0107b058e1",
-						"account_origin_id": "5e551c315bb0cb0107b058e2",
+						"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+						"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
 						"amount": 10
 					}`,
 				),
 			},
 			expectedStatusCode: http.StatusUnprocessableEntity,
 		},
-		{
-			name:           "Store action invalid ObjectID",
-			transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
-			args: args{
-				rawPayload: []byte(
-					`{
-						"account_destination_id": "test",
-						"account_origin_id": "test", 
-						"amount": 10 
-					}`,
-				),
-			},
-			expectedStatusCode: http.StatusBadRequest,
-		},
+		//{
+		//	name:           "Store action invalid ObjectID",
+		//	transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
+		//	args: args{
+		//		rawPayload: []byte(
+		//			`{
+		//				"account_destination_id": "test",
+		//				"account_origin_id": "test",
+		//				"amount": 10
+		//			}`,
+		//		),
+		//	},
+		//	expectedStatusCode: http.StatusBadRequest,
+		//},
 		{
 			name:           "Store action invalid JSON",
 			transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
@@ -127,7 +129,9 @@ func TestTransferStore(t *testing.T) {
 	}
 }
 
-func TestTransferIndex(t *testing.T) {
+func TestTransfer_Index(t *testing.T) {
+	t.Parallel()
+
 	var loggerMock, _ = test.NewNullLogger()
 
 	tests := []struct {

@@ -1,14 +1,8 @@
 package usecase
 
 import (
-	"time"
-
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
-
-	"github.com/pkg/errors"
 )
 
 //Transfer armazena as depedências para ações de uma transferência
@@ -29,13 +23,12 @@ func NewTransfer(
 }
 
 //Store cria uma nova transferência
-func (t Transfer) Store(transfer domain.Transfer) (domain.Transfer, error) {
-	if err := t.processTransfer(transfer); err != nil {
+func (t Transfer) Store(data domain.Transfer) (domain.Transfer, error) {
+	if err := t.processTransfer(data); err != nil {
 		return domain.Transfer{}, err
 	}
 
-	transfer.CreatedAt = time.Now()
-	transfer.ID = bson.NewObjectId()
+	var transfer = domain.NewTransfer(data.AccountOriginID, data.AccountDestinationID, data.Amount)
 
 	result, err := t.transferRepository.Store(transfer)
 	if err != nil {
@@ -46,7 +39,12 @@ func (t Transfer) Store(transfer domain.Transfer) (domain.Transfer, error) {
 }
 
 func (t Transfer) processTransfer(transfer domain.Transfer) error {
-	origin, err := t.accountRepository.FindOne(bson.M{"_id": transfer.GetAccountOriginID()})
+	origin, err := t.accountRepository.FindByID(transfer.GetAccountOriginID())
+	if err != nil {
+		return err
+	}
+
+	destination, err := t.accountRepository.FindByID(transfer.GetAccountDestinationID())
 	if err != nil {
 		return err
 	}
@@ -55,33 +53,14 @@ func (t Transfer) processTransfer(transfer domain.Transfer) error {
 		return err
 	}
 
-	destination, err := t.accountRepository.FindOne(bson.M{"_id": transfer.GetAccountDestinationID()})
-	if err != nil {
-		return err
-	}
-
 	destination.Deposit(transfer.GetAmount())
 
-	if err = t.updateAccount(
-		bson.M{"_id": transfer.GetAccountOriginID()},
-		bson.M{"$set": bson.M{"balance": origin.GetBalance()}},
-	); err != nil {
+	if err = t.accountRepository.UpdateBalance(transfer.GetAccountOriginID(), origin.GetBalance()); err != nil {
 		return err
 	}
 
-	if err = t.updateAccount(
-		bson.M{"_id": transfer.GetAccountDestinationID()},
-		bson.M{"$set": bson.M{"balance": destination.GetBalance()}},
-	); err != nil {
+	if err = t.accountRepository.UpdateBalance(transfer.GetAccountDestinationID(), destination.GetBalance()); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (t Transfer) updateAccount(query bson.M, update bson.M) error {
-	if err := t.accountRepository.Update(query, update); err != nil {
-		return errors.Wrap(err, "error updating account")
 	}
 
 	return nil

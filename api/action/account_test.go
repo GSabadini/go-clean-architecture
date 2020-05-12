@@ -3,18 +3,18 @@ package action
 import (
 	"bytes"
 	"fmt"
-	"github.com/gsabadini/go-bank-transfer/domain"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	mock "github.com/gsabadini/go-bank-transfer/usecase/stub"
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/usecase/stub"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus/hooks/test"
 )
 
-func TestAccountStore(t *testing.T) {
+func TestAccount_Store(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -32,7 +32,7 @@ func TestAccountStore(t *testing.T) {
 		{
 			name:               "Store action success",
 			expectedStatusCode: http.StatusCreated,
-			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubSuccess{}, loggerMock),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -46,7 +46,7 @@ func TestAccountStore(t *testing.T) {
 		{
 			name:               "Store action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -60,7 +60,7 @@ func TestAccountStore(t *testing.T) {
 		{
 			name:               "Store action invalid JSON",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -99,7 +99,7 @@ func TestAccountStore(t *testing.T) {
 	}
 }
 
-func TestAccountIndex(t *testing.T) {
+func TestAccount_Index(t *testing.T) {
 	t.Parallel()
 
 	var loggerMock, _ = test.NewNullLogger()
@@ -112,12 +112,12 @@ func TestAccountIndex(t *testing.T) {
 		{
 			name:               "Index handler success",
 			expectedStatusCode: http.StatusOK,
-			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubSuccess{}, loggerMock),
 		},
 		{
 			name:               "Index handler error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
 		},
 	}
 
@@ -148,7 +148,7 @@ func TestAccountIndex(t *testing.T) {
 	}
 }
 
-func TestAccountFindBalance(t *testing.T) {
+func TestAccount_FindBalance(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -166,33 +166,33 @@ func TestAccountFindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action success",
 			expectedStatusCode: http.StatusOK,
-			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubSuccess{}, loggerMock),
 			args: args{
-				accountID: "5e5282beba39bfc244dc4c4b",
+				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 		},
 		{
 			name:               "FindBalance action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
 			args: args{
-				accountID: "5e5282beba39bfc244dc4c4b",
+				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 		},
 		{
 			name:               "FindBalance action parameter invalid",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
 			args: args{
-				accountID: "1",
+				accountID: "error",
 			},
 		},
 		{
 			name:               "FindBalance action error fetching account",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, loggerMock),
+			accountAction:      NewAccount(stub.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, loggerMock),
 			args: args{
-				accountID: "5e5282beba39bfc244dc4c4b",
+				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 		},
 	}
@@ -205,7 +205,7 @@ func TestAccountFindBalance(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			req = mux.SetURLVars(req, map[string]string{"account_id": "5e5282beba39bfc244dc4c4b"})
+			req = mux.SetURLVars(req, map[string]string{"account_id": tt.args.accountID})
 
 			var (
 				rr = httptest.NewRecorder()

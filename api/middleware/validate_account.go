@@ -96,9 +96,9 @@ func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next ht
 }
 
 var (
-	errBalanceInvalid = errors.New("Balance invalid")
-	errCPFInvalid     = errors.New("CPF invalid")
-	errNameInvalid    = errors.New("Name invalid")
+	errBalanceInvalid = errors.New("balance invalid")
+	errCPFInvalid     = errors.New("cpf invalid")
+	errNameInvalid    = errors.New("name invalid")
 )
 
 type accountRequest struct {
