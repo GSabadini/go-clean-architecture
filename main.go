@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gsabadini/go-bank-transfer/api"
-	"github.com/gsabadini/go-bank-transfer/config"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/config"
 )
 
 func main() {

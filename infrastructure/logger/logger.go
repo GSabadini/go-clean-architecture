@@ -1,6 +1,8 @@
 package logger
 
-import "errors"
+import (
+	"errors"
+)
 
 type Logger interface {
 	Infof(format string, args ...interface{})
@@ -19,6 +21,19 @@ type Logger interface {
 type Fields map[string]interface{}
 
 const (
+	//Debug has verbose message
+	Debug = "debug"
+	//Info is default log level
+	Info = "info"
+	//Warn is for logging messages about possible issues
+	Warn = "warn"
+	//Error is for logging errors
+	Error = "error"
+	//Fatal is for logging fatal messages. The sytem shutsdown after logging the message.
+	Fatal = "fatal"
+)
+
+const (
 	InstanceZapLogger int = iota
 	InstanceLogrusLogger
 )
@@ -27,19 +42,15 @@ var (
 	errInvalidLoggerInstance = errors.New("invalid logger instance")
 )
 
-//NewLogger retorna a instancia de um logger
-func NewLogger(loggerInstance int) (Logger, error) {
+//NewLogger retorna a instância de um logger
+func NewLogger(level string, formatJSON bool, loggerInstance int) (Logger, error) {
 	switch loggerInstance {
 	case InstanceZapLogger:
-		//logger, err := newZapLogger(config)
-		//if err != nil {
-		//	return err
-		//}
-		//log = logger
-		return nil, nil
+		var logger = NewZapLogger(level, formatJSON)
+		return logger, nil
 
 	case InstanceLogrusLogger:
-		var logger = NewLogrusLogger()
+		var logger = NewLogrusLogger(level, formatJSON)
 		return logger, nil
 
 	default:

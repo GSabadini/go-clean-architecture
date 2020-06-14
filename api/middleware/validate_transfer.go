@@ -3,11 +3,11 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 
 	"github.com/pkg/errors"
 )

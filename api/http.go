@@ -7,7 +7,7 @@ import (
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
 	"github.com/gsabadini/go-bank-transfer/api/middleware"
-	"github.com/gsabadini/go-bank-transfer/config"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/config"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/repository/postgres"
@@ -53,7 +53,9 @@ func (s HTTPServer) Listen() {
 		Handler:      negroniHandler,
 	}
 
-	s.log.Infof("Starting HTTP server on the port %s", s.appConfig.APIPort)
+	s.log.WithFields(logger.Fields{
+		"port": s.appConfig.APIPort,
+	}).Infof("Starting HTTP Server")
 	if err := server.ListenAndServe(); err != nil {
 		s.log.WithError(err).Fatalln("Error starting HTTP server")
 	}
