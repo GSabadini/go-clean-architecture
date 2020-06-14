@@ -5,19 +5,18 @@ import (
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
-
-	"github.com/sirupsen/logrus"
 )
 
 //Transfer armazena as dependências de uma transferência
 type Transfer struct {
-	logger  *logrus.Logger
+	logger  logger.Logger
 	usecase usecase.TransferUseCase
 }
 
 //NewTransfer constrói uma transferência com suas dependências
-func NewTransfer(usecase usecase.TransferUseCase, log *logrus.Logger) Transfer {
+func NewTransfer(usecase usecase.TransferUseCase, log logger.Logger) Transfer {
 	return Transfer{usecase: usecase, logger: log}
 }
 
@@ -93,16 +92,16 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (t Transfer) logSuccess(key string, message string, httpStatus int) {
-	t.logger.WithFields(logrus.Fields{
+	t.logger.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
-	}).Info(message)
+	}).Infof(message)
 }
 
 func (t Transfer) logError(key string, message string, httpStatus int, err error) {
-	t.logger.WithFields(logrus.Fields{
+	t.logger.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
 		"error":       err.Error(),
-	}).Error(message)
+	}).Errorf(message)
 }

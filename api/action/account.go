@@ -4,20 +4,21 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
-	"github.com/sirupsen/logrus"
+
+	"github.com/gorilla/mux"
 )
 
 //Account armazena as dependências de uma conta
 type Account struct {
 	usecase usecase.AccountUseCase
-	logger  *logrus.Logger
+	logger  logger.Logger
 }
 
 //NewAccount constrói uma conta com suas dependências
-func NewAccount(usecase usecase.AccountUseCase, log *logrus.Logger) Account {
+func NewAccount(usecase usecase.AccountUseCase, log logger.Logger) Account {
 	return Account{usecase: usecase, logger: log}
 }
 
@@ -131,16 +132,16 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a Account) logSuccess(key string, message string, httpStatus int) {
-	a.logger.WithFields(logrus.Fields{
+	a.logger.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
-	}).Info(message)
+	}).Infof(message)
 }
 
 func (a Account) logError(key string, message string, httpStatus int, err error) {
-	a.logger.WithFields(logrus.Fields{
+	a.logger.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
 		"error":       err.Error(),
-	}).Error(message)
+	}).Errorf(message)
 }

@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"fmt"
@@ -6,30 +6,28 @@ import (
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	//"github.com/lib/pq"
 
 	"github.com/pkg/errors"
 )
 
-//AccountPostgres representa um repositório para manipulação de dados de uma conta
-type AccountPostgres struct {
+//AccountRepository representa um repositório para manipulação de dados de uma conta
+type AccountRepository struct {
 	handler database.SQLHandler
 }
 
-//NewAccount constrói um repository com suas dependências
-func NewAccountPostgres(handler database.SQLHandler) AccountPostgres {
-	return AccountPostgres{handler: handler}
+//NewAccountRepository constrói um repository com suas dependências
+func NewAccountRepository(handler database.SQLHandler) AccountRepository {
+	return AccountRepository{handler: handler}
 }
 
 //Store realiza a inserção de uma conta no banco de dados
-func (a AccountPostgres) Store(account domain.Account) (domain.Account, error) {
+func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
 	query := `
 		INSERT INTO 
 			accounts (id, name, cpf, balance, created_at)
 		VALUES 
 			($1, $2, $3, $4, $5)
 	`
-	//err.(*pq.PGError)
 
 	if err := a.handler.Execute(
 		query,
@@ -46,7 +44,7 @@ func (a AccountPostgres) Store(account domain.Account) (domain.Account, error) {
 }
 
 //UpdateBalance realiza a atualização do saldo de uma conta no banco de dados
-func (a AccountPostgres) UpdateBalance(ID string, balance float64) error {
+func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
 	if err := a.handler.Execute(query, balance, ID); err != nil {
@@ -57,7 +55,7 @@ func (a AccountPostgres) UpdateBalance(ID string, balance float64) error {
 }
 
 //FindAll realiza a busca de todas as contas no banco de dados
-func (a AccountPostgres) FindAll() ([]domain.Account, error) {
+func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	var (
 		accounts = make([]domain.Account, 0)
 		query    = "SELECT * FROM accounts"
@@ -100,7 +98,7 @@ func (a AccountPostgres) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID realiza a busca de uma conta no banco de dados
-func (a AccountPostgres) FindByID(ID string) (*domain.Account, error) {
+func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	var (
 		account   = &domain.Account{}
 		query     = "SELECT * FROM accounts WHERE id = $1"
@@ -131,7 +129,7 @@ func (a AccountPostgres) FindByID(ID string) (*domain.Account, error) {
 }
 
 //FindBalance realiza a busca do saldo de uma conta no banco de dados
-func (a AccountPostgres) FindBalance(ID string) (domain.Account, error) {
+func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 	var (
 		account = domain.Account{}
 		query   = "SELECT balance FROM accounts WHERE id = $1"

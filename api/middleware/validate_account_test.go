@@ -6,8 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gsabadini/go-bank-transfer/mock"
+
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus/hooks/test"
 )
 
 func TestValidateAccount_Execute(t *testing.T) {
@@ -82,12 +83,10 @@ func TestValidateAccount_Execute(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			var loggerMock, _ = test.NewNullLogger()
-
 			// transformando middleware em um http.Handler
 			middlewareHandler := func(w http.ResponseWriter, r *http.Request) {
 				next := func(w http.ResponseWriter, r *http.Request) {}
-				middleware := NewValidateAccount(loggerMock)
+				middleware := NewValidateAccount(mock.LoggerMock{})
 				middleware.Execute(w, r, next)
 			}
 

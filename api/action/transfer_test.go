@@ -7,10 +7,9 @@ import (
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	stubTransfer "github.com/gsabadini/go-bank-transfer/usecase/stub"
+	"github.com/gsabadini/go-bank-transfer/mock"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus/hooks/test"
 )
 
 func TestTransfer_Store(t *testing.T) {
@@ -20,8 +19,6 @@ func TestTransfer_Store(t *testing.T) {
 		rawPayload []byte
 	}
 
-	var loggerMock, _ = test.NewNullLogger()
-
 	tests := []struct {
 		name               string
 		expectedStatusCode int
@@ -30,7 +27,7 @@ func TestTransfer_Store(t *testing.T) {
 	}{
 		{
 			name:           "Store action success",
-			transferAction: NewTransfer(stubTransfer.TransferUseCaseStubSuccess{}, loggerMock),
+			transferAction: NewTransfer(mock.TransferUseCaseStubSuccess{}, mock.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(`{
 					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -42,7 +39,7 @@ func TestTransfer_Store(t *testing.T) {
 		},
 		{
 			name:           "Store action error",
-			transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
+			transferAction: NewTransfer(mock.TransferUseCaseStubError{}, mock.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -57,8 +54,8 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Store action insufficient balance",
 			transferAction: NewTransfer(
-				stubTransfer.TransferUseCaseStubError{TypeErr: domain.ErrInsufficientBalance},
-				loggerMock,
+				mock.TransferUseCaseStubError{TypeErr: domain.ErrInsufficientBalance},
+				mock.LoggerMock{},
 			),
 			args: args{
 				rawPayload: []byte(
@@ -72,8 +69,8 @@ func TestTransfer_Store(t *testing.T) {
 			expectedStatusCode: http.StatusUnprocessableEntity,
 		},
 		//{
-		//	name:           "Store action invalid ObjectID",
-		//	transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
+		//	name:           "Store action invalid UUID",
+		//	transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, mock.LoggerMock{),
 		//	args: args{
 		//		rawPayload: []byte(
 		//			`{
@@ -87,7 +84,7 @@ func TestTransfer_Store(t *testing.T) {
 		//},
 		{
 			name:           "Store action invalid JSON",
-			transferAction: NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
+			transferAction: NewTransfer(mock.TransferUseCaseStubError{}, mock.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -132,8 +129,6 @@ func TestTransfer_Store(t *testing.T) {
 func TestTransfer_Index(t *testing.T) {
 	t.Parallel()
 
-	var loggerMock, _ = test.NewNullLogger()
-
 	tests := []struct {
 		name               string
 		expectedStatusCode int
@@ -142,12 +137,12 @@ func TestTransfer_Index(t *testing.T) {
 		{
 			name:               "Index action success",
 			expectedStatusCode: http.StatusOK,
-			transferAction:     NewTransfer(stubTransfer.TransferUseCaseStubSuccess{}, loggerMock),
+			transferAction:     NewTransfer(mock.TransferUseCaseStubSuccess{}, mock.LoggerMock{}),
 		},
 		{
 			name:               "Index action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			transferAction:     NewTransfer(stubTransfer.TransferUseCaseStubError{}, loggerMock),
+			transferAction:     NewTransfer(mock.TransferUseCaseStubError{}, mock.LoggerMock{}),
 		},
 	}
 

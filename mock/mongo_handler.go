@@ -1,4 +1,4 @@
-package stub
+package mock
 
 import "errors"
 

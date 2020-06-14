@@ -1,4 +1,4 @@
-package repository
+package mongodb
 
 import (
 	"gopkg.in/mgo.v2"
@@ -10,19 +10,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-//AccountMongoDB representa um repositório para manipulação de dados de contas utilizando MongoDB
-type AccountMongoDB struct {
+//AccountRepository representa um repositório para manipulação de dados de contas utilizando MongoDB
+type AccountRepository struct {
 	handler        database.NoSQLHandler
 	collectionName string
 }
 
-//NewAccountMongoDB constrói um repository com suas dependências
-func NewAccountMongoDB(dbHandler database.NoSQLHandler) AccountMongoDB {
-	return AccountMongoDB{handler: dbHandler, collectionName: "accounts"}
+//NewAccountRepository constrói um repository com suas dependências
+func NewAccountRepository(dbHandler database.NoSQLHandler) AccountRepository {
+	return AccountRepository{handler: dbHandler, collectionName: "accounts"}
 }
 
 //Store realiza a inserção de uma conta no banco de dados
-func (a AccountMongoDB) Store(account domain.Account) (domain.Account, error) {
+func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
 	if err := a.handler.Store(a.collectionName, &account); err != nil {
 		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
@@ -31,7 +31,7 @@ func (a AccountMongoDB) Store(account domain.Account) (domain.Account, error) {
 }
 
 //UpdateBalance realiza a atualização do saldo de uma conta no banco de dados
-func (a AccountMongoDB) UpdateBalance(ID string, balance float64) error {
+func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
 	var (
 		query  = bson.M{"id": ID}
 		update = bson.M{"$set": bson.M{"balance": balance}}
@@ -45,7 +45,7 @@ func (a AccountMongoDB) UpdateBalance(ID string, balance float64) error {
 }
 
 //FindAll realiza a busca de todas as contas no banco de dados
-func (a AccountMongoDB) FindAll() ([]domain.Account, error) {
+func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	var accounts = make([]domain.Account, 0)
 
 	if err := a.handler.FindAll(a.collectionName, nil, &accounts); err != nil {
@@ -56,7 +56,7 @@ func (a AccountMongoDB) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID realiza a busca de uma conta no banco de dados
-func (a AccountMongoDB) FindByID(ID string) (*domain.Account, error) {
+func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	var (
 		account = &domain.Account{}
 		query   = bson.M{"id": ID}
@@ -75,7 +75,7 @@ func (a AccountMongoDB) FindByID(ID string) (*domain.Account, error) {
 }
 
 //FindBalance realiza a busca do saldo de uma conta no banco de dados
-func (a AccountMongoDB) FindBalance(ID string) (domain.Account, error) {
+func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 	var (
 		account  = domain.Account{}
 		query    = bson.M{"id": ID}

@@ -1,11 +1,11 @@
-package repository
+package mongodb
 
 import (
+	mock2 "github.com/gsabadini/go-bank-transfer/mock"
 	"reflect"
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database/stub"
 	"gopkg.in/mgo.v2"
 )
 
@@ -19,19 +19,19 @@ func TestAccountMongoDB_Store(t *testing.T) {
 		args          args
 		expected      domain.Account
 		expectedError interface{}
-		repository    AccountMongoDB
+		repository    AccountRepository
 		expectedErr   bool
 	}{
 		{
 			name:       "Success to create account",
 			args:       args{account: domain.Account{}},
 			expected:   domain.Account{},
-			repository: NewAccountMongoDB(stub.MongoHandlerSuccessStub{}),
+			repository: NewAccountRepository(mock2.MongoHandlerSuccessStub{}),
 		},
 		{
 			name:        "Error to create account",
 			args:        args{account: domain.Account{}},
-			repository:  NewAccountMongoDB(stub.MongoHandlerErrorStub{}),
+			repository:  NewAccountRepository(mock2.MongoHandlerErrorStub{}),
 			expectedErr: true,
 		},
 	}
@@ -60,13 +60,13 @@ func TestAccountMongoDB_UpdateBalance(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		repository  AccountMongoDB
+		repository  AccountRepository
 		args        args
 		expectedErr bool
 	}{
 		{
 			name:       "Success to account update",
-			repository: NewAccountMongoDB(stub.MongoHandlerSuccessStub{}),
+			repository: NewAccountRepository(mock2.MongoHandlerSuccessStub{}),
 			args: args{
 				ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				balance: 100.00,
@@ -74,7 +74,7 @@ func TestAccountMongoDB_UpdateBalance(t *testing.T) {
 		},
 		{
 			name:       "Error to account update",
-			repository: NewAccountMongoDB(stub.MongoHandlerErrorStub{}),
+			repository: NewAccountRepository(mock2.MongoHandlerErrorStub{}),
 			args: args{
 				ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				balance: 1.00,
@@ -95,19 +95,19 @@ func TestAccountMongoDB_UpdateBalance(t *testing.T) {
 func TestAccountMongoDB_FindAll(t *testing.T) {
 	tests := []struct {
 		name        string
-		repository  AccountMongoDB
+		repository  AccountRepository
 		expected    []domain.Account
 		expectedErr bool
 	}{
 		{
 			name:       "Success in finding all accounts",
-			repository: NewAccountMongoDB(stub.MongoHandlerSuccessStub{}),
+			repository: NewAccountRepository(mock2.MongoHandlerSuccessStub{}),
 
 			expected: []domain.Account{},
 		},
 		{
 			name:        "Error in finding all accounts",
-			repository:  NewAccountMongoDB(stub.MongoHandlerErrorStub{}),
+			repository:  NewAccountRepository(mock2.MongoHandlerErrorStub{}),
 			expected:    []domain.Account{},
 			expectedErr: true,
 		},
@@ -136,27 +136,27 @@ func TestAccountMongoDB_FindByID(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		repository  AccountMongoDB
+		repository  AccountRepository
 		args        args
 		expected    *domain.Account
 		expectedErr bool
 	}{
 		{
 			name:       "Success to find account",
-			repository: NewAccountMongoDB(stub.MongoHandlerSuccessStub{}),
+			repository: NewAccountRepository(mock2.MongoHandlerSuccessStub{}),
 			args:       args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:   &domain.Account{},
 		},
 		{
 			name:        "Error to find account",
-			repository:  NewAccountMongoDB(stub.MongoHandlerErrorStub{}),
+			repository:  NewAccountRepository(mock2.MongoHandlerErrorStub{}),
 			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    &domain.Account{},
 			expectedErr: true,
 		},
 		{
 			name:        "Account not found",
-			repository:  NewAccountMongoDB(stub.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
+			repository:  NewAccountRepository(mock2.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
 			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    &domain.Account{},
 			expectedErr: true,
@@ -186,27 +186,27 @@ func TestAccountMongoDB_FindBalance(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		repository  AccountMongoDB
+		repository  AccountRepository
 		args        args
 		expected    domain.Account
 		expectedErr bool
 	}{
 		{
 			name:       "Success to find account balance",
-			repository: NewAccountMongoDB(stub.MongoHandlerSuccessStub{}),
+			repository: NewAccountRepository(mock2.MongoHandlerSuccessStub{}),
 			args:       args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:   domain.Account{},
 		},
 		{
 			name:        "Error to find account balance",
-			repository:  NewAccountMongoDB(stub.MongoHandlerErrorStub{}),
+			repository:  NewAccountRepository(mock2.MongoHandlerErrorStub{}),
 			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    domain.Account{},
 			expectedErr: true,
 		},
 		{
 			name:        "Account balance not found",
-			repository:  NewAccountMongoDB(stub.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
+			repository:  NewAccountRepository(mock2.MongoHandlerErrorStub{TypeErr: mgo.ErrNotFound}),
 			args:        args{ID: "3c096a40-ccba-4b58-93ed-57379ab04680"},
 			expected:    domain.Account{},
 			expectedErr: true,

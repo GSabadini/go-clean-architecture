@@ -8,18 +8,18 @@ import (
 	"regexp"
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 //ValidateAccount armazena a estrutura de validação de entrada de dados
 type ValidateAccount struct {
-	logger *logrus.Logger
+	logger logger.Logger
 }
 
 //NewValidateAccount constrói um ValidateAccount com suas dependências
-func NewValidateAccount(log *logrus.Logger) ValidateAccount {
+func NewValidateAccount(log logger.Logger) ValidateAccount {
 	return ValidateAccount{logger: log}
 }
 
@@ -32,11 +32,11 @@ func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next ht
 
 	payload, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("error read body")
+		}).Errorf("error read body")
 
 		return
 	}
@@ -46,44 +46,44 @@ func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next ht
 
 	var account accountRequest
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("error when decoding json")
+		}).Errorf("error when decoding json")
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
 	if err := account.validateBalance(); err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error(messageInvalidField)
+		}).Errorf(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
 	if err := account.validateCPF(); err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error(messageInvalidField)
+		}).Errorf(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
 	if err := account.validateName(); err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error(messageInvalidField)
+		}).Errorf(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return

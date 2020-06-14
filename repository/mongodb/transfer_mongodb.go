@@ -1,4 +1,4 @@
-package repository
+package mongodb
 
 import (
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -6,21 +6,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-//const transfersCollectionName = "transfers"
-
-//TransferMongoDB representa um repositório para manipulação de dados de transferências utilizando MongoDB
-type TransferMongoDB struct {
+//TransferRepository representa um repositório para manipulação de dados de transferências utilizando MongoDB
+type TransferRepository struct {
 	handler        database.NoSQLHandler
 	collectionName string
 }
 
-//NewTransferMongoDB cria um repository com suas dependências
-func NewTransferMongoDB(handler database.NoSQLHandler) TransferMongoDB {
-	return TransferMongoDB{handler: handler, collectionName: "transfers"}
+//NewTransferRepository cria um repository com suas dependências
+func NewTransferRepository(handler database.NoSQLHandler) TransferRepository {
+	return TransferRepository{handler: handler, collectionName: "transfers"}
 }
 
 //Store cria uma transferência através da implementação real do database
-func (t TransferMongoDB) Store(transfer domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	if err := t.handler.Store(t.collectionName, &transfer); err != nil {
 		return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
 	}
@@ -29,7 +27,7 @@ func (t TransferMongoDB) Store(transfer domain.Transfer) (domain.Transfer, error
 }
 
 //FindAll realiza uma busca através da implementação real do database
-func (t TransferMongoDB) FindAll() ([]domain.Transfer, error) {
+func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 	var transfer = make([]domain.Transfer, 0)
 
 	if err := t.handler.FindAll(t.collectionName, nil, &transfer); err != nil {

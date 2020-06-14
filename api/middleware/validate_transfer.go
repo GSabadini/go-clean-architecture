@@ -3,22 +3,22 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 //ValidateTransfer armazena a estrutura de validação de entrada de dados
 type ValidateTransfer struct {
-	logger *logrus.Logger
+	logger logger.Logger
 }
 
 //NewValidateTransfer constrói um ValidateTransfer com suas dependências
-func NewValidateTransfer(log *logrus.Logger) ValidateTransfer {
+func NewValidateTransfer(log logger.Logger) ValidateTransfer {
 	return ValidateTransfer{logger: log}
 }
 
@@ -31,11 +31,11 @@ func (v ValidateTransfer) Execute(w http.ResponseWriter, r *http.Request, next h
 
 	payload, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("error read body")
+		}).Errorf("error read body")
 
 		return
 	}
@@ -45,33 +45,33 @@ func (v ValidateTransfer) Execute(w http.ResponseWriter, r *http.Request, next h
 
 	var transfer transferRequest
 	if err := json.NewDecoder(r.Body).Decode(&transfer); err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("error when decoding json")
+		}).Errorf("error when decoding json")
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
 	if err := transfer.validateAmount(); err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error(messageInvalidField)
+		}).Errorf(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
 	if err := transfer.validateOriginEqualsDestination(); err != nil {
-		v.logger.WithFields(logrus.Fields{
+		v.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error(messageInvalidField)
+		}).Errorf(messageInvalidField)
 
 		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
 		return

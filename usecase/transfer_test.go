@@ -1,12 +1,12 @@
 package usecase
 
 import (
+	mock2 "github.com/gsabadini/go-bank-transfer/mock"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository/stub"
 )
 
 func TestTransfer_Store(t *testing.T) {
@@ -32,7 +32,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase: NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
+			usecase: NewTransfer(mock2.TransferRepositoryStubSuccess{}, mock2.AccountRepositoryStubSuccess{}),
 			expected: domain.Transfer{
 				ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -50,7 +50,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase:       NewTransfer(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(mock2.TransferRepositoryStubError{}, mock2.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
@@ -63,7 +63,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               200,
 				},
 			},
-			usecase:       NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(mock2.TransferRepositoryStubSuccess{}, mock2.AccountRepositoryStubSuccess{}),
 			expectedError: "origin account does not have sufficient balance",
 			expected:      domain.Transfer{},
 		},
@@ -76,7 +76,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase:       NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubError{}),
+			usecase:       NewTransfer(mock2.TransferRepositoryStubSuccess{}, mock2.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      domain.Transfer{},
 		},
@@ -109,7 +109,7 @@ func TestTransfer_FindAll(t *testing.T) {
 	}{
 		{
 			name:    "Success when returning the transfer list",
-			usecase: NewTransfer(stub.TransferRepositoryStubSuccess{}, stub.AccountRepositoryStubSuccess{}),
+			usecase: NewTransfer(mock2.TransferRepositoryStubSuccess{}, mock2.AccountRepositoryStubSuccess{}),
 			expected: []domain.Transfer{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -129,7 +129,7 @@ func TestTransfer_FindAll(t *testing.T) {
 		},
 		{
 			name:          "Error when returning the transfer list",
-			usecase:       NewTransfer(stub.TransferRepositoryStubError{}, stub.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(mock2.TransferRepositoryStubError{}, mock2.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      []domain.Transfer{},
 		},

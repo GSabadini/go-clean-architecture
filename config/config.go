@@ -5,15 +5,14 @@ import (
 	"os"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-
-	"github.com/sirupsen/logrus"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 )
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
 	AppName                 string
 	APIPort                 int
-	Logger                  *logrus.Logger
+	Logger                  logger.Logger
 	DatabaseSQLConnection   database.SQLHandler
 	DatabaseNOSQLConnection database.NoSQLHandler
 }
@@ -29,34 +28,33 @@ func NewConfig() Config {
 	}
 }
 
-func getLogger() *logrus.Logger {
-	log := logrus.New()
-	log.SetFormatter(&logrus.JSONFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
+func getLogger() logger.Logger {
+	log, err := logger.NewLogger(logger.InstanceLogrusLogger)
+	if err != nil {
+		panic(err)
+	}
 
+	log.Infof("Successfully configured logger")
 	return log
 }
 
-func getConnectionMongoDB(logger *logrus.Logger) *database.MongoHandler {
+func getConnectionMongoDB(logger logger.Logger) *database.MongoHandler {
 	handler, err := database.NewMongoHandler(
 		verifyExistEnvironmentParams("MONGODB_HOST"),
 		verifyExistEnvironmentParams("MONGODB_DATABASE"),
 	)
 
 	if err != nil {
-		logger.Infoln("Could not make a connection to the database")
-
-		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
+		logger.Fatalln("Could not make a connection to the database")
 		panic(err)
 	}
 
-	logger.Infoln("Successfully connected to the database")
+	logger.Infof("Successfully connected to the database")
 
 	return handler
 }
 
-func getConnectionPostgres(logger *logrus.Logger) *database.PostgresHandler {
+func getConnectionPostgres(logger logger.Logger) *database.PostgresHandler {
 	ds := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 		verifyExistEnvironmentParams("POSTGRES_HOST"),
 		verifyExistEnvironmentParams("POSTGRES_PORT"),
@@ -67,13 +65,11 @@ func getConnectionPostgres(logger *logrus.Logger) *database.PostgresHandler {
 
 	handler, err := database.NewPostgresHandler(ds)
 	if err != nil {
-		logger.Infoln("Could not make a connection to the database")
-
-		// Se não conseguir conexão com o banco por algum motivo, então a aplicação deve criticar
+		logger.Fatalln("Could not make a connection to the database")
 		panic(err)
 	}
 
-	logger.Infoln("Successfully connected to the database")
+	logger.Infof("Successfully connected to the database")
 
 	return handler
 }

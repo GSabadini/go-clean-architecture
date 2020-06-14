@@ -10,7 +10,7 @@ func uuid() string {
 	return strings.Replace(gouuid.NewV4().String(), "-", "", -1)
 }
 
-//IsValidUUID
+//IsValidUUID retorna um UUID válido
 func IsValidUUID(uuid string) bool {
 	_, err := gouuid.FromString(uuid)
 	return err == nil

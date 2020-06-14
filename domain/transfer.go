@@ -13,6 +13,7 @@ type Transfer struct {
 	CreatedAt            time.Time `json:"created_at" bson:"created_at"`
 }
 
+//NewTransfer cria uma transferência
 func NewTransfer(accountOriginID string, accountDestinationID string, amount float64) Transfer {
 	return Transfer{
 		ID:                   uuid(),

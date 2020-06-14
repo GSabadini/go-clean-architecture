@@ -1,4 +1,4 @@
-package stub
+package mock
 
 import (
 	"github.com/gsabadini/go-bank-transfer/domain"
