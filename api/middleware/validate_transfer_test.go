@@ -72,7 +72,7 @@ func TestValidateTransfer_Execute(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// transformando middleware em um http.Handler
+			// transformando middleware em um web.Handler
 			middlewareHandler := func(w http.ResponseWriter, r *http.Request) {
 				next := func(w http.ResponseWriter, r *http.Request) {}
 				middleware := NewValidateTransfer(mock.LoggerMock{})

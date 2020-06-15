@@ -7,8 +7,6 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
-
-	"github.com/gorilla/mux"
 )
 
 //Account armazena as dependências de uma conta
@@ -84,9 +82,11 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_balance"
 
-	var vars = mux.Vars(r)
-	accountID, ok := vars["account_id"]
-	if !ok || !domain.IsValidUUID(accountID) {
+	//var vars = mux.Vars(r)
+	//accountID, ok := vars["account_id"]
+
+	accountID := r.URL.Query().Get("account_id")
+	if accountID != "" && !domain.IsValidUUID(accountID) {
 		var err = errParameterInvalid
 
 		a.logError(

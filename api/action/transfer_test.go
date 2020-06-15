@@ -80,7 +80,7 @@ func TestTransfer_Store(t *testing.T) {
 		//			}`,
 		//		),
 		//	},
-		//	expectedStatusCode: http.StatusBadRequest,
+		//	expectedStatusCode: web.StatusBadRequest,
 		//},
 		{
 			name:           "Store action invalid JSON",

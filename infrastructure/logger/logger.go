@@ -43,14 +43,17 @@ var (
 )
 
 //NewLogger retorna a instância de um logger
-func NewLogger(level string, formatJSON bool, loggerInstance int) (Logger, error) {
+func NewLogger(level string, isJSON bool, loggerInstance int) (Logger, error) {
 	switch loggerInstance {
 	case InstanceZapLogger:
-		var logger = NewZapLogger(level, formatJSON)
+		logger, err := NewZapLogger(level, isJSON)
+		if err != nil {
+			return nil, err
+		}
 		return logger, nil
 
 	case InstanceLogrusLogger:
-		var logger = NewLogrusLogger(level, formatJSON)
+		var logger = NewLogrusLogger(level, isJSON)
 		return logger, nil
 
 	default:

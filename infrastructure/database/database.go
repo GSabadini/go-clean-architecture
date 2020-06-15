@@ -24,7 +24,7 @@ type Row interface {
 }
 
 var (
-	errInvalidDatabaseInstance = errors.New("invalid databse instance")
+	errInvalidDatabaseInstance = errors.New("invalid database instance")
 )
 
 const (

@@ -9,7 +9,7 @@ type logrusLogger struct {
 }
 
 //NewLogrusLogger constrói um logrus logger
-func NewLogrusLogger(level string, formatJSON bool) Logger {
+func NewLogrusLogger(level string, isJSON bool) Logger {
 	log := logrus.New()
 
 	if level != "" {
@@ -20,7 +20,7 @@ func NewLogrusLogger(level string, formatJSON bool) Logger {
 		log.SetLevel(lvl)
 	}
 
-	if formatJSON {
+	if isJSON {
 		log.SetFormatter(&logrus.JSONFormatter{
 			TimestampFormat: "2006-01-02 15:04:05",
 		})
