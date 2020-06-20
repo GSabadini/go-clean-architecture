@@ -3,10 +3,10 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gsabadini/go-bank-transfer/api/response"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/gsabadini/go-bank-transfer/api/action"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 
 	"github.com/pkg/errors"
@@ -51,7 +51,7 @@ func (v ValidateTransfer) Execute(w http.ResponseWriter, r *http.Request, next h
 			"error":       err.Error(),
 		}).Errorf("error when decoding json")
 
-		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (v ValidateTransfer) Execute(w http.ResponseWriter, r *http.Request, next h
 			"error":       err.Error(),
 		}).Errorf(messageInvalidField)
 
-		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (v ValidateTransfer) Execute(w http.ResponseWriter, r *http.Request, next h
 			"error":       err.Error(),
 		}).Errorf(messageInvalidField)
 
-		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 

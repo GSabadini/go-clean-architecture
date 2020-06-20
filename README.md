@@ -82,7 +82,7 @@ curl -i --request POST 'http://localhost:3001/api/accounts' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "Test",
-    "cpf": "070.910.584-64",
+    "cpf": "070.910.584-24",
     "balance": 1.00
 }'
 ```

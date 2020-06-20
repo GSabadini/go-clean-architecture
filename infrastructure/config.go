@@ -12,12 +12,12 @@ import (
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
-	AppName         string
-	Port            int64
-	WebServer       web.Server
-	Logger          logger.Logger
-	SQLConnection   database.SQLHandler
-	NoSQLConnection database.NoSQLHandler
+	AppName   string
+	Port      web.Port
+	WebServer web.Server
+	Logger    logger.Logger
+	dbSQL     database.SQLHandler
+	dbNoSQL   database.NoSQLHandler
 }
 
 //NewConfig retorna a configuração da aplicação
@@ -29,17 +29,17 @@ func NewConfig() Config {
 
 	config := Config{
 		AppName: os.Getenv("APP_NAME"),
-		Port:    port,
+		Port:    web.Port(port),
 		Logger:  log(),
 	}
 
-	config.SQLConnection = databaseSQLConnection(config.Logger)
-	config.NoSQLConnection = databaseNoSQLConnection(config.Logger)
+	config.dbSQL = dbSQLConn(config.Logger)
+	config.dbNoSQL = dbNoSQLConn(config.Logger)
 
 	config.WebServer = webServer(
 		config.Logger,
-		config.SQLConnection,
-		config.NoSQLConnection,
+		config.dbSQL,
+		config.dbNoSQL,
 		config.Port,
 	)
 
@@ -48,15 +48,15 @@ func NewConfig() Config {
 
 func webServer(
 	log logger.Logger,
-	dbConnSQL database.SQLHandler,
-	dbConnNoSQL database.NoSQLHandler,
-	port int64,
+	dbSQLConn database.SQLHandler,
+	dbNoSQLConn database.NoSQLHandler,
+	port web.Port,
 ) web.Server {
 	server, err := web.NewWebServer(
-		web.InstanceGin,
+		web.InstanceGorillaMux,
 		log,
-		dbConnSQL,
-		dbConnNoSQL,
+		dbSQLConn,
+		dbNoSQLConn,
 		port,
 	)
 	if err != nil {
@@ -69,7 +69,7 @@ func webServer(
 }
 
 func log() logger.Logger {
-	log, err := logger.NewLogger(logger.Info, true, logger.InstanceLogrusLogger)
+	log, err := logger.NewLogger(logger.InstanceLogrusLogger, logger.Info, true)
 	if err != nil {
 		panic(err)
 	}
@@ -79,7 +79,7 @@ func log() logger.Logger {
 	return log
 }
 
-func databaseNoSQLConnection(log logger.Logger) database.NoSQLHandler {
+func dbNoSQLConn(log logger.Logger) database.NoSQLHandler {
 	var (
 		host   = verifyExistEnvironmentParams("MONGODB_HOST")
 		dbName = verifyExistEnvironmentParams("MONGODB_DATABASE")
@@ -96,7 +96,7 @@ func databaseNoSQLConnection(log logger.Logger) database.NoSQLHandler {
 	return handler
 }
 
-func databaseSQLConnection(log logger.Logger) database.SQLHandler {
+func dbSQLConn(log logger.Logger) database.SQLHandler {
 	var ds = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 		verifyExistEnvironmentParams("POSTGRES_HOST"),
 		verifyExistEnvironmentParams("POSTGRES_PORT"),

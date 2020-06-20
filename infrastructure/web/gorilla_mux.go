@@ -17,23 +17,20 @@ import (
 )
 
 type GorillaMux struct {
-	log                     logger.Logger
-	databaseSQLConnection   database.SQLHandler
-	databaseNOSQLConnection database.NoSQLHandler
-	port                    int64
+	log  logger.Logger
+	db   database.SQLHandler
+	port Port
 }
 
 func NewGorillaMux(
 	log logger.Logger,
 	dbConnSQL database.SQLHandler,
-	dbConnNoSQL database.NoSQLHandler,
-	port int64,
+	port Port,
 ) GorillaMux {
 	return GorillaMux{
-		log:                     log,
-		databaseSQLConnection:   dbConnSQL,
-		databaseNOSQLConnection: dbConnNoSQL,
-		port:                    port,
+		log:  log,
+		db:   dbConnSQL,
+		port: port,
 	}
 }
 
@@ -76,8 +73,8 @@ func (g GorillaMux) setAppHandlers(router *mux.Router) {
 func (g GorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferRepository = postgres.NewTransferRepository(g.databaseSQLConnection)
-			accountRepository  = postgres.NewAccountRepository(g.databaseSQLConnection)
+			transferRepository = postgres.NewTransferRepository(g.db)
+			accountRepository  = postgres.NewAccountRepository(g.db)
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 		)
 
@@ -102,8 +99,8 @@ func (g GorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 func (g GorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferRepository = postgres.NewTransferRepository(g.databaseSQLConnection)
-			accountRepository  = postgres.NewAccountRepository(g.databaseSQLConnection)
+			transferRepository = postgres.NewTransferRepository(g.db)
+			accountRepository  = postgres.NewAccountRepository(g.db)
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 			transferAction     = action.NewTransfer(transferUseCase, g.log)
 		)
@@ -121,7 +118,7 @@ func (g GorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 func (g GorillaMux) buildActionStoreAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountRepository = postgres.NewAccountRepository(g.databaseSQLConnection)
+			accountRepository = postgres.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
 			accountAction     = action.NewAccount(accountUseCase, g.log)
 		)
@@ -145,7 +142,7 @@ func (g GorillaMux) buildActionStoreAccount() *negroni.Negroni {
 func (g GorillaMux) buildActionIndexAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountRepository = postgres.NewAccountRepository(g.databaseSQLConnection)
+			accountRepository = postgres.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
 			accountAction     = action.NewAccount(accountUseCase, g.log)
 		)
@@ -163,10 +160,19 @@ func (g GorillaMux) buildActionIndexAccount() *negroni.Negroni {
 func (g GorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountRepository = postgres.NewAccountRepository(g.databaseSQLConnection)
+			accountRepository = postgres.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
 			accountAction     = action.NewAccount(accountUseCase, g.log)
 		)
+
+		var (
+			vars = mux.Vars(req)
+			q    = req.URL.Query()
+		)
+
+		accountID, _ := vars["account_id"]
+		q.Add("account_id", accountID)
+		req.URL.RawQuery = q.Encode()
 
 		accountAction.FindBalance(res, req)
 	}

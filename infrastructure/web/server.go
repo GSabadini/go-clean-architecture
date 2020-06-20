@@ -10,26 +10,28 @@ type Server interface {
 	Listen()
 }
 
+type Port int64
+
 var (
 	errInvalidWebServerInstance = errors.New("invalid web server instance")
 )
 
 const (
-	InstanceGorillaWithNegroni int = iota
+	InstanceGorillaMux int = iota
 	InstanceGin
 )
 
 //NewWebServer
 func NewWebServer(
-	webServerInstance int,
+	instance int,
 	log logger.Logger,
 	dbConnSQL database.SQLHandler,
 	dbConnNoSQL database.NoSQLHandler,
-	port int64,
+	port Port,
 ) (Server, error) {
-	switch webServerInstance {
-	case InstanceGorillaWithNegroni:
-		return NewGorillaMux(log, dbConnSQL, dbConnNoSQL, port), nil
+	switch instance {
+	case InstanceGorillaMux:
+		return NewGorillaMux(log, dbConnSQL, port), nil
 	case InstanceGin:
 		return NewGin(log, dbConnNoSQL, port), nil
 	default:

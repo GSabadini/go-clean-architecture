@@ -32,8 +32,8 @@ const (
 )
 
 //NewDatabaseNoSQL retorna o handler de um banco de dados NoSQL
-func NewDatabaseNoSQL(dbInstance int, host, dbName string) (NoSQLHandler, error) {
-	switch dbInstance {
+func NewDatabaseNoSQL(instance int, host, dbName string) (NoSQLHandler, error) {
+	switch instance {
 	case InstanceMongoDB:
 		db, err := NewMongoHandler(host, dbName)
 		if err != nil {
@@ -50,8 +50,8 @@ const (
 )
 
 //NewDatabaseSQL retorna o handler de um banco de dados SQL
-func NewDatabaseSQL(dbInstance int, dataSource string) (SQLHandler, error) {
-	switch dbInstance {
+func NewDatabaseSQL(instance int, dataSource string) (SQLHandler, error) {
+	switch instance {
 	case InstancePostgres:
 		db, err := NewPostgresHandler(dataSource)
 		if err != nil {

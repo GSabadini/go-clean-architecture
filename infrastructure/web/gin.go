@@ -3,7 +3,6 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
@@ -18,13 +17,13 @@ import (
 type Gin struct {
 	log  logger.Logger
 	db   database.NoSQLHandler
-	port int64
+	port Port
 }
 
 func NewGin(
 	log logger.Logger,
 	db database.NoSQLHandler,
-	port int64,
+	port Port,
 ) Gin {
 	return Gin{
 		log:  log,
@@ -35,11 +34,12 @@ func NewGin(
 
 func (g Gin) Listen() {
 	var router = gin.New()
+	gin.SetMode(gin.ReleaseMode)
 
 	g.setAppHandlers(router)
 
 	server := &http.Server{
-		Addr:           fmt.Sprintf(":%s", os.Getenv("APP_PORT")),
+		Addr:           fmt.Sprintf(":%d", g.port),
 		Handler:        router,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
@@ -121,6 +121,10 @@ func (g Gin) buildActionFindBalanceAccount() gin.HandlerFunc {
 			accountUseCase    = usecase.NewAccount(accountRepository)
 			accountAction     = action.NewAccount(accountUseCase, g.log)
 		)
+
+		q := c.Request.URL.Query()
+		q.Add("account_id", c.Param("account_id"))
+		c.Request.URL.RawQuery = q.Encode()
 
 		accountAction.FindBalance(c.Writer, c.Request)
 	}

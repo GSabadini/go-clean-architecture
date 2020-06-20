@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gsabadini/go-bank-transfer/api/response"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
@@ -33,7 +34,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 			err,
 		)
 
-		ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 	defer r.Body.Close()
@@ -49,7 +50,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 				err,
 			)
 
-			ErrorMessage(err, http.StatusUnprocessableEntity).Send(w)
+			response.NewError(err, http.StatusUnprocessableEntity).Send(w)
 			return
 		default:
 			t.logError(
@@ -59,14 +60,13 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 				err,
 			)
 
-			ErrorMessage(err, http.StatusInternalServerError).Send(w)
+			response.NewError(err, http.StatusInternalServerError).Send(w)
 			return
 		}
 	}
-
 	t.logSuccess(logKey, "success create transfer", http.StatusCreated)
 
-	Success(result, http.StatusCreated).Send(w)
+	response.NewSuccess(result, http.StatusCreated).Send(w)
 }
 
 //Index é um handler para retornar a lista de transferências
@@ -82,13 +82,12 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 			err,
 		)
 
-		ErrorMessage(err, http.StatusInternalServerError).Send(w)
+		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-
 	t.logSuccess(logKey, "success when returning transfer list", http.StatusOK)
 
-	Success(result, http.StatusOK).Send(w)
+	response.NewSuccess(result, http.StatusOK).Send(w)
 }
 
 func (t Transfer) logSuccess(key string, message string, httpStatus int) {

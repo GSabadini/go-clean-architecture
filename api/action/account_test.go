@@ -161,7 +161,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, mock.LoggerMock{}),
 			args: args{
-				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountID: "59e09306b5174ba2986a7ce36aa2afd9",
 			},
 		},
 		{
@@ -198,7 +198,9 @@ func TestAccount_FindBalance(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			req = mux.SetURLVars(req, map[string]string{"account_id": tt.args.accountID})
+			q := req.URL.Query()
+			q.Add("account_id", tt.args.accountID)
+			req.URL.RawQuery = q.Encode()
 
 			var (
 				rr = httptest.NewRecorder()
@@ -218,4 +220,9 @@ func TestAccount_FindBalance(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAccount_Find(t *testing.T) {
+	r := domain.IsValidUUID("59e09306b5174ba2986a7ce36aa2afd9")
+	t.Log(r)
 }

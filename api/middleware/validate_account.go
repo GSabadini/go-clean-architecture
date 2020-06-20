@@ -3,11 +3,11 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gsabadini/go-bank-transfer/api/response"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 
-	"github.com/gsabadini/go-bank-transfer/api/action"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 
 	"github.com/pkg/errors"
@@ -52,7 +52,7 @@ func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next ht
 			"error":       err.Error(),
 		}).Errorf("error when decoding json")
 
-		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next ht
 			"error":       err.Error(),
 		}).Errorf(messageInvalidField)
 
-		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
@@ -74,7 +74,7 @@ func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next ht
 			"error":       err.Error(),
 		}).Errorf(messageInvalidField)
 
-		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (v ValidateAccount) Execute(w http.ResponseWriter, r *http.Request, next ht
 			"error":       err.Error(),
 		}).Errorf(messageInvalidField)
 
-		action.ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
