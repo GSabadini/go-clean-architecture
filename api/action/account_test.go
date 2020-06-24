@@ -3,6 +3,7 @@ package action
 import (
 	"bytes"
 	"fmt"
+	mock2 "github.com/gsabadini/go-bank-transfer/usecase/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,7 +30,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name:               "Store action success",
 			expectedStatusCode: http.StatusCreated,
-			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubSuccess{}, mock.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -43,7 +44,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name:               "Store action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubError{}, mock.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -57,7 +58,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name:               "Store action invalid JSON",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubError{}, mock.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -107,12 +108,12 @@ func TestAccount_Index(t *testing.T) {
 		{
 			name:               "Index handler success",
 			expectedStatusCode: http.StatusOK,
-			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubSuccess{}, mock.LoggerMock{}),
 		},
 		{
 			name:               "Index handler error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubError{}, mock.LoggerMock{}),
 		},
 	}
 
@@ -159,7 +160,7 @@ func TestAccount_FindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action success",
 			expectedStatusCode: http.StatusOK,
-			accountAction:      NewAccount(mock.AccountUseCaseStubSuccess{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubSuccess{}, mock.LoggerMock{}),
 			args: args{
 				accountID: "59e09306b5174ba2986a7ce36aa2afd9",
 			},
@@ -167,7 +168,7 @@ func TestAccount_FindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubError{}, mock.LoggerMock{}),
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
@@ -175,7 +176,7 @@ func TestAccount_FindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action parameter invalid",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubError{}, mock.LoggerMock{}),
 			args: args{
 				accountID: "error",
 			},
@@ -183,7 +184,7 @@ func TestAccount_FindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action error fetching account",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(mock.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, mock.LoggerMock{}),
+			accountAction:      NewAccount(mock2.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, mock.LoggerMock{}),
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},

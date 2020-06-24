@@ -84,13 +84,13 @@ func (g GorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 	}
 
 	var (
-		logging  = middleware.NewLogger(g.log).Execute
-		validate = middleware.NewValidateTransfer(g.log).Execute
+		logging = middleware.NewLogger(g.log).Execute
+		//validate = middleware.NewValidateTransfer(g.log).Execute
 	)
 
 	return negroni.New(
 		negroni.HandlerFunc(logging),
-		negroni.HandlerFunc(validate),
+		//negroni.HandlerFunc(validate),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)

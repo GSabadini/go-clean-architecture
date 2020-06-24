@@ -2,18 +2,18 @@ package web
 
 import (
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/gsabadini/go-bank-transfer/api/action"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/repository/mongodb"
 	"github.com/gsabadini/go-bank-transfer/usecase"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
+/** TODO verificar middlewares */
 type Gin struct {
 	log  logger.Logger
 	db   database.NoSQLHandler
@@ -39,11 +39,10 @@ func (g Gin) Listen() {
 	g.setAppHandlers(router)
 
 	server := &http.Server{
-		Addr:           fmt.Sprintf(":%d", g.port),
-		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Addr:         fmt.Sprintf(":%d", g.port),
+		Handler:      router,
 	}
 
 	g.log.WithFields(logger.Fields{"port": g.port}).Infof("Starting HTTP Server")

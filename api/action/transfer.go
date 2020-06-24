@@ -25,8 +25,8 @@ func NewTransfer(usecase usecase.TransferUseCase, log logger.Logger) Transfer {
 func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 
-	var transfer domain.Transfer
-	if err := json.NewDecoder(r.Body).Decode(&transfer); err != nil {
+	var input usecase.TransferInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		t.logError(
 			logKey,
 			"error when decoding json",
@@ -39,7 +39,19 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	result, err := t.usecase.Store(transfer)
+	if err := input.Validate(); err != nil {
+		t.logError(
+			logKey,
+			"validate error",
+			http.StatusBadRequest,
+			err,
+		)
+
+		response.NewError(err, http.StatusBadRequest).Send(w)
+		return
+	}
+
+	result, err := t.usecase.Store(input)
 	if err != nil {
 		switch err {
 		case domain.ErrInsufficientBalance:

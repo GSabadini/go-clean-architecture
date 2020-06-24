@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-playground/validator/v10 v10.3.0
 	github.com/gorilla/mux v1.7.4
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v1.3.0
