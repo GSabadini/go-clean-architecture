@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/mock"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 func TestTransfer_Store(t *testing.T) {
@@ -32,7 +32,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase: NewTransfer(mock.TransferRepositoryStubSuccess{}, mock.AccountRepositoryStubSuccess{}),
+			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
 			expected: TransferOutput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
@@ -49,7 +49,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase:       NewTransfer(mock.TransferRepositoryStubError{}, mock.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      TransferOutput{},
 		},
@@ -62,7 +62,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               200,
 				},
 			},
-			usecase:       NewTransfer(mock.TransferRepositoryStubSuccess{}, mock.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "origin account does not have sufficient balance",
 			expected:      TransferOutput{},
 		},
@@ -75,7 +75,7 @@ func TestTransfer_Store(t *testing.T) {
 					Amount:               20,
 				},
 			},
-			usecase:       NewTransfer(mock.TransferRepositoryStubSuccess{}, mock.AccountRepositoryStubError{}),
+			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      TransferOutput{},
 		},
@@ -110,7 +110,7 @@ func TestTransfer_FindAll(t *testing.T) {
 	}{
 		{
 			name:    "Success when returning the transfer list",
-			usecase: NewTransfer(mock.TransferRepositoryStubSuccess{}, mock.AccountRepositoryStubSuccess{}),
+			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
 			expected: []TransferOutput{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -130,7 +130,7 @@ func TestTransfer_FindAll(t *testing.T) {
 		},
 		{
 			name:          "Error when returning the transfer list",
-			usecase:       NewTransfer(mock.TransferRepositoryStubError{}, mock.AccountRepositoryStubSuccess{}),
+			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
 			expected:      []TransferOutput{},
 		},

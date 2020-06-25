@@ -1,11 +1,11 @@
 package mongodb
 
 import (
-	mock2 "github.com/gsabadini/go-bank-transfer/mock"
 	"reflect"
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 )
 
 func TestTransferMongoDB_Store(t *testing.T) {
@@ -25,13 +25,13 @@ func TestTransferMongoDB_Store(t *testing.T) {
 		{
 			name:       "Success to create transfer",
 			args:       args{transfer: domain.Transfer{}},
-			repository: NewTransferRepository(mock2.MongoHandlerSuccessStub{}),
+			repository: NewTransferRepository(database.MongoHandlerSuccessStub{}),
 			expected:   domain.Transfer{},
 		},
 		{
 			name:        "Error to create transfer",
 			args:        args{transfer: domain.Transfer{}},
-			repository:  NewTransferRepository(mock2.MongoHandlerErrorStub{}),
+			repository:  NewTransferRepository(database.MongoHandlerErrorStub{}),
 			expected:    domain.Transfer{},
 			expectedErr: true,
 		},
@@ -64,12 +64,12 @@ func TestTransferMongoDB_FindAll(t *testing.T) {
 	}{
 		{
 			name:       "Success to find all the transfers",
-			repository: NewTransferRepository(mock2.MongoHandlerSuccessStub{}),
+			repository: NewTransferRepository(database.MongoHandlerSuccessStub{}),
 			expected:   []domain.Transfer{},
 		},
 		{
 			name:        "Error to find all the transfers",
-			repository:  NewTransferRepository(mock2.MongoHandlerErrorStub{}),
+			repository:  NewTransferRepository(database.MongoHandlerErrorStub{}),
 			expected:    []domain.Transfer{},
 			expectedErr: true,
 		},

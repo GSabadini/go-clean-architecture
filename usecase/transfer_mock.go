@@ -1,18 +1,16 @@
-package mock
+package usecase
 
 import (
 	"errors"
 	"time"
-
-	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
 //TransferUseCaseStubSuccess implementa a interface de TransferUseCase com resultados de sucesso
 type TransferUseCaseStubSuccess struct{}
 
 //Store
-func (t TransferUseCaseStubSuccess) Store(input usecase.TransferInput) (usecase.TransferOutput, error) {
-	return usecase.TransferOutput{
+func (t TransferUseCaseStubSuccess) Store(input TransferInput) (TransferOutput, error) {
+	return TransferOutput{
 		ID:                   "",
 		AccountOriginID:      input.AccountOriginID,
 		AccountDestinationID: input.AccountDestinationID,
@@ -22,8 +20,8 @@ func (t TransferUseCaseStubSuccess) Store(input usecase.TransferInput) (usecase.
 }
 
 //FindAll
-func (t TransferUseCaseStubSuccess) FindAll() ([]usecase.TransferOutput, error) {
-	return []usecase.TransferOutput{}, nil
+func (t TransferUseCaseStubSuccess) FindAll() ([]TransferOutput, error) {
+	return []TransferOutput{}, nil
 }
 
 //TransferUseCaseStubError implementa a interface de TransferUseCase com resultados de erro
@@ -32,16 +30,16 @@ type TransferUseCaseStubError struct {
 }
 
 //Store
-func (t TransferUseCaseStubError) Store(_ usecase.TransferInput) (usecase.TransferOutput, error) {
+func (t TransferUseCaseStubError) Store(_ TransferInput) (TransferOutput, error) {
 	var err = errors.New("Error")
 	if t.TypeErr != nil {
 		err = t.TypeErr
 	}
 
-	return usecase.TransferOutput{}, err
+	return TransferOutput{}, err
 }
 
 //FindAll
-func (t TransferUseCaseStubError) FindAll() ([]usecase.TransferOutput, error) {
-	return []usecase.TransferOutput{}, errors.New("Error")
+func (t TransferUseCaseStubError) FindAll() ([]TransferOutput, error) {
+	return []TransferOutput{}, errors.New("Error")
 }

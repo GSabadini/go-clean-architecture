@@ -6,11 +6,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/mock"
-	mock2 "github.com/gsabadini/go-bank-transfer/usecase/mock"
-
 	"github.com/gorilla/mux"
+	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
 func TestTransfer_Store(t *testing.T) {
@@ -28,7 +27,7 @@ func TestTransfer_Store(t *testing.T) {
 	}{
 		{
 			name:           "Store action success",
-			transferAction: NewTransfer(mock2.TransferUseCaseStubSuccess{}, mock.LoggerMock{}),
+			transferAction: NewTransfer(usecase.TransferUseCaseStubSuccess{}, logger.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(`{
 					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -40,7 +39,7 @@ func TestTransfer_Store(t *testing.T) {
 		},
 		{
 			name:           "Store action error",
-			transferAction: NewTransfer(mock2.TransferUseCaseStubError{}, mock.LoggerMock{}),
+			transferAction: NewTransfer(usecase.TransferUseCaseStubError{}, logger.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -55,8 +54,8 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Store action insufficient balance",
 			transferAction: NewTransfer(
-				mock2.TransferUseCaseStubError{TypeErr: domain.ErrInsufficientBalance},
-				mock.LoggerMock{},
+				usecase.TransferUseCaseStubError{TypeErr: domain.ErrInsufficientBalance},
+				logger.LoggerMock{},
 			),
 			args: args{
 				rawPayload: []byte(
@@ -85,7 +84,7 @@ func TestTransfer_Store(t *testing.T) {
 		//},
 		{
 			name:           "Store action invalid JSON",
-			transferAction: NewTransfer(mock2.TransferUseCaseStubError{}, mock.LoggerMock{}),
+			transferAction: NewTransfer(usecase.TransferUseCaseStubError{}, logger.LoggerMock{}),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -138,12 +137,12 @@ func TestTransfer_Index(t *testing.T) {
 		{
 			name:               "Index action success",
 			expectedStatusCode: http.StatusOK,
-			transferAction:     NewTransfer(mock2.TransferUseCaseStubSuccess{}, mock.LoggerMock{}),
+			transferAction:     NewTransfer(usecase.TransferUseCaseStubSuccess{}, logger.LoggerMock{}),
 		},
 		{
 			name:               "Index action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			transferAction:     NewTransfer(mock2.TransferUseCaseStubError{}, mock.LoggerMock{}),
+			transferAction:     NewTransfer(usecase.TransferUseCaseStubError{}, logger.LoggerMock{}),
 		},
 	}
 

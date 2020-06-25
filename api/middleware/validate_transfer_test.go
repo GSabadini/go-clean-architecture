@@ -2,11 +2,10 @@ package middleware
 
 import (
 	"bytes"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gsabadini/go-bank-transfer/mock"
 
 	"github.com/gorilla/mux"
 )
@@ -75,7 +74,7 @@ func TestValidateTransfer_Execute(t *testing.T) {
 			// transformando middleware em um web.Handler
 			middlewareHandler := func(w http.ResponseWriter, r *http.Request) {
 				next := func(w http.ResponseWriter, r *http.Request) {}
-				middleware := NewValidateTransfer(mock.LoggerMock{})
+				middleware := NewValidateTransfer(logger.LoggerMock{})
 				middleware.Execute(w, r, next)
 			}
 

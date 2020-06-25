@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/mock"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 func TestAccount_Store(t *testing.T) {
@@ -27,7 +27,7 @@ func TestAccount_Store(t *testing.T) {
 			args: args{
 				account: domain.Account{},
 			},
-			usecase: NewAccount(mock.AccountRepositoryStubSuccess{}),
+			usecase: NewAccount(repository.AccountRepositoryStubSuccess{}),
 			expected: domain.Account{
 				ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:    "Test",
@@ -38,7 +38,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name:          "Create account error",
 			args:          args{account: domain.Account{}},
-			usecase:       NewAccount(mock.AccountRepositoryStubError{}),
+			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      domain.Account{},
 		},
@@ -70,7 +70,7 @@ func TestAccount_FindAll(t *testing.T) {
 	}{
 		{
 			name:    "Success when returning the account list",
-			usecase: NewAccount(mock.AccountRepositoryStubSuccess{}),
+			usecase: NewAccount(repository.AccountRepositoryStubSuccess{}),
 			expected: []domain.Account{
 				{
 					ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -88,7 +88,7 @@ func TestAccount_FindAll(t *testing.T) {
 		},
 		{
 			name:          "Error when returning the list of accounts",
-			usecase:       NewAccount(mock.AccountRepositoryStubError{}),
+			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      []domain.Account{},
 		},
@@ -128,7 +128,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			args: args{
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
-			usecase: NewAccount(mock.AccountRepositoryStubSuccess{}),
+			usecase: NewAccount(repository.AccountRepositoryStubSuccess{}),
 			expected: domain.Account{
 				Balance: 100.00,
 			},
@@ -138,7 +138,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			args: args{
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
-			usecase:       NewAccount(mock.AccountRepositoryStubError{}),
+			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
 			expected:      domain.Account{},
 		},

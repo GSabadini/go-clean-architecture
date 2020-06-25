@@ -14,6 +14,7 @@ var (
 type Error struct {
 	statusCode int
 	Message    string `json:"message,omitempty"`
+	Messages []string `json:"messages,omitempty"`
 }
 
 //Send envia um response de error
@@ -28,5 +29,13 @@ func NewError(err error, status int) *Error {
 	return &Error{
 		statusCode: status,
 		Message:    err.Error(),
+	}
+}
+
+//NewError constrói uma estrutura de response com error
+func NewMessagesError(messages []string, status int) *Error {
+	return &Error{
+		statusCode: status,
+		Messages:   messages,
 	}
 }

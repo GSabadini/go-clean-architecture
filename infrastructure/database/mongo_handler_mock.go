@@ -1,4 +1,4 @@
-package mock
+package database
 
 import "errors"
 

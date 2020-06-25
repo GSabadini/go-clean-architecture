@@ -2,15 +2,19 @@ package action
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gsabadini/go-bank-transfer/api/response"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	en_translations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/pkg/errors"
 )
 
@@ -43,15 +47,15 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if err := validate(input); err != nil {
+	if err := validate(input); len(err) > 0 {
 		t.logError(
 			logKey,
 			"input invalid",
 			http.StatusBadRequest,
-			err,
+			errors.New("validate"),
 		)
 
-		response.NewError(err, http.StatusBadRequest).Send(w)
+		response.NewMessagesError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
@@ -106,22 +110,40 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	response.NewSuccess(result, http.StatusOK).Send(w)
 }
 
-func validate(input usecase.TransferInput) error {
+func validate(input usecase.TransferInput) []string {
+	var messages []string
+
 	var errAccountsEquals = errors.New("account origin equals destination account")
 	if input.AccountOriginID == input.AccountDestinationID {
-		return errAccountsEquals
+		messages = append(messages, errAccountsEquals.Error())
 	}
 
-	var err = validator.New().Struct(input)
+	translator := en.New()
+	uni := ut.New(translator, translator)
+	trans, found := uni.GetTranslator("en")
+	if !found {
+		log.Fatal("translator not found")
+	}
+	v := validator.New()
+	if err := en_translations.RegisterDefaultTranslations(v, trans); err != nil {
+		log.Fatal(err)
+	}
+
+	//_ = v.RegisterTranslation("required", trans, func(ut ut.Translator) error {
+	//	return ut.Add("required", "{0}xx is a required field!", true) // see universal-translator for details
+	//}, func(ut ut.Translator, fe validator.FieldError) string {
+	//	t, _ := ut.T("required", fe.Field())
+	//	return t
+	//})
+
+	var err = v.Struct(input)
 	if err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
-			fmt.Println(e)
+			messages = append(messages, strings.ToLower(e.Translate(trans)))
 		}
-
-		return err
 	}
 
-	return nil
+	return messages
 }
 
 func (t Transfer) logSuccess(key string, message string, httpStatus int) {

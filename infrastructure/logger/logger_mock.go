@@ -1,8 +1,4 @@
-package mock
-
-import (
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-)
+package logger
 
 type LoggerMock struct{}
 
@@ -14,11 +10,11 @@ func (l LoggerMock) Errorf(_ string, _ ...interface{}) {}
 
 func (l LoggerMock) Fatalln(_ ...interface{}) {}
 
-func (l LoggerMock) WithFields(_ logger.Fields) logger.Logger {
+func (l LoggerMock) WithFields(_ Fields) Logger {
 	return LoggerEntryMock{}
 }
 
-func (l LoggerMock) WithError(_ error) logger.Logger {
+func (l LoggerMock) WithError(_ error) Logger {
 	return LoggerEntryMock{}
 }
 
@@ -32,10 +28,10 @@ func (l LoggerEntryMock) Errorf(_ string, _ ...interface{}) {}
 
 func (l LoggerEntryMock) Fatalln(_ ...interface{}) {}
 
-func (l LoggerEntryMock) WithFields(_ logger.Fields) logger.Logger {
+func (l LoggerEntryMock) WithFields(_ Fields) Logger {
 	return LoggerEntryMock{}
 }
 
-func (l LoggerEntryMock) WithError(_ error) logger.Logger {
+func (l LoggerEntryMock) WithError(_ error) Logger {
 	return LoggerEntryMock{}
 }
