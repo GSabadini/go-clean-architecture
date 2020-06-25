@@ -11,8 +11,8 @@ import (
 type TransferUseCaseStubSuccess struct{}
 
 //Store
-func (t TransferUseCaseStubSuccess) Store(input usecase.TransferInput) (usecase.TransferResult, error) {
-	return usecase.TransferResult{
+func (t TransferUseCaseStubSuccess) Store(input usecase.TransferInput) (usecase.TransferOutput, error) {
+	return usecase.TransferOutput{
 		ID:                   "",
 		AccountOriginID:      input.AccountOriginID,
 		AccountDestinationID: input.AccountDestinationID,
@@ -22,8 +22,8 @@ func (t TransferUseCaseStubSuccess) Store(input usecase.TransferInput) (usecase.
 }
 
 //FindAll
-func (t TransferUseCaseStubSuccess) FindAll() ([]usecase.TransferResult, error) {
-	return []usecase.TransferResult{}, nil
+func (t TransferUseCaseStubSuccess) FindAll() ([]usecase.TransferOutput, error) {
+	return []usecase.TransferOutput{}, nil
 }
 
 //TransferUseCaseStubError implementa a interface de TransferUseCase com resultados de erro
@@ -32,16 +32,16 @@ type TransferUseCaseStubError struct {
 }
 
 //Store
-func (t TransferUseCaseStubError) Store(_ usecase.TransferInput) (usecase.TransferResult, error) {
+func (t TransferUseCaseStubError) Store(_ usecase.TransferInput) (usecase.TransferOutput, error) {
 	var err = errors.New("Error")
 	if t.TypeErr != nil {
 		err = t.TypeErr
 	}
 
-	return usecase.TransferResult{}, err
+	return usecase.TransferOutput{}, err
 }
 
 //FindAll
-func (t TransferUseCaseStubError) FindAll() ([]usecase.TransferResult, error) {
-	return []usecase.TransferResult{}, errors.New("Error")
+func (t TransferUseCaseStubError) FindAll() ([]usecase.TransferOutput, error) {
+	return []usecase.TransferOutput{}, errors.New("Error")
 }

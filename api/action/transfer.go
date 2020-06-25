@@ -2,12 +2,16 @@ package action
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/api/response"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 )
 
 //Transfer armazena as dependências de uma transferência
@@ -39,10 +43,10 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if err := input.Validate(); err != nil {
+	if err := validate(input); err != nil {
 		t.logError(
 			logKey,
-			"validate error",
+			"input invalid",
 			http.StatusBadRequest,
 			err,
 		)
@@ -100,6 +104,24 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	t.logSuccess(logKey, "success when returning transfer list", http.StatusOK)
 
 	response.NewSuccess(result, http.StatusOK).Send(w)
+}
+
+func validate(input usecase.TransferInput) error {
+	var errAccountsEquals = errors.New("account origin equals destination account")
+	if input.AccountOriginID == input.AccountDestinationID {
+		return errAccountsEquals
+	}
+
+	var err = validator.New().Struct(input)
+	if err != nil {
+		for _, e := range err.(validator.ValidationErrors) {
+			fmt.Println(e)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func (t Transfer) logSuccess(key string, message string, httpStatus int) {

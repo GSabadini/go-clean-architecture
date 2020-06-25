@@ -11,6 +11,6 @@ type AccountUseCase interface {
 }
 
 type TransferUseCase interface {
-	Store(TransferInput) (TransferResult, error)
-	FindAll() ([]TransferResult, error)
+	Store(TransferInput) (TransferOutput, error)
+	FindAll() ([]TransferOutput, error)
 }
