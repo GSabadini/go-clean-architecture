@@ -49,7 +49,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	var accounts = make([]domain.Account, 0)
 
 	if err := a.handler.FindAll(a.collectionName, nil, &accounts); err != nil {
-		return accounts, errors.Wrap(err, "error listing accounts")
+		return []domain.Account{}, errors.Wrap(err, "error listing accounts")
 	}
 
 	return accounts, nil
@@ -65,9 +65,9 @@ func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	if err := a.handler.FindOne(a.collectionName, query, nil, &account); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			return account, errors.Wrap(domain.ErrNotFound, "error fetching account")
+			return &domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account")
 		default:
-			return account, errors.Wrap(err, "error fetching account")
+			return &domain.Account{}, errors.Wrap(err, "error fetching account")
 		}
 	}
 
@@ -85,9 +85,9 @@ func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 	if err := a.handler.FindOne(a.collectionName, query, selector, &account); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			return account, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
+			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
 		default:
-			return account, errors.Wrap(err, "error fetching account balance")
+			return domain.Account{}, errors.Wrap(err, "error fetching account balance")
 		}
 	}
 

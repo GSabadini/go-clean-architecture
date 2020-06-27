@@ -77,3 +77,7 @@ func (pr PostgresRow) Next() bool {
 func (pr PostgresRow) Err() error {
 	return pr.Rows.Err()
 }
+
+func (pr PostgresRow) Close() error {
+	return pr.Rows.Close()
+}

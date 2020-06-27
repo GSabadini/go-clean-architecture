@@ -23,18 +23,3 @@ func NewTransfer(accountOriginID string, accountDestinationID string, amount flo
 		CreatedAt:            time.Now(),
 	}
 }
-
-//GetAccountOriginID retorna o id da conta de origem
-func (t *Transfer) GetAccountOriginID() string {
-	return t.AccountOriginID
-}
-
-//GetAccountDestinationID retorna o id da conta de destino
-func (t *Transfer) GetAccountDestinationID() string {
-	return t.AccountDestinationID
-}
-
-//GetAmount retorna o valor
-func (t *Transfer) GetAmount() float64 {
-	return t.Amount
-}

@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -66,6 +65,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 		return accounts, errors.Wrap(err, "error listing accounts")
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			ID        string
@@ -91,7 +91,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	}
 
 	if err = rows.Err(); err != nil {
-		fmt.Println(err)
+		return []domain.Account{}, err
 	}
 
 	return accounts, nil
@@ -114,9 +114,14 @@ func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 		return account, errors.Wrap(err, "error fetching account")
 	}
 
+	defer row.Close()
 	row.Next()
 	if err = row.Scan(&id, &name, &CPF, &balance, &createdAt); err != nil {
 		return account, errors.Wrap(err, "error fetching account")
+	}
+
+	if err = row.Err(); err != nil {
+		return &domain.Account{}, err
 	}
 
 	account.ID = id
@@ -141,9 +146,14 @@ func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 		return account, errors.Wrap(err, "error fetching account balance")
 	}
 
+	defer row.Close()
 	row.Next()
 	if err := row.Scan(&balance); err != nil {
 		return account, errors.Wrap(err, "error fetching account balance")
+	}
+
+	if err = row.Err(); err != nil {
+		return domain.Account{}, err
 	}
 
 	account.Balance = balance

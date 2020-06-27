@@ -24,11 +24,6 @@ func NewAccount(name string, CPF string, balance float64) Account {
 	}
 }
 
-//GetBalance retorna o saldo
-func (a *Account) GetBalance() float64 {
-	return a.Balance
-}
-
 //Deposit adiciona um valor no saldo
 func (a *Account) Deposit(amount float64) {
 	a.Balance += amount

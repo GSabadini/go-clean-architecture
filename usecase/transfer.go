@@ -77,11 +77,11 @@ func (t Transfer) processTransfer(transfer TransferInput) error {
 
 	destination.Deposit(transfer.Amount)
 
-	if err = t.accountRepository.UpdateBalance(origin.ID, origin.GetBalance()); err != nil {
+	if err = t.accountRepository.UpdateBalance(origin.ID, origin.Balance); err != nil {
 		return err
 	}
 
-	if err = t.accountRepository.UpdateBalance(destination.ID, destination.GetBalance()); err != nil {
+	if err = t.accountRepository.UpdateBalance(destination.ID, destination.Balance); err != nil {
 		return err
 	}
 

@@ -13,8 +13,8 @@ var (
 //Error armazena a estrutura de response com error da API
 type Error struct {
 	statusCode int
-	Message    string `json:"message,omitempty"`
-	Messages []string `json:"messages,omitempty"`
+	Message    string   `json:"message,omitempty"`
+	Messages   []string `json:"messages,omitempty"`
 }
 
 //Send envia um response de error
@@ -32,7 +32,7 @@ func NewError(err error, status int) *Error {
 	}
 }
 
-//NewError constrói uma estrutura de response com error
+//NewMessagesError constrói uma estrutura de response com mensagens de error
 func NewMessagesError(messages []string, status int) *Error {
 	return &Error{
 		statusCode: status,

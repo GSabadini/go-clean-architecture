@@ -2,6 +2,10 @@ package database
 
 import "errors"
 
+var (
+	errInvalidDatabaseInstance = errors.New("invalid database instance")
+)
+
 //NoSQLHandler expõe os métodos disponíveis para as abstrações de banco NoSQL
 type NoSQLHandler interface {
 	Store(string, interface{}) error
@@ -9,23 +13,6 @@ type NoSQLHandler interface {
 	FindAll(string, interface{}, interface{}) error
 	FindOne(string, interface{}, interface{}, interface{}) error
 }
-
-//SQLHandler expõe os métodos disponíveis para as abstrações de banco SQL
-type SQLHandler interface {
-	Execute(string, ...interface{}) error
-	Query(string, ...interface{}) (Row, error)
-}
-
-//Row
-type Row interface {
-	Scan(dest ...interface{}) error
-	Next() bool
-	Err() error
-}
-
-var (
-	errInvalidDatabaseInstance = errors.New("invalid database instance")
-)
 
 const (
 	InstanceMongoDB int = iota
@@ -43,6 +30,20 @@ func NewDatabaseNoSQL(instance int, host, dbName string) (NoSQLHandler, error) {
 	default:
 		return nil, errInvalidDatabaseInstance
 	}
+}
+
+//SQLHandler expõe os métodos disponíveis para as abstrações de banco SQL
+type SQLHandler interface {
+	Execute(string, ...interface{}) error
+	Query(string, ...interface{}) (Row, error)
+}
+
+//Row
+type Row interface {
+	Scan(dest ...interface{}) error
+	Next() bool
+	Err() error
+	Close() error
 }
 
 const (

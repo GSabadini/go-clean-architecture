@@ -54,6 +54,7 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 		return transfers, errors.Wrap(err, "error listing transfers")
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			ID                   string
@@ -64,7 +65,7 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 		)
 
 		if err = rows.Scan(&ID, &accountOriginID, &accountDestinationID, &amount, &createdAt); err != nil {
-			return transfers, errors.Wrap(err, "error listing transfers")
+			return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 		}
 
 		transfer := domain.Transfer{
@@ -76,6 +77,10 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 		}
 
 		transfers = append(transfers, transfer)
+	}
+
+	if err = rows.Err(); err != nil {
+		return []domain.Transfer{}, err
 	}
 
 	return transfers, nil
