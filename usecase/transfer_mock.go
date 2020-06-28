@@ -9,12 +9,11 @@ import (
 type TransferUseCaseStubSuccess struct{}
 
 //Store
-func (t TransferUseCaseStubSuccess) Store(input TransferInput) (TransferOutput, error) {
+func (t TransferUseCaseStubSuccess) Store(accountOriginID, accountDestinationID string, amount float64) (TransferOutput, error) {
 	return TransferOutput{
-		ID:                   "",
-		AccountOriginID:      input.AccountOriginID,
-		AccountDestinationID: input.AccountDestinationID,
-		Amount:               input.Amount,
+		AccountOriginID:      accountOriginID,
+		AccountDestinationID: accountDestinationID,
+		Amount:               amount,
 		CreatedAt:            time.Time{},
 	}, nil
 }
@@ -30,7 +29,7 @@ type TransferUseCaseStubError struct {
 }
 
 //Store
-func (t TransferUseCaseStubError) Store(_ TransferInput) (TransferOutput, error) {
+func (t TransferUseCaseStubError) Store(_, _ string, _ float64) (TransferOutput, error) {
 	var err = errors.New("Error")
 	if t.TypeErr != nil {
 		err = t.TypeErr

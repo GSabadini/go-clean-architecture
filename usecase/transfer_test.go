@@ -13,7 +13,9 @@ func TestTransfer_Store(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		input TransferInput
+		accountOriginID      string
+		accountDestinationID string
+		amount               float64
 	}
 
 	tests := []struct {
@@ -26,11 +28,9 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Create transfer successful",
 			args: args{
-				input: TransferInput{
-					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
-					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-					Amount:               20,
-				},
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
+				amount:               20,
 			},
 			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
 			expected: TransferOutput{
@@ -43,11 +43,9 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Create transfer error",
 			args: args{
-				input: TransferInput{
-					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
-					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-					Amount:               20,
-				},
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               20,
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
@@ -56,11 +54,9 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Create transfer amount not have sufficient",
 			args: args{
-				input: TransferInput{
-					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
-					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-					Amount:               200,
-				},
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               200,
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "origin account does not have sufficient balance",
@@ -69,11 +65,9 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Create transfer error find account",
 			args: args{
-				input: TransferInput{
-					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
-					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-					Amount:               20,
-				},
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               200,
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
@@ -83,7 +77,7 @@ func TestTransfer_Store(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.usecase.Store(tt.args.input)
+			got, err := tt.usecase.Store(tt.args.accountOriginID, tt.args.accountDestinationID, tt.args.amount)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

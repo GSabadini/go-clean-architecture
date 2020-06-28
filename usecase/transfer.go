@@ -7,12 +7,6 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
-type TransferInput struct {
-	AccountOriginID      string  `json:"account_origin_id" validate:"required"`
-	AccountDestinationID string  `json:"account_destination_id" validate:"required"`
-	Amount               float64 `json:"amount" validate:"gt=0,required"`
-}
-
 type TransferOutput struct {
 	ID                   string    `json:"id"`
 	AccountOriginID      string    `json:"account_origin_id"`
@@ -39,12 +33,12 @@ func NewTransfer(
 }
 
 //Store cria uma nova transferência
-func (t Transfer) Store(input TransferInput) (TransferOutput, error) {
-	if err := t.processTransfer(input); err != nil {
+func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (TransferOutput, error) {
+	if err := t.process(accountOriginID, accountDestinationID, amount); err != nil {
 		return TransferOutput{}, err
 	}
 
-	var transfer = domain.NewTransfer(input.AccountOriginID, input.AccountDestinationID, input.Amount)
+	var transfer = domain.NewTransfer(accountOriginID, accountDestinationID, amount)
 
 	transfer, err := t.transferRepository.Store(transfer)
 	if err != nil {
@@ -60,22 +54,22 @@ func (t Transfer) Store(input TransferInput) (TransferOutput, error) {
 	}, nil
 }
 
-func (t Transfer) processTransfer(transfer TransferInput) error {
-	origin, err := t.accountRepository.FindByID(transfer.AccountOriginID)
+func (t Transfer) process(accountOriginID, accountDestinationID string, amount float64) error {
+	origin, err := t.accountRepository.FindByID(accountOriginID)
 	if err != nil {
 		return err
 	}
 
-	destination, err := t.accountRepository.FindByID(transfer.AccountDestinationID)
+	destination, err := t.accountRepository.FindByID(accountDestinationID)
 	if err != nil {
 		return err
 	}
 
-	if err := origin.Withdraw(transfer.Amount); err != nil {
+	if err := origin.Withdraw(amount); err != nil {
 		return err
 	}
 
-	destination.Deposit(transfer.Amount)
+	destination.Deposit(amount)
 
 	if err = t.accountRepository.UpdateBalance(origin.ID, origin.Balance); err != nil {
 		return err

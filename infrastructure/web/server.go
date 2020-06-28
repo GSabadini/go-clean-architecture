@@ -2,8 +2,10 @@ package web
 
 import (
 	"errors"
+
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 )
 
 type Server interface {
@@ -27,11 +29,12 @@ func NewWebServer(
 	log logger.Logger,
 	dbConnSQL database.SQLHandler,
 	dbConnNoSQL database.NoSQLHandler,
+	validation validator.Validator,
 	port Port,
 ) (Server, error) {
 	switch instance {
 	case InstanceGorillaMux:
-		return NewGorillaMux(log, dbConnSQL, port), nil
+		return NewGorillaMux(log, dbConnSQL, validation, port), nil
 	case InstanceGin:
 		return NewGin(log, dbConnNoSQL, port), nil
 	default:

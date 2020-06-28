@@ -9,6 +9,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/api/middleware"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/repository/postgres"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
@@ -17,20 +18,23 @@ import (
 )
 
 type GorillaMux struct {
-	log  logger.Logger
-	db   database.SQLHandler
-	port Port
+	log        logger.Logger
+	db         database.SQLHandler
+	validation validator.Validator
+	port       Port
 }
 
 func NewGorillaMux(
 	log logger.Logger,
 	dbConnSQL database.SQLHandler,
+	validation validator.Validator,
 	port Port,
 ) GorillaMux {
 	return GorillaMux{
-		log:  log,
-		db:   dbConnSQL,
-		port: port,
+		log:        log,
+		db:         dbConnSQL,
+		validation: validation,
+		port:       port,
 	}
 }
 
@@ -78,19 +82,13 @@ func (g GorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 		)
 
-		var transferAction = action.NewTransfer(transferUseCase, g.log)
+		var transferAction = action.NewTransfer(transferUseCase, g.log, g.validation)
 
 		transferAction.Store(res, req)
 	}
 
-	var (
-		logging = middleware.NewLogger(g.log).Execute
-		//validate = middleware.NewValidateTransfer(g.log).Execute
-	)
-
 	return negroni.New(
-		negroni.HandlerFunc(logging),
-		//negroni.HandlerFunc(validate),
+		negroni.HandlerFunc(middleware.NewLogger(g.log).Execute),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
@@ -102,7 +100,7 @@ func (g GorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 			transferRepository = postgres.NewTransferRepository(g.db)
 			accountRepository  = postgres.NewAccountRepository(g.db)
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
-			transferAction     = action.NewTransfer(transferUseCase, g.log)
+			transferAction     = action.NewTransfer(transferUseCase, g.log, g.validation)
 		)
 
 		transferAction.Index(res, req)

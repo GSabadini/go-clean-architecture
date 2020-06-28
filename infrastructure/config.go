@@ -7,17 +7,19 @@ import (
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/web"
 )
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
-	AppName   string
-	Port      web.Port
-	WebServer web.Server
-	Logger    logger.Logger
-	dbSQL     database.SQLHandler
-	dbNoSQL   database.NoSQLHandler
+	AppName    string
+	Port       web.Port
+	WebServer  web.Server
+	Logger     logger.Logger
+	dbSQL      database.SQLHandler
+	dbNoSQL    database.NoSQLHandler
+	validation validator.Validator
 }
 
 //NewConfig retorna a configuração da aplicação
@@ -33,6 +35,7 @@ func NewConfig() Config {
 		Logger:  log(),
 	}
 
+	config.validation = validation(config.Logger)
 	config.dbSQL = dbSQLConn(config.Logger)
 	config.dbNoSQL = dbNoSQLConn(config.Logger)
 
@@ -40,16 +43,29 @@ func NewConfig() Config {
 		config.Logger,
 		config.dbSQL,
 		config.dbNoSQL,
+		config.validation,
 		config.Port,
 	)
 
 	return config
 }
 
+func validation(log logger.Logger) validator.Validator {
+	v, err := validator.NewValidator(validator.InstanceGoPlayground, log)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Infof("Successfully configured validator")
+
+	return v
+}
+
 func webServer(
 	log logger.Logger,
 	dbSQLConn database.SQLHandler,
 	dbNoSQLConn database.NoSQLHandler,
+	validation validator.Validator,
 	port web.Port,
 ) web.Server {
 	server, err := web.NewWebServer(
@@ -57,8 +73,10 @@ func webServer(
 		log,
 		dbSQLConn,
 		dbNoSQLConn,
+		validation,
 		port,
 	)
+
 	if err != nil {
 		panic(err)
 	}

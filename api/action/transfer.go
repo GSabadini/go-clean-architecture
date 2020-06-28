@@ -2,38 +2,34 @@ package action
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
-	"strings"
 
 	"github.com/gsabadini/go-bank-transfer/api/response"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
-	"github.com/go-playground/locales/en"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
-	en_translations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/pkg/errors"
 )
 
 //Transfer armazena as dependências de uma transferência
 type Transfer struct {
-	logger  logger.Logger
-	usecase usecase.TransferUseCase
+	validator validator.Validator
+	log       logger.Logger
+	usecase   usecase.TransferUseCase
 }
 
 //NewTransfer constrói uma transferência com suas dependências
-func NewTransfer(usecase usecase.TransferUseCase, log logger.Logger) Transfer {
-	return Transfer{usecase: usecase, logger: log}
+func NewTransfer(usecase usecase.TransferUseCase, log logger.Logger, v validator.Validator) Transfer {
+	return Transfer{usecase: usecase, log: log, validator: v}
 }
 
 //Store é um handler para criação de transferência
 func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 
-	var input usecase.TransferInput
+	var input TransferInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		t.logError(
 			logKey,
@@ -47,7 +43,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if err := validate(input); len(err) > 0 {
+	if errMsg := input.validateDecorator(input, t.validator); len(errMsg) > 0 {
 		t.logError(
 			logKey,
 			"input invalid",
@@ -55,11 +51,15 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 			errors.New("validate"),
 		)
 
-		response.NewMessagesError(err, http.StatusBadRequest).Send(w)
+		response.NewMessagesError(errMsg, http.StatusBadRequest).Send(w)
 		return
 	}
 
-	result, err := t.usecase.Store(input)
+	result, err := t.usecase.Store(
+		input.AccountOriginID,
+		input.AccountDestinationID,
+		input.Amount,
+	)
 	if err != nil {
 		switch err {
 		case domain.ErrInsufficientBalance:
@@ -110,36 +110,27 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	response.NewSuccess(result, http.StatusOK).Send(w)
 }
 
-func validate(input usecase.TransferInput) []string {
-	var messages []string
+//TransferInput armazena a estruturas de dados de entrada da API
+type TransferInput struct {
+	AccountOriginID      string  `json:"account_origin_id" validate:"required"`
+	AccountDestinationID string  `json:"account_destination_id" validate:"required"`
+	Amount               float64 `json:"amount" validate:"gt=0,required"`
+}
 
-	var errAccountsEquals = errors.New("account origin equals destination account")
+func (t TransferInput) validateDecorator(input TransferInput, validator validator.Validator) []string {
+	var (
+		messages          []string
+		errAccountsEquals = errors.New("account origin equals destination account")
+	)
+
 	if input.AccountOriginID == input.AccountDestinationID {
 		messages = append(messages, errAccountsEquals.Error())
 	}
 
-	translator := en.New()
-	uni := ut.New(translator, translator)
-	trans, found := uni.GetTranslator("en")
-	if !found {
-		log.Fatal("translator not found")
-	}
-	v := validator.New()
-	if err := en_translations.RegisterDefaultTranslations(v, trans); err != nil {
-		log.Fatal(err)
-	}
-
-	//_ = v.RegisterTranslation("required", trans, func(ut ut.Translator) error {
-	//	return ut.Add("required", "{0}xx is a required field!", true) // see universal-translator for details
-	//}, func(ut ut.Translator, fe validator.FieldError) string {
-	//	t, _ := ut.T("required", fe.Field())
-	//	return t
-	//})
-
-	var err = v.Struct(input)
+	err := validator.Validate(input)
 	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			messages = append(messages, strings.ToLower(e.Translate(trans)))
+		for _, msg := range validator.Messages() {
+			messages = append(messages, msg)
 		}
 	}
 
@@ -147,14 +138,14 @@ func validate(input usecase.TransferInput) []string {
 }
 
 func (t Transfer) logSuccess(key string, message string, httpStatus int) {
-	t.logger.WithFields(logger.Fields{
+	t.log.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
 	}).Infof(message)
 }
 
 func (t Transfer) logError(key string, message string, httpStatus int, err error) {
-	t.logger.WithFields(logger.Fields{
+	t.log.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
 		"error":       err.Error(),

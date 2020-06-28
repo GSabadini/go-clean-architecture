@@ -14,6 +14,7 @@ import (
 )
 
 /** TODO verificar middlewares */
+/** TODO adicionar validation na struct */
 type Gin struct {
 	log  logger.Logger
 	db   database.NoSQLHandler
@@ -52,8 +53,8 @@ func (g Gin) Listen() {
 }
 
 func (g Gin) setAppHandlers(router *gin.Engine) {
-	router.POST("/api/transfers", g.buildActionStoreTransfer())
-	router.GET("/api/transfers", g.buildActionIndexTransfer())
+	//router.POST("/api/transfers", g.buildActionStoreTransfer())
+	//router.GET("/api/transfers", g.buildActionIndexTransfer())
 
 	router.GET("/api/accounts/:account_id/balance", g.buildActionFindBalanceAccount())
 	router.POST("/api/accounts", g.buildActionStoreAccount())
@@ -62,32 +63,32 @@ func (g Gin) setAppHandlers(router *gin.Engine) {
 	router.GET("/api/healthcheck", g.healthcheck())
 }
 
-func (g Gin) buildActionStoreTransfer() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var (
-			transferRepository = mongodb.NewTransferRepository(g.db)
-			accountRepository  = mongodb.NewAccountRepository(g.db)
-			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
-		)
+//func (g Gin) buildActionStoreTransfer() gin.HandlerFunc {
+//	return func(c *gin.Context) {
+//		var (
+//			transferRepository = mongodb.NewTransferRepository(g.db)
+//			accountRepository  = mongodb.NewAccountRepository(g.db)
+//			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
+//		)
+//
+//		var transferAction = action.NewTransfer(transferUseCase, g.log)
+//
+//		transferAction.Store(c.Writer, c.Request)
+//	}
+//}
 
-		var transferAction = action.NewTransfer(transferUseCase, g.log)
-
-		transferAction.Store(c.Writer, c.Request)
-	}
-}
-
-func (g Gin) buildActionIndexTransfer() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var (
-			transferRepository = mongodb.NewTransferRepository(g.db)
-			accountRepository  = mongodb.NewAccountRepository(g.db)
-			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
-			transferAction     = action.NewTransfer(transferUseCase, g.log)
-		)
-
-		transferAction.Index(c.Writer, c.Request)
-	}
-}
+//func (g Gin) buildActionIndexTransfer() gin.HandlerFunc {
+//	return func(c *gin.Context) {
+//		var (
+//			transferRepository = mongodb.NewTransferRepository(g.db)
+//			accountRepository  = mongodb.NewAccountRepository(g.db)
+//			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
+//			transferAction     = action.NewTransfer(transferUseCase, g.log)
+//		)
+//
+//		transferAction.Index(c.Writer, c.Request)
+//	}
+//}
 
 func (g Gin) buildActionStoreAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
