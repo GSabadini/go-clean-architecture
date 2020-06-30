@@ -29,14 +29,14 @@ func NewWebServer(
 	log logger.Logger,
 	dbConnSQL database.SQLHandler,
 	dbConnNoSQL database.NoSQLHandler,
-	validation validator.Validator,
+	validator validator.Validator,
 	port Port,
 ) (Server, error) {
 	switch instance {
 	case InstanceGorillaMux:
-		return NewGorillaMux(log, dbConnSQL, validation, port), nil
+		return NewGorillaMux(log, dbConnSQL, validator, port), nil
 	case InstanceGin:
-		return NewGin(log, dbConnNoSQL, port), nil
+		return NewGin(log, dbConnNoSQL, validator, port), nil
 	default:
 		return nil, errInvalidWebServerInstance
 	}

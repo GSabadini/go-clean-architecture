@@ -18,41 +18,40 @@ import (
 )
 
 type GorillaMux struct {
+	router     *mux.Router
+	middleware *negroni.Negroni
 	log        logger.Logger
 	db         database.SQLHandler
-	validation validator.Validator
+	validator  validator.Validator
 	port       Port
 }
 
 func NewGorillaMux(
 	log logger.Logger,
 	dbConnSQL database.SQLHandler,
-	validation validator.Validator,
+	validator validator.Validator,
 	port Port,
 ) GorillaMux {
 	return GorillaMux{
+		router:     mux.NewRouter(),
+		middleware: negroni.New(),
 		log:        log,
 		db:         dbConnSQL,
-		validation: validation,
+		validator:  validator,
 		port:       port,
 	}
 }
 
 //Listen inicia o servidor HTTP
 func (g GorillaMux) Listen() {
-	var (
-		router         = mux.NewRouter()
-		negroniHandler = negroni.New()
-	)
-
-	g.setAppHandlers(router)
-	negroniHandler.UseHandler(router)
+	g.setAppHandlers(g.router)
+	g.middleware.UseHandler(g.router)
 
 	server := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		Addr:         fmt.Sprintf(":%d", g.port),
-		Handler:      negroniHandler,
+		Handler:      g.middleware,
 	}
 
 	g.log.WithFields(logger.Fields{"port": g.port}).Infof("Starting HTTP Server")
@@ -82,7 +81,7 @@ func (g GorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
 		)
 
-		var transferAction = action.NewTransfer(transferUseCase, g.log, g.validation)
+		var transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
 
 		transferAction.Store(res, req)
 	}
@@ -100,7 +99,7 @@ func (g GorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 			transferRepository = postgres.NewTransferRepository(g.db)
 			accountRepository  = postgres.NewAccountRepository(g.db)
 			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
-			transferAction     = action.NewTransfer(transferUseCase, g.log, g.validation)
+			transferAction     = action.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
 		transferAction.Index(res, req)

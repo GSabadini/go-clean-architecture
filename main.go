@@ -5,7 +5,6 @@ import (
 )
 
 func main() {
-	var appConfig = infrastructure.NewConfig()
-
-	appConfig.WebServer.Listen()
+	var config = infrastructure.NewConfig()
+	config.WebServer.Listen()
 }

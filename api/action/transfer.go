@@ -13,6 +13,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+//TransferInput armazena a estruturas de dados de entrada da API
+type TransferInput struct {
+	AccountOriginID      string  `json:"account_origin_id" validate:"required"`
+	AccountDestinationID string  `json:"account_destination_id" validate:"required"`
+	Amount               float64 `json:"amount" validate:"gt=0,required"`
+}
+
 //Transfer armazena as dependências de uma transferência
 type Transfer struct {
 	validator validator.Validator
@@ -43,7 +50,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if errMsg := input.validateDecorator(input, t.validator); len(errMsg) > 0 {
+	if errMsg := t.validateInput(input); len(errMsg) > 0 {
 		t.logError(
 			logKey,
 			"input invalid",
@@ -99,8 +106,7 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 			logKey,
 			"error when returning the transfer list",
 			http.StatusInternalServerError,
-			err,
-		)
+			err)
 
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
@@ -110,14 +116,7 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	response.NewSuccess(result, http.StatusOK).Send(w)
 }
 
-//TransferInput armazena a estruturas de dados de entrada da API
-type TransferInput struct {
-	AccountOriginID      string  `json:"account_origin_id" validate:"required"`
-	AccountDestinationID string  `json:"account_destination_id" validate:"required"`
-	Amount               float64 `json:"amount" validate:"gt=0,required"`
-}
-
-func (t TransferInput) validateDecorator(input TransferInput, validator validator.Validator) []string {
+func (t Transfer) validateInput(input TransferInput) []string {
 	var (
 		messages          []string
 		errAccountsEquals = errors.New("account origin equals destination account")
@@ -127,9 +126,9 @@ func (t TransferInput) validateDecorator(input TransferInput, validator validato
 		messages = append(messages, errAccountsEquals.Error())
 	}
 
-	err := validator.Validate(input)
+	err := t.validator.Validate(input)
 	if err != nil {
-		for _, msg := range validator.Messages() {
+		for _, msg := range t.validator.Messages() {
 			messages = append(messages, msg)
 		}
 	}

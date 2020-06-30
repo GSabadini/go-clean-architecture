@@ -13,13 +13,13 @@ import (
 
 //Config armazena a estrutura de configuração da aplicação
 type Config struct {
-	AppName    string
-	Port       web.Port
-	WebServer  web.Server
-	Logger     logger.Logger
-	dbSQL      database.SQLHandler
-	dbNoSQL    database.NoSQLHandler
-	validation validator.Validator
+	appName   string
+	port      web.Port
+	WebServer web.Server
+	Logger    logger.Logger
+	dbSQL     database.SQLHandler
+	dbNoSQL   database.NoSQLHandler
+	validator validator.Validator
 }
 
 //NewConfig retorna a configuração da aplicação
@@ -30,12 +30,12 @@ func NewConfig() Config {
 	}
 
 	config := Config{
-		AppName: os.Getenv("APP_NAME"),
-		Port:    web.Port(port),
+		appName: os.Getenv("APP_NAME"),
+		port:    web.Port(port),
 		Logger:  log(),
 	}
 
-	config.validation = validation(config.Logger)
+	config.validator = validation(config.Logger)
 	config.dbSQL = dbSQLConn(config.Logger)
 	config.dbNoSQL = dbNoSQLConn(config.Logger)
 
@@ -43,8 +43,8 @@ func NewConfig() Config {
 		config.Logger,
 		config.dbSQL,
 		config.dbNoSQL,
-		config.validation,
-		config.Port,
+		config.validator,
+		config.port,
 	)
 
 	return config
@@ -65,7 +65,7 @@ func webServer(
 	log logger.Logger,
 	dbSQLConn database.SQLHandler,
 	dbNoSQLConn database.NoSQLHandler,
-	validation validator.Validator,
+	validator validator.Validator,
 	port web.Port,
 ) web.Server {
 	server, err := web.NewWebServer(
@@ -73,7 +73,7 @@ func webServer(
 		log,
 		dbSQLConn,
 		dbNoSQLConn,
-		validation,
+		validator,
 		port,
 	)
 

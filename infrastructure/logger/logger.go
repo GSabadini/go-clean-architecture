@@ -51,11 +51,9 @@ func NewLogger(instance int, level string, isJSON bool) (Logger, error) {
 			return nil, err
 		}
 		return logger, nil
-
 	case InstanceLogrusLogger:
 		var logger = NewLogrusLogger(level, isJSON)
 		return logger, nil
-
 	default:
 		return nil, errInvalidLoggerInstance
 	}
