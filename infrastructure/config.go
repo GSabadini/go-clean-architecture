@@ -87,7 +87,7 @@ func webServer(
 }
 
 func log() logger.Logger {
-	log, err := logger.NewLogger(logger.InstanceLogrusLogger, logger.Info, true)
+	log, err := logger.NewLogger(logger.InstanceLogrusLogger, true)
 	if err != nil {
 		panic(err)
 	}

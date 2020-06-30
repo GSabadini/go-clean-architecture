@@ -50,7 +50,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if errMsg := t.validateInput(input); len(errMsg) > 0 {
+	if errs := t.validateInput(input); len(errs) > 0 {
 		t.logError(
 			logKey,
 			"input invalid",
@@ -58,7 +58,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 			errors.New("validate"),
 		)
 
-		response.NewMessagesError(errMsg, http.StatusBadRequest).Send(w)
+		response.NewMessagesError(errs, http.StatusBadRequest).Send(w)
 		return
 	}
 

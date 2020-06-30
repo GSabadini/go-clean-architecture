@@ -21,19 +21,6 @@ type Logger interface {
 type Fields map[string]interface{}
 
 const (
-	//Debug has verbose message
-	Debug = "debug"
-	//Info is default log level
-	Info = "info"
-	//Warn is for logging messages about possible issues
-	Warn = "warn"
-	//Error is for logging errors
-	Error = "error"
-	//Fatal is for logging fatal messages. The sytem shutsdown after logging the message.
-	Fatal = "fatal"
-)
-
-const (
 	InstanceZapLogger int = iota
 	InstanceLogrusLogger
 )
@@ -43,16 +30,16 @@ var (
 )
 
 //NewLogger retorna a instância de um logger
-func NewLogger(instance int, level string, isJSON bool) (Logger, error) {
+func NewLogger(instance int, isJSON bool) (Logger, error) {
 	switch instance {
 	case InstanceZapLogger:
-		logger, err := NewZapLogger(level, isJSON)
+		logger, err := NewZapLogger(isJSON)
 		if err != nil {
 			return nil, err
 		}
 		return logger, nil
 	case InstanceLogrusLogger:
-		var logger = NewLogrusLogger(level, isJSON)
+		var logger = NewLogrusLogger(isJSON)
 		return logger, nil
 	default:
 		return nil, errInvalidLoggerInstance

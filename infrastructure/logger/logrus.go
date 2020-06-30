@@ -9,16 +9,8 @@ type logrusLogger struct {
 }
 
 //NewLogrusLogger constrói um logrus logger
-func NewLogrusLogger(level string, isJSON bool) Logger {
+func NewLogrusLogger(isJSON bool) Logger {
 	log := logrus.New()
-
-	if level != "" {
-		lvl, err := logrus.ParseLevel(level)
-		if err != nil {
-			panic(err)
-		}
-		log.SetLevel(lvl)
-	}
 
 	if isJSON {
 		log.SetFormatter(&logrus.JSONFormatter{

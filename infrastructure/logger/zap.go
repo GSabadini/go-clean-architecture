@@ -11,18 +11,13 @@ type zapLogger struct {
 	logger *zap.SugaredLogger
 }
 
-func NewZapLogger(level string, isJSON bool) (Logger, error) {
+func NewZapLogger(isJSON bool) (Logger, error) {
 	log, err := zap.NewProduction()
 	if err != nil {
 		return nil, err
 	}
 	sugar := log.Sugar()
 	defer log.Sync()
-
-	var zapCoreLevel zapcore.Level
-	if level != "" {
-		zapCoreLevel = getZapLevel(level)
-	}
 
 	var encoderConfig zapcore.EncoderConfig
 	if isJSON {
@@ -31,7 +26,10 @@ func NewZapLogger(level string, isJSON bool) (Logger, error) {
 		zapcore.NewJSONEncoder(encoderConfig)
 	}
 
-	var cores []zapcore.Core
+	var (
+		zapCoreLevel zapcore.Level
+		cores        []zapcore.Core
+	)
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(encoderConfig),
 		zapcore.Lock(os.Stdout),
@@ -78,21 +76,4 @@ func (l *zapLogger) WithFields(fields Fields) Logger {
 func (l *zapLogger) WithError(err error) Logger {
 	var log = l.logger.With(err.Error())
 	return &zapLogger{logger: log}
-}
-
-func getZapLevel(level string) zapcore.Level {
-	switch level {
-	case Info:
-		return zapcore.InfoLevel
-	case Warn:
-		return zapcore.WarnLevel
-	case Debug:
-		return zapcore.DebugLevel
-	case Error:
-		return zapcore.ErrorLevel
-	case Fatal:
-		return zapcore.FatalLevel
-	default:
-		return zapcore.InfoLevel
-	}
 }
