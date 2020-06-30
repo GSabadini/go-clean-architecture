@@ -2,6 +2,7 @@ package domain
 
 import "time"
 
+/* TODO remover notações de JSON e BD */
 //Account armazena a estrutura de uma conta
 type Account struct {
 	ID        string     `json:"id,omitempty" bson:"id"`

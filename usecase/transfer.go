@@ -7,6 +7,8 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
+/* TODO criar camada de presenters para encapsular o retorno da API */
+//TransferOutput armazena a estrutura de dados de retorno da API
 type TransferOutput struct {
 	ID                   string    `json:"id"`
 	AccountOriginID      string    `json:"account_origin_id"`
@@ -15,7 +17,7 @@ type TransferOutput struct {
 	CreatedAt            time.Time `json:"created_at"`
 }
 
-//Transfer armazena as depedências para ações de uma transferência
+//Transfer armazena as dependências para ações de uma transferência
 type Transfer struct {
 	transferRepository repository.TransferRepository
 	accountRepository  repository.AccountRepository
@@ -54,6 +56,7 @@ func (t Transfer) Store(accountOriginID, accountDestinationID string, amount flo
 	}, nil
 }
 
+/* TODO melhorar processsamento de transação */
 func (t Transfer) process(accountOriginID, accountDestinationID string, amount float64) error {
 	origin, err := t.accountRepository.FindByID(accountOriginID)
 	if err != nil {

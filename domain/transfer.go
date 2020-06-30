@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+/* TODO remover notações de JSON e BD */
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
 	ID                   string    `json:"id" bson:"id"`

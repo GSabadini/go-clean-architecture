@@ -15,8 +15,8 @@ import (
 
 //TransferInput armazena a estruturas de dados de entrada da API
 type TransferInput struct {
-	AccountOriginID      string  `json:"account_origin_id" validate:"required"`
-	AccountDestinationID string  `json:"account_destination_id" validate:"required"`
+	AccountOriginID      string  `json:"account_origin_id" validate:"required,uuid4"`
+	AccountDestinationID string  `json:"account_destination_id" validate:"required,uuid4"`
 	Amount               float64 `json:"amount" validate:"gt=0,required"`
 }
 
@@ -58,7 +58,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 			errors.New("validate"),
 		)
 
-		response.NewMessagesError(errs, http.StatusBadRequest).Send(w)
+		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
 		return
 	}
 

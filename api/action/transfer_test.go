@@ -10,8 +10,6 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
-
-	"github.com/gorilla/mux"
 )
 
 func TestTransfer_Store(t *testing.T) {
@@ -146,12 +144,12 @@ func TestTransfer_Store(t *testing.T) {
 			}
 
 			var (
-				rr = httptest.NewRecorder()
-				r  = mux.NewRouter()
+				rr      = httptest.NewRecorder()
+				handler = http.NewServeMux()
 			)
 
-			r.HandleFunc("/transfers", tt.transferAction.Store).Methods(http.MethodPost)
-			r.ServeHTTP(rr, req)
+			handler.HandleFunc("/transfers", tt.transferAction.Store)
+			handler.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
 				t.Errorf(
@@ -203,12 +201,12 @@ func TestTransfer_Index(t *testing.T) {
 			}
 
 			var (
-				rr = httptest.NewRecorder()
-				r  = mux.NewRouter()
+				rr      = httptest.NewRecorder()
+				handler = http.NewServeMux()
 			)
 
-			r.HandleFunc("/transfers", tt.transferAction.Index).Methods(http.MethodGet)
-			r.ServeHTTP(rr, req)
+			handler.HandleFunc("/transfers", tt.transferAction.Index)
+			handler.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
 				t.Errorf(

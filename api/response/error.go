@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+/* TODO definir local de errors da API */
 var (
 	ErrParameterInvalid = errors.New("parameter invalid")
 )
@@ -32,8 +33,8 @@ func NewError(err error, status int) *Error {
 	}
 }
 
-//NewMessagesError constrói uma estrutura de response com mensagens de error
-func NewMessagesError(messages []string, status int) *Error {
+//NewErrorMessage constrói uma estrutura de response com mensagens de error
+func NewErrorMessage(messages []string, status int) *Error {
 	return &Error{
 		statusCode: status,
 		Messages:   messages,

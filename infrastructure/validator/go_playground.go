@@ -14,7 +14,7 @@ type GoPlayground struct {
 	translate ut.Translator
 	log       logger.Logger
 	err       error
-	msgs      []string
+	msg       []string
 }
 
 func NewGoPlayground(log logger.Logger) Validator {
@@ -35,9 +35,12 @@ func NewGoPlayground(log logger.Logger) Validator {
 }
 
 func (g *GoPlayground) Validate(i interface{}) error {
-	errs := g.validator.Struct(i)
-	if errs != nil {
-		g.err = errs
+	if len(g.msg) > 0 {
+		g.msg = nil
+	}
+
+	g.err = g.validator.Struct(i)
+	if g.err != nil {
 		return g.err
 	}
 
@@ -47,9 +50,9 @@ func (g *GoPlayground) Validate(i interface{}) error {
 func (g *GoPlayground) Messages() []string {
 	if g.err != nil {
 		for _, err := range g.err.(validator.ValidationErrors) {
-			g.msgs = append(g.msgs, err.Translate(g.translate))
+			g.msg = append(g.msg, err.Translate(g.translate))
 		}
 	}
 
-	return g.msgs
+	return g.msg
 }
