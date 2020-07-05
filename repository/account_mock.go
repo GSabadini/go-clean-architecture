@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -16,7 +17,7 @@ func (a AccountRepositoryStubSuccess) Store(_ domain.Account) (domain.Account, e
 		Name:      "Test",
 		CPF:       "02815517078",
 		Balance:   100,
-		CreatedAt: nil,
+		CreatedAt: time.Time{},
 	}, nil
 }
 

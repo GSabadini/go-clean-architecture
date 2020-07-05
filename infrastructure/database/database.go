@@ -14,8 +14,8 @@ const (
 	InstanceMongoDB int = iota
 )
 
-//NewDatabaseNoSQL retorna o handler de um banco de dados NoSQL
-func NewDatabaseNoSQL(instance int, host, dbName string) (repository.NoSQLHandler, error) {
+//NewDatabaseNoSQLFactory retorna o handler de um banco de dados NoSQL
+func NewDatabaseNoSQLFactory(instance int, host, dbName string) (repository.NoSQLHandler, error) {
 	switch instance {
 	case InstanceMongoDB:
 		db, err := NewMongoHandler(host, dbName)
@@ -32,8 +32,8 @@ const (
 	InstancePostgres int = iota
 )
 
-//NewDatabaseSQL retorna o handler de um banco de dados SQL
-func NewDatabaseSQL(instance int, dataSource string) (repository.SQLHandler, error) {
+//NewDatabaseSQLFactory retorna o handler de um banco de dados SQL
+func NewDatabaseSQLFactory(instance int, dataSource string) (repository.SQLHandler, error) {
 	switch instance {
 	case InstancePostgres:
 		db, err := NewPostgresHandler(dataSource)

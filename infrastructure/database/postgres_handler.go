@@ -2,8 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"github.com/gsabadini/go-bank-transfer/repository"
 	"os"
+
+	"github.com/gsabadini/go-bank-transfer/repository"
 
 	_ "github.com/lib/pq"
 )

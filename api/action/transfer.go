@@ -13,8 +13,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-//TransferInput armazena a estruturas de dados de entrada da API
-type TransferInput struct {
+//transferInput armazena a estruturas de dados de entrada da API
+type transferInput struct {
 	AccountOriginID      string  `json:"account_origin_id" validate:"required,uuid4"`
 	AccountDestinationID string  `json:"account_destination_id" validate:"required,uuid4"`
 	Amount               float64 `json:"amount" validate:"gt=0,required"`
@@ -28,15 +28,15 @@ type Transfer struct {
 }
 
 //NewTransfer constrói uma transferência com suas dependências
-func NewTransfer(usecase usecase.TransferUseCase, log logger.Logger, v validator.Validator) Transfer {
-	return Transfer{usecase: usecase, log: log, validator: v}
+func NewTransfer(uc usecase.TransferUseCase, l logger.Logger, v validator.Validator) Transfer {
+	return Transfer{usecase: uc, log: l, validator: v}
 }
 
 //Store é um handler para criação de transferência
 func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 
-	var input TransferInput
+	var input transferInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		t.logError(
 			logKey,
@@ -116,7 +116,7 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	response.NewSuccess(result, http.StatusOK).Send(w)
 }
 
-func (t Transfer) validateInput(input TransferInput) []string {
+func (t Transfer) validateInput(input transferInput) []string {
 	var (
 		messages          []string
 		errAccountsEquals = errors.New("account origin equals destination account")

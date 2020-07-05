@@ -72,7 +72,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 			name      string
 			CPF       string
 			balance   float64
-			createdAt *time.Time
+			createdAt time.Time
 		)
 
 		if err = rows.Scan(&ID, &name, &CPF, &balance, &createdAt); err != nil {
@@ -106,7 +106,7 @@ func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 		name      string
 		CPF       string
 		balance   float64
-		createdAt *time.Time
+		createdAt time.Time
 	)
 
 	row, err := a.handler.Query(query, ID)

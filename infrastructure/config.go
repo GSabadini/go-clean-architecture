@@ -52,7 +52,7 @@ func NewConfig() Config {
 }
 
 func validation(log logger.Logger) validator.Validator {
-	v, err := validator.NewValidator(validator.InstanceGoPlayground, log)
+	v, err := validator.NewValidatorFactory(validator.InstanceGoPlayground, log)
 	if err != nil {
 		panic(err)
 	}
@@ -69,8 +69,8 @@ func webServer(
 	validator validator.Validator,
 	port web.Port,
 ) web.Server {
-	server, err := web.NewWebServer(
-		web.InstanceGin,
+	server, err := web.NewWebServerFactory(
+		web.InstanceGorillaMux,
 		log,
 		dbSQLConn,
 		dbNoSQLConn,
@@ -88,7 +88,7 @@ func webServer(
 }
 
 func log() logger.Logger {
-	log, err := logger.NewLogger(logger.InstanceLogrusLogger, true)
+	log, err := logger.NewLoggerFactory(logger.InstanceLogrusLogger, true)
 	if err != nil {
 		panic(err)
 	}
@@ -104,7 +104,7 @@ func dbNoSQLConn(log logger.Logger) repository.NoSQLHandler {
 		dbName = verifyExistEnvironmentParams("MONGODB_DATABASE")
 	)
 
-	handler, err := database.NewDatabaseNoSQL(database.InstanceMongoDB, host, dbName)
+	handler, err := database.NewDatabaseNoSQLFactory(database.InstanceMongoDB, host, dbName)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)
@@ -124,7 +124,7 @@ func dbSQLConn(log logger.Logger) repository.SQLHandler {
 		verifyExistEnvironmentParams("POSTGRES_PASSWORD"),
 	)
 
-	handler, err := database.NewDatabaseSQL(database.InstanceMongoDB, ds)
+	handler, err := database.NewDatabaseSQLFactory(database.InstanceMongoDB, ds)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)

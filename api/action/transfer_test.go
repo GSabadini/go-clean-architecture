@@ -15,7 +15,7 @@ import (
 func TestTransfer_Store(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidator(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
 
 	type args struct {
 		rawPayload []byte
@@ -166,7 +166,7 @@ func TestTransfer_Store(t *testing.T) {
 func TestTransfer_Index(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidator(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
 
 	tests := []struct {
 		name               string

@@ -23,8 +23,8 @@ const (
 	InstanceGin
 )
 
-//NewWebServer
-func NewWebServer(
+//NewWebServerFactory
+func NewWebServerFactory(
 	instance int,
 	log logger.Logger,
 	dbConnSQL repository.SQLHandler,

@@ -2,26 +2,30 @@ package usecase
 
 import (
 	"errors"
-
-	"github.com/gsabadini/go-bank-transfer/domain"
+	"time"
 )
 
 //AccountUseCaseStubSuccess implementa a interface de AccountUseCase com resultados de sucesso
 type AccountUseCaseStubSuccess struct{}
 
 //Store
-func (a AccountUseCaseStubSuccess) Store(account domain.Account) (domain.Account, error) {
-	return account, nil
+func (a AccountUseCaseStubSuccess) Store(name, CPF string, balance float64) (accountOutput, error) {
+	return accountOutput{
+		Name:      name,
+		CPF:       CPF,
+		Balance:   balance,
+		CreatedAt: time.Time{},
+	}, nil
 }
 
 //FindAll
-func (a AccountUseCaseStubSuccess) FindAll() ([]domain.Account, error) {
-	return []domain.Account{}, nil
+func (a AccountUseCaseStubSuccess) FindAll() ([]accountOutput, error) {
+	return []accountOutput{}, nil
 }
 
 //FindBalance
-func (a AccountUseCaseStubSuccess) FindBalance(_ string) (domain.Account, error) {
-	return domain.Account{}, nil
+func (a AccountUseCaseStubSuccess) FindBalance(_ string) (accountBalanceOutput, error) {
+	return accountBalanceOutput{}, nil
 }
 
 //AccountUseCaseStubSuccess implementa a interface de AccountUseCase com resultados de erro
@@ -30,21 +34,21 @@ type AccountUseCaseStubError struct {
 }
 
 //Store
-func (a AccountUseCaseStubError) Store(_ domain.Account) (domain.Account, error) {
-	return domain.Account{}, errors.New("Error")
+func (a AccountUseCaseStubError) Store(_, _ string, _ float64) (accountOutput, error) {
+	return accountOutput{}, errors.New("Error")
 }
 
 //FindAll
-func (a AccountUseCaseStubError) FindAll() ([]domain.Account, error) {
-	return []domain.Account{}, errors.New("Error")
+func (a AccountUseCaseStubError) FindAll() ([]accountOutput, error) {
+	return []accountOutput{}, errors.New("Error")
 }
 
 //FindBalance
-func (a AccountUseCaseStubError) FindBalance(_ string) (domain.Account, error) {
+func (a AccountUseCaseStubError) FindBalance(_ string) (accountBalanceOutput, error) {
 	var err = errors.New("Error")
 	if a.TypeErr != nil {
 		err = a.TypeErr
 	}
 
-	return domain.Account{}, err
+	return accountBalanceOutput{}, err
 }

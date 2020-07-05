@@ -117,20 +117,14 @@ func (g GorillaMux) buildActionStoreAccount() *negroni.Negroni {
 		var (
 			accountRepository = postgres.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
-			accountAction     = action.NewAccount(accountUseCase, g.log)
+			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.Store(res, req)
 	}
 
-	var (
-		logging  = middleware.NewLogger(g.log).Execute
-		validate = middleware.NewValidateAccount(g.log).Execute
-	)
-
 	return negroni.New(
-		negroni.HandlerFunc(logging),
-		negroni.HandlerFunc(validate),
+		negroni.HandlerFunc(middleware.NewLogger(g.log).Execute),
 		negroni.NewRecovery(),
 		negroni.Wrap(handler),
 	)
@@ -141,7 +135,7 @@ func (g GorillaMux) buildActionIndexAccount() *negroni.Negroni {
 		var (
 			accountRepository = postgres.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
-			accountAction     = action.NewAccount(accountUseCase, g.log)
+			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.Index(res, req)
@@ -159,7 +153,7 @@ func (g GorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
 		var (
 			accountRepository = postgres.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
-			accountAction     = action.NewAccount(accountUseCase, g.log)
+			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		var (

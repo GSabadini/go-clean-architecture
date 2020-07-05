@@ -19,8 +19,8 @@ const (
 	InstanceGoPlayground int = iota
 )
 
-//NewValidator
-func NewValidator(instance int, log logger.Logger) (Validator, error) {
+//NewValidatorFactory
+func NewValidatorFactory(instance int, log logger.Logger) (Validator, error) {
 	switch instance {
 	case InstanceGoPlayground:
 		return NewGoPlayground(log), nil

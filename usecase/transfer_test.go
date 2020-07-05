@@ -22,7 +22,7 @@ func TestTransfer_Store(t *testing.T) {
 		name          string
 		args          args
 		usecase       TransferUseCase
-		expected      TransferOutput
+		expected      transferOutput
 		expectedError string
 	}{
 		{
@@ -33,7 +33,7 @@ func TestTransfer_Store(t *testing.T) {
 				amount:               20,
 			},
 			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
-			expected: TransferOutput{
+			expected: transferOutput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 				Amount:               20,
@@ -49,7 +49,7 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
-			expected:      TransferOutput{},
+			expected:      transferOutput{},
 		},
 		{
 			name: "Create transfer amount not have sufficient",
@@ -60,7 +60,7 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "origin account does not have sufficient balance",
-			expected:      TransferOutput{},
+			expected:      transferOutput{},
 		},
 		{
 			name: "Create transfer error find account",
@@ -71,7 +71,7 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
-			expected:      TransferOutput{},
+			expected:      transferOutput{},
 		},
 	}
 
@@ -98,14 +98,14 @@ func TestTransfer_FindAll(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		expected      []TransferOutput
+		expected      []transferOutput
 		usecase       TransferUseCase
 		expectedError string
 	}{
 		{
 			name:    "Success when returning the transfer list",
 			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
-			expected: []TransferOutput{
+			expected: []transferOutput{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -126,7 +126,7 @@ func TestTransfer_FindAll(t *testing.T) {
 			name:          "Error when returning the transfer list",
 			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
-			expected:      []TransferOutput{},
+			expected:      []transferOutput{},
 		},
 	}
 

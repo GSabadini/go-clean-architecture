@@ -1,10 +1,12 @@
 package mongodb
 
 import (
+	"time"
+
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
+
 	"github.com/pkg/errors"
-	"time"
 )
 
 type transferBson struct {
@@ -45,13 +47,15 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 
 //FindAll realiza uma busca através da implementação real do database
 func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
-	var transfersBson = make([]transferBson, 0)
+	var (
+		transfersBson = make([]transferBson, 0)
+		transfers     = make([]domain.Transfer, 0)
+	)
 
 	if err := t.handler.FindAll(t.collectionName, nil, &transfersBson); err != nil {
-		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
+		return transfers, errors.Wrap(err, "error listing transfers")
 	}
 
-	var transfers []domain.Transfer
 	for _, transferBson := range transfersBson {
 		var transfer = domain.Transfer{
 			ID:                   transferBson.ID,

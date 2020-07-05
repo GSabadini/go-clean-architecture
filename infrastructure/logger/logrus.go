@@ -1,8 +1,6 @@
 package logger
 
-import (
-	"github.com/sirupsen/logrus"
-)
+import "github.com/sirupsen/logrus"
 
 type logrusLogger struct {
 	logger *logrus.Logger

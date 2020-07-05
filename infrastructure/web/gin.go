@@ -16,7 +16,6 @@ import (
 )
 
 /** TODO verificar middlewares */
-/** TODO adicionar validation na struct */
 type Gin struct {
 	router    *gin.Engine
 	log       logger.Logger
@@ -102,7 +101,7 @@ func (g Gin) buildActionStoreAccount() gin.HandlerFunc {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
-			accountAction     = action.NewAccount(accountUseCase, g.log)
+			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.Store(c.Writer, c.Request)
@@ -114,7 +113,7 @@ func (g Gin) buildActionIndexAccount() gin.HandlerFunc {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
-			accountAction     = action.NewAccount(accountUseCase, g.log)
+			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.Index(c.Writer, c.Request)
@@ -126,7 +125,7 @@ func (g Gin) buildActionFindBalanceAccount() gin.HandlerFunc {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
 			accountUseCase    = usecase.NewAccount(accountRepository)
-			accountAction     = action.NewAccount(accountUseCase, g.log)
+			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		q := c.Request.URL.Query()

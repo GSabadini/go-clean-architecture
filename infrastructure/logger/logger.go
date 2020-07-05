@@ -1,8 +1,6 @@
 package logger
 
-import (
-	"errors"
-)
+import "errors"
 
 type Logger interface {
 	Infof(format string, args ...interface{})
@@ -29,8 +27,8 @@ var (
 	errInvalidLoggerInstance = errors.New("invalid logger instance")
 )
 
-//NewLogger retorna a instância de um logger
-func NewLogger(instance int, isJSON bool) (Logger, error) {
+//NewLoggerFactory retorna a instância de um logger
+func NewLoggerFactory(instance int, isJSON bool) (Logger, error) {
 	switch instance {
 	case InstanceZapLogger:
 		logger, err := NewZapLogger(isJSON)

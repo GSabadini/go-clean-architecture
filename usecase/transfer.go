@@ -6,9 +6,8 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-/* TODO criar camada de presenters para encapsular o retorno da API */
-//TransferOutput armazena a estrutura de dados de retorno da API
-type TransferOutput struct {
+//transferOutput armazena a estrutura de dados de retorno da API
+type transferOutput struct {
 	ID                   string    `json:"id"`
 	AccountOriginID      string    `json:"account_origin_id"`
 	AccountDestinationID string    `json:"account_destination_id"`
@@ -34,19 +33,19 @@ func NewTransfer(
 }
 
 //Store cria uma nova transferência
-func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (TransferOutput, error) {
+func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (transferOutput, error) {
 	if err := t.process(accountOriginID, accountDestinationID, amount); err != nil {
-		return TransferOutput{}, err
+		return transferOutput{}, err
 	}
 
 	var transfer = domain.NewTransfer(accountOriginID, accountDestinationID, amount)
 
 	transfer, err := t.transferRepository.Store(transfer)
 	if err != nil {
-		return TransferOutput{}, err
+		return transferOutput{}, err
 	}
 
-	return TransferOutput{
+	return transferOutput{
 		ID:                   transfer.ID,
 		AccountOriginID:      transfer.AccountOriginID,
 		AccountDestinationID: transfer.AccountDestinationID,
@@ -85,15 +84,16 @@ func (t Transfer) process(accountOriginID, accountDestinationID string, amount f
 }
 
 //FindAll retorna uma lista de transferências
-func (t Transfer) FindAll() ([]TransferOutput, error) {
+func (t Transfer) FindAll() ([]transferOutput, error) {
+	var output = make([]transferOutput, 0)
+
 	transfers, err := t.transferRepository.FindAll()
 	if err != nil {
-		return []TransferOutput{}, err
+		return output, err
 	}
 
-	var output []TransferOutput
 	for _, transfer := range transfers {
-		var transfer = TransferOutput{
+		var transfer = transferOutput{
 			ID:                   transfer.ID,
 			AccountOriginID:      transfer.AccountOriginID,
 			AccountDestinationID: transfer.AccountDestinationID,

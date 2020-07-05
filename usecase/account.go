@@ -2,9 +2,18 @@ package usecase
 
 import (
 	"strings"
+	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
+
+type accountOutput struct {
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	CPF       string    `json:"cpf"`
+	Balance   float64   `json:"balance"`
+	CreatedAt time.Time `json:"created_at"`
+}
 
 //Account armazena as depedências para ações de uma conta
 type Account struct {
@@ -17,35 +26,61 @@ func NewAccount(repository domain.AccountRepository) Account {
 }
 
 //Store cria uma nova conta
-func (a Account) Store(data domain.Account) (domain.Account, error) {
-	var account = domain.NewAccount(data.Name, a.cleanCPF(data.CPF), data.Balance)
+func (a Account) Store(name, CPF string, balance float64) (accountOutput, error) {
+	var account = domain.NewAccount(name, a.cleanCPF(CPF), balance)
 
-	result, err := a.repository.Store(account)
+	account, err := a.repository.Store(account)
 	if err != nil {
-		return result, err
+		return accountOutput{}, err
 	}
 
-	return result, nil
+	return accountOutput{
+		ID:        account.ID,
+		Name:      account.Name,
+		CPF:       account.CPF,
+		Balance:   account.Balance,
+		CreatedAt: account.CreatedAt,
+	}, nil
 }
 
 //FindAll retorna uma lista de contas
-func (a Account) FindAll() ([]domain.Account, error) {
-	result, err := a.repository.FindAll()
+func (a Account) FindAll() ([]accountOutput, error) {
+	var output = make([]accountOutput, 0)
+
+	accounts, err := a.repository.FindAll()
 	if err != nil {
-		return result, err
+		return output, err
 	}
 
-	return result, nil
+	for _, account := range accounts {
+		var account = accountOutput{
+			ID:        account.ID,
+			Name:      account.Name,
+			CPF:       account.CPF,
+			Balance:   account.Balance,
+			CreatedAt: account.CreatedAt,
+		}
+
+		output = append(output, account)
+	}
+
+	return output, nil
+}
+
+type accountBalanceOutput struct {
+	Balance float64 `json:"balance"`
 }
 
 //FindBalance retorna o saldo de uma conta
-func (a Account) FindBalance(ID string) (domain.Account, error) {
-	result, err := a.repository.FindBalance(ID)
+func (a Account) FindBalance(ID string) (accountBalanceOutput, error) {
+	account, err := a.repository.FindBalance(ID)
 	if err != nil {
-		return result, err
+		return accountBalanceOutput{}, err
 	}
 
-	return result, nil
+	return accountBalanceOutput{
+		Balance: account.Balance,
+	}, nil
 }
 
 func (a Account) cleanCPF(cpf string) string {
