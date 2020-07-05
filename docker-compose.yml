@@ -36,3 +36,24 @@ services:
       POSTGRES_DB: bank
     volumes:
       - ./scripts/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+#  go-bank-transfer-debug:
+#    container_name: "go-bank-transfer-debug"
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.debug
+#    ports:
+#      - 3001:3001
+#      - 40000:40000
+#    volumes:
+#      - ./:/go-bank-transfer
+#      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
+#    security_opt:
+#      - "seccomp:unconfined"
+#    cap_add:
+#      - SYS_PTRACE
+#    env_file:
+#      - .env
+#    depends_on:
+#      - mongodb
+#      - postgres

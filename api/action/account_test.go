@@ -8,20 +8,22 @@ import (
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/stub"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/usecase"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus/hooks/test"
 )
 
+/* TODO remover dependecia do gorilla mux */
 func TestAccount_Store(t *testing.T) {
 	t.Parallel()
+
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
 
 	type args struct {
 		rawPayload []byte
 	}
-
-	var loggerMock, _ = test.NewNullLogger()
 
 	tests := []struct {
 		name               string
@@ -32,7 +34,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name:               "Store action success",
 			expectedStatusCode: http.StatusCreated,
-			accountAction:      NewAccount(stub.AccountUseCaseStubSuccess{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubSuccess{}, logger.LoggerMock{}, validator),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -46,7 +48,7 @@ func TestAccount_Store(t *testing.T) {
 		{
 			name:               "Store action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubError{}, logger.LoggerMock{}, validator),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -58,9 +60,37 @@ func TestAccount_Store(t *testing.T) {
 			},
 		},
 		{
+			name:          "Store action invalid balance",
+			accountAction: NewAccount(usecase.AccountUseCaseStubError{}, logger.LoggerMock{}, validator),
+			args: args{
+				rawPayload: []byte(
+					`{
+						"name": "test",
+						"cpf": "44451598087", 
+						"balance": -1 
+					}`,
+				),
+			},
+			expectedStatusCode: http.StatusBadRequest,
+		},
+		{
+			name:          "Store action invalid name fields",
+			accountAction: NewAccount(usecase.AccountUseCaseStubError{}, logger.LoggerMock{}, validator),
+			args: args{
+				rawPayload: []byte(
+					`{
+						"name123": "test",
+						"cpf1231": "44451598087", 
+						"balance12312": 1 
+					}`,
+				),
+			},
+			expectedStatusCode: http.StatusBadRequest,
+		},
+		{
 			name:               "Store action invalid JSON",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubError{}, logger.LoggerMock{}, validator),
 			args: args{
 				rawPayload: []byte(
 					`{
@@ -102,7 +132,7 @@ func TestAccount_Store(t *testing.T) {
 func TestAccount_Index(t *testing.T) {
 	t.Parallel()
 
-	var loggerMock, _ = test.NewNullLogger()
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
 
 	tests := []struct {
 		name               string
@@ -112,12 +142,12 @@ func TestAccount_Index(t *testing.T) {
 		{
 			name:               "Index handler success",
 			expectedStatusCode: http.StatusOK,
-			accountAction:      NewAccount(stub.AccountUseCaseStubSuccess{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubSuccess{}, logger.LoggerMock{}, validator),
 		},
 		{
 			name:               "Index handler error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubError{}, logger.LoggerMock{}, validator),
 		},
 	}
 
@@ -151,11 +181,11 @@ func TestAccount_Index(t *testing.T) {
 func TestAccount_FindBalance(t *testing.T) {
 	t.Parallel()
 
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+
 	type args struct {
 		accountID string
 	}
-
-	var loggerMock, _ = test.NewNullLogger()
 
 	tests := []struct {
 		name               string
@@ -166,15 +196,15 @@ func TestAccount_FindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action success",
 			expectedStatusCode: http.StatusOK,
-			accountAction:      NewAccount(stub.AccountUseCaseStubSuccess{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubSuccess{}, logger.LoggerMock{}, validator),
 			args: args{
-				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountID: "59e09306b5174ba2986a7ce36aa2afd9",
 			},
 		},
 		{
 			name:               "FindBalance action error",
 			expectedStatusCode: http.StatusInternalServerError,
-			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubError{}, logger.LoggerMock{}, validator),
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
@@ -182,7 +212,7 @@ func TestAccount_FindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action parameter invalid",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(stub.AccountUseCaseStubError{}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubError{}, logger.LoggerMock{}, validator),
 			args: args{
 				accountID: "error",
 			},
@@ -190,7 +220,7 @@ func TestAccount_FindBalance(t *testing.T) {
 		{
 			name:               "FindBalance action error fetching account",
 			expectedStatusCode: http.StatusBadRequest,
-			accountAction:      NewAccount(stub.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, loggerMock),
+			accountAction:      NewAccount(usecase.AccountUseCaseStubError{TypeErr: domain.ErrNotFound}, logger.LoggerMock{}, validator),
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
@@ -205,7 +235,9 @@ func TestAccount_FindBalance(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			req = mux.SetURLVars(req, map[string]string{"account_id": tt.args.accountID})
+			q := req.URL.Query()
+			q.Add("account_id", tt.args.accountID)
+			req.URL.RawQuery = q.Encode()
 
 			var (
 				rr = httptest.NewRecorder()
@@ -225,4 +257,9 @@ func TestAccount_FindBalance(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAccount_Find(t *testing.T) {
+	r := domain.IsValidUUID("59e09306b5174ba2986a7ce36aa2afd9")
+	t.Log(r)
 }

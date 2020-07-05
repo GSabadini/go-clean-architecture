@@ -1,20 +1,30 @@
 package usecase
 
 import (
+	"time"
+
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
-//Transfer armazena as depedências para ações de uma transferência
+//transferOutput armazena a estrutura de dados de retorno da API
+type transferOutput struct {
+	ID                   string    `json:"id"`
+	AccountOriginID      string    `json:"account_origin_id"`
+	AccountDestinationID string    `json:"account_destination_id"`
+	Amount               float64   `json:"amount"`
+	CreatedAt            time.Time `json:"created_at"`
+}
+
+//Transfer armazena as dependências para ações de uma transferência
 type Transfer struct {
-	transferRepository repository.TransferRepository
-	accountRepository  repository.AccountRepository
+	transferRepository domain.TransferRepository
+	accountRepository  domain.AccountRepository
 }
 
 //NewTransfer cria uma transferência com suas dependências
 func NewTransfer(
-	transferRepository repository.TransferRepository,
-	accountRepository repository.AccountRepository,
+	transferRepository domain.TransferRepository,
+	accountRepository domain.AccountRepository,
 ) Transfer {
 	return Transfer{
 		transferRepository: transferRepository,
@@ -23,43 +33,50 @@ func NewTransfer(
 }
 
 //Store cria uma nova transferência
-func (t Transfer) Store(data domain.Transfer) (domain.Transfer, error) {
-	if err := t.processTransfer(data); err != nil {
-		return domain.Transfer{}, err
+func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (transferOutput, error) {
+	if err := t.process(accountOriginID, accountDestinationID, amount); err != nil {
+		return transferOutput{}, err
 	}
 
-	var transfer = domain.NewTransfer(data.AccountOriginID, data.AccountDestinationID, data.Amount)
+	var transfer = domain.NewTransfer(accountOriginID, accountDestinationID, amount)
 
-	result, err := t.transferRepository.Store(transfer)
+	transfer, err := t.transferRepository.Store(transfer)
 	if err != nil {
-		return result, err
+		return transferOutput{}, err
 	}
 
-	return result, nil
+	return transferOutput{
+		ID:                   transfer.ID,
+		AccountOriginID:      transfer.AccountOriginID,
+		AccountDestinationID: transfer.AccountDestinationID,
+		Amount:               transfer.Amount,
+		CreatedAt:            transfer.CreatedAt,
+	}, nil
 }
 
-func (t Transfer) processTransfer(transfer domain.Transfer) error {
-	origin, err := t.accountRepository.FindByID(transfer.GetAccountOriginID())
+/* TODO melhorar processsamento de transação */
+func (t Transfer) process(accountOriginID, accountDestinationID string, amount float64) error {
+	origin, err := t.accountRepository.FindByID(accountOriginID)
 	if err != nil {
 		return err
 	}
 
-	destination, err := t.accountRepository.FindByID(transfer.GetAccountDestinationID())
+	destination, err := t.accountRepository.FindByID(accountDestinationID)
 	if err != nil {
 		return err
 	}
 
-	if err := origin.Withdraw(transfer.GetAmount()); err != nil {
+	if err := origin.Withdraw(amount); err != nil {
 		return err
 	}
 
-	destination.Deposit(transfer.GetAmount())
+	destination.Deposit(amount)
 
-	if err = t.accountRepository.UpdateBalance(transfer.GetAccountOriginID(), origin.GetBalance()); err != nil {
+	if err = t.accountRepository.UpdateBalance(origin.ID, origin.Balance); err != nil {
 		return err
 	}
 
-	if err = t.accountRepository.UpdateBalance(transfer.GetAccountDestinationID(), destination.GetBalance()); err != nil {
+	if err = t.accountRepository.UpdateBalance(destination.ID, destination.Balance); err != nil {
 		return err
 	}
 
@@ -67,11 +84,25 @@ func (t Transfer) processTransfer(transfer domain.Transfer) error {
 }
 
 //FindAll retorna uma lista de transferências
-func (t Transfer) FindAll() ([]domain.Transfer, error) {
-	result, err := t.transferRepository.FindAll()
+func (t Transfer) FindAll() ([]transferOutput, error) {
+	var output = make([]transferOutput, 0)
+
+	transfers, err := t.transferRepository.FindAll()
 	if err != nil {
-		return result, err
+		return output, err
 	}
 
-	return result, nil
+	for _, transfer := range transfers {
+		var transfer = transferOutput{
+			ID:                   transfer.ID,
+			AccountOriginID:      transfer.AccountOriginID,
+			AccountDestinationID: transfer.AccountDestinationID,
+			Amount:               transfer.Amount,
+			CreatedAt:            transfer.CreatedAt,
+		}
+
+		output = append(output, transfer)
+	}
+
+	return output, nil
 }

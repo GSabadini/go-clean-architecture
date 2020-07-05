@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gorilla/mux"
 )
 
 func TestHealthCheck(t *testing.T) {
@@ -17,12 +15,12 @@ func TestHealthCheck(t *testing.T) {
 	}
 
 	var (
-		rr = httptest.NewRecorder()
-		r  = mux.NewRouter()
+		rr      = httptest.NewRecorder()
+		handler = http.NewServeMux()
 	)
 
-	r.HandleFunc("/healthcheck", HealthCheck).Methods(http.MethodGet)
-	r.ServeHTTP(rr, req)
+	handler.HandleFunc("/healthcheck", HealthCheck)
+	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("O handler retornou um HTTP status code inesperado: retornado '%v' esperado '%v'",

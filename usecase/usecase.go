@@ -1,16 +1,12 @@
 package usecase
 
-import (
-	"github.com/gsabadini/go-bank-transfer/domain"
-)
-
 type AccountUseCase interface {
-	Store(domain.Account) (domain.Account, error)
-	FindAll() ([]domain.Account, error)
-	FindBalance(string) (domain.Account, error)
+	Store(string, string, float64) (accountOutput, error)
+	FindAll() ([]accountOutput, error)
+	FindBalance(string) (accountBalanceOutput, error)
 }
 
 type TransferUseCase interface {
-	Store(domain.Transfer) (domain.Transfer, error)
-	FindAll() ([]domain.Transfer, error)
+	Store(string, string, float64) (transferOutput, error)
+	FindAll() ([]transferOutput, error)
 }
