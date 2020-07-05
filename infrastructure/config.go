@@ -70,7 +70,7 @@ func webServer(
 	port web.Port,
 ) web.Server {
 	server, err := web.NewWebServer(
-		web.InstanceGorillaMux,
+		web.InstanceGin,
 		log,
 		dbSQLConn,
 		dbNoSQLConn,
@@ -124,7 +124,7 @@ func dbSQLConn(log logger.Logger) repository.SQLHandler {
 		verifyExistEnvironmentParams("POSTGRES_PASSWORD"),
 	)
 
-	handler, err := database.NewDatabaseSQL(database.InstancePostgres, ds)
+	handler, err := database.NewDatabaseSQL(database.InstanceMongoDB, ds)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)

@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"time"
-)
+import "time"
 
 //TransferRepository expõe os métodos disponíveis para as abstrações do repositório de transferências
 type TransferRepository interface {
@@ -10,14 +8,13 @@ type TransferRepository interface {
 	FindAll() ([]Transfer, error)
 }
 
-/* TODO remover notações de JSON e BD */
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
-	ID                   string    `json:"id" bson:"id"`
-	AccountOriginID      string    `json:"account_origin_id" bson:"account_origin_id"`
-	AccountDestinationID string    `json:"account_destination_id" bson:"account_destination_id"`
-	Amount               float64   `json:"amount" bson:"amount"`
-	CreatedAt            time.Time `json:"created_at" bson:"created_at"`
+	ID                   string
+	AccountOriginID      string
+	AccountDestinationID string
+	Amount               float64
+	CreatedAt            time.Time
 }
 
 //NewTransfer cria uma transferência

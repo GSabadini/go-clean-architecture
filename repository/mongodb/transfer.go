@@ -4,7 +4,16 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/pkg/errors"
+	"time"
 )
+
+type transferBson struct {
+	ID                   string    `bson:"id"`
+	AccountOriginID      string    `bson:"account_origin_id"`
+	AccountDestinationID string    `bson:"account_destination_id"`
+	Amount               float64   `bson:"amount"`
+	CreatedAt            time.Time `bson:"created_at"`
+}
 
 //TransferRepository representa um repositório para manipulação de dados de transferências utilizando MongoDB
 type TransferRepository struct {
@@ -19,7 +28,15 @@ func NewTransferRepository(handler repository.NoSQLHandler) TransferRepository {
 
 //Store cria uma transferência através da implementação real do database
 func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
-	if err := t.handler.Store(t.collectionName, &transfer); err != nil {
+	transferBson := &transferBson{
+		ID:                   transfer.ID,
+		AccountOriginID:      transfer.AccountOriginID,
+		AccountDestinationID: transfer.AccountDestinationID,
+		Amount:               transfer.Amount,
+		CreatedAt:            transfer.CreatedAt,
+	}
+
+	if err := t.handler.Store(t.collectionName, transferBson); err != nil {
 		return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
 	}
 
@@ -28,11 +45,24 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 
 //FindAll realiza uma busca através da implementação real do database
 func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
-	var transfer = make([]domain.Transfer, 0)
+	var transfersBson = make([]transferBson, 0)
 
-	if err := t.handler.FindAll(t.collectionName, nil, &transfer); err != nil {
+	if err := t.handler.FindAll(t.collectionName, nil, &transfersBson); err != nil {
 		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 	}
 
-	return transfer, nil
+	var transfers []domain.Transfer
+	for _, transferBson := range transfersBson {
+		var transfer = domain.Transfer{
+			ID:                   transferBson.ID,
+			AccountOriginID:      transferBson.AccountOriginID,
+			AccountDestinationID: transferBson.AccountDestinationID,
+			Amount:               transferBson.Amount,
+			CreatedAt:            transferBson.CreatedAt,
+		}
+
+		transfers = append(transfers, transfer)
+	}
+
+	return transfers, nil
 }
