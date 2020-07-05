@@ -4,18 +4,18 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/repository"
 
 	"github.com/pkg/errors"
 )
 
 //TransferRepository representa um repositório para manipulação de dados de transferências utilizando Postgres
 type TransferRepository struct {
-	handler database.SQLHandler
+	handler repository.SQLHandler
 }
 
 //NewTransferRepository cria um repositório utilizando Postgres
-func NewTransferRepository(handler database.SQLHandler) TransferRepository {
+func NewTransferRepository(handler repository.SQLHandler) TransferRepository {
 	return TransferRepository{handler: handler}
 }
 

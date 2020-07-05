@@ -4,6 +4,12 @@ import (
 	"time"
 )
 
+//TransferRepository expõe os métodos disponíveis para as abstrações do repositório de transferências
+type TransferRepository interface {
+	Store(Transfer) (Transfer, error)
+	FindAll() ([]Transfer, error)
+}
+
 /* TODO remover notações de JSON e BD */
 //Transfer armazena a estrutura de transferência
 type Transfer struct {

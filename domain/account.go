@@ -2,6 +2,15 @@ package domain
 
 import "time"
 
+//AccountRepository expõe os métodos disponíveis para as abstrações do repositório de contas
+type AccountRepository interface {
+	Store(Account) (Account, error)
+	UpdateBalance(string, float64) error
+	FindAll() ([]Account, error)
+	FindByID(string) (*Account, error)
+	FindBalance(string) (Account, error)
+}
+
 /* TODO remover notações de JSON e BD */
 //Account armazena a estrutura de uma conta
 type Account struct {

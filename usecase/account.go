@@ -4,16 +4,15 @@ import (
 	"strings"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 //Account armazena as depedências para ações de uma conta
 type Account struct {
-	repository repository.AccountRepository
+	repository domain.AccountRepository
 }
 
 //NewAccount cria uma conta com suas dependências
-func NewAccount(repository repository.AccountRepository) Account {
+func NewAccount(repository domain.AccountRepository) Account {
 	return Account{repository: repository}
 }
 

@@ -1,25 +1,21 @@
 package database
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/gsabadini/go-bank-transfer/repository"
+)
 
 var (
 	errInvalidDatabaseInstance = errors.New("invalid database instance")
 )
-
-//NoSQLHandler expõe os métodos disponíveis para as abstrações de banco NoSQL
-type NoSQLHandler interface {
-	Store(string, interface{}) error
-	Update(string, interface{}, interface{}) error
-	FindAll(string, interface{}, interface{}) error
-	FindOne(string, interface{}, interface{}, interface{}) error
-}
 
 const (
 	InstanceMongoDB int = iota
 )
 
 //NewDatabaseNoSQL retorna o handler de um banco de dados NoSQL
-func NewDatabaseNoSQL(instance int, host, dbName string) (NoSQLHandler, error) {
+func NewDatabaseNoSQL(instance int, host, dbName string) (repository.NoSQLHandler, error) {
 	switch instance {
 	case InstanceMongoDB:
 		db, err := NewMongoHandler(host, dbName)
@@ -32,26 +28,12 @@ func NewDatabaseNoSQL(instance int, host, dbName string) (NoSQLHandler, error) {
 	}
 }
 
-//SQLHandler expõe os métodos disponíveis para as abstrações de banco SQL
-type SQLHandler interface {
-	Execute(string, ...interface{}) error
-	Query(string, ...interface{}) (Row, error)
-}
-
-//Row
-type Row interface {
-	Scan(dest ...interface{}) error
-	Next() bool
-	Err() error
-	Close() error
-}
-
 const (
 	InstancePostgres int = iota
 )
 
 //NewDatabaseSQL retorna o handler de um banco de dados SQL
-func NewDatabaseSQL(instance int, dataSource string) (SQLHandler, error) {
+func NewDatabaseSQL(instance int, dataSource string) (repository.SQLHandler, error) {
 	switch instance {
 	case InstancePostgres:
 		db, err := NewPostgresHandler(dataSource)

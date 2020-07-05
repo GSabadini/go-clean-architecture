@@ -9,6 +9,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/web"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 //Config armazena a estrutura de configuração da aplicação
@@ -17,8 +18,8 @@ type Config struct {
 	port      web.Port
 	WebServer web.Server
 	Logger    logger.Logger
-	dbSQL     database.SQLHandler
-	dbNoSQL   database.NoSQLHandler
+	dbSQL     repository.SQLHandler
+	dbNoSQL   repository.NoSQLHandler
 	validator validator.Validator
 }
 
@@ -63,8 +64,8 @@ func validation(log logger.Logger) validator.Validator {
 
 func webServer(
 	log logger.Logger,
-	dbSQLConn database.SQLHandler,
-	dbNoSQLConn database.NoSQLHandler,
+	dbSQLConn repository.SQLHandler,
+	dbNoSQLConn repository.NoSQLHandler,
 	validator validator.Validator,
 	port web.Port,
 ) web.Server {
@@ -97,7 +98,7 @@ func log() logger.Logger {
 	return log
 }
 
-func dbNoSQLConn(log logger.Logger) database.NoSQLHandler {
+func dbNoSQLConn(log logger.Logger) repository.NoSQLHandler {
 	var (
 		host   = verifyExistEnvironmentParams("MONGODB_HOST")
 		dbName = verifyExistEnvironmentParams("MONGODB_DATABASE")
@@ -114,7 +115,7 @@ func dbNoSQLConn(log logger.Logger) database.NoSQLHandler {
 	return handler
 }
 
-func dbSQLConn(log logger.Logger) database.SQLHandler {
+func dbSQLConn(log logger.Logger) repository.SQLHandler {
 	var ds = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 		verifyExistEnvironmentParams("POSTGRES_HOST"),
 		verifyExistEnvironmentParams("POSTGRES_PORT"),

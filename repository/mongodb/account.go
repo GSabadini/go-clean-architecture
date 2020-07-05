@@ -5,19 +5,19 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/repository"
 
 	"github.com/pkg/errors"
 )
 
 //AccountRepository representa um repositório para manipulação de dados de contas utilizando MongoDB
 type AccountRepository struct {
-	handler        database.NoSQLHandler
+	handler        repository.NoSQLHandler
 	collectionName string
 }
 
 //NewAccountRepository constrói um repository com suas dependências
-func NewAccountRepository(dbHandler database.NoSQLHandler) AccountRepository {
+func NewAccountRepository(dbHandler repository.NoSQLHandler) AccountRepository {
 	return AccountRepository{handler: dbHandler, collectionName: "accounts"}
 }
 

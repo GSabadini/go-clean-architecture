@@ -2,14 +2,15 @@ package web
 
 import (
 	"fmt"
-	"github.com/gsabadini/go-bank-transfer/api/action"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
-	"github.com/gsabadini/go-bank-transfer/repository/mongodb"
-	"github.com/gsabadini/go-bank-transfer/usecase"
 	"net/http"
 	"time"
+
+	"github.com/gsabadini/go-bank-transfer/api/action"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/repository/mongodb"
+	"github.com/gsabadini/go-bank-transfer/usecase"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,14 +20,14 @@ import (
 type Gin struct {
 	router    *gin.Engine
 	log       logger.Logger
-	db        database.NoSQLHandler
+	db        repository.NoSQLHandler
 	validator validator.Validator
 	port      Port
 }
 
 func NewGin(
 	log logger.Logger,
-	db database.NoSQLHandler,
+	db repository.NoSQLHandler,
 	validator validator.Validator,
 	port Port,
 ) Gin {

@@ -2,18 +2,18 @@ package mongodb
 
 import (
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/pkg/errors"
 )
 
 //TransferRepository representa um repositório para manipulação de dados de transferências utilizando MongoDB
 type TransferRepository struct {
-	handler        database.NoSQLHandler
+	handler        repository.NoSQLHandler
 	collectionName string
 }
 
 //NewTransferRepository cria um repository com suas dependências
-func NewTransferRepository(handler database.NoSQLHandler) TransferRepository {
+func NewTransferRepository(handler repository.NoSQLHandler) TransferRepository {
 	return TransferRepository{handler: handler, collectionName: "transfers"}
 }
 

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 /* TODO criar camada de presenters para encapsular o retorno da API */
@@ -19,14 +18,14 @@ type TransferOutput struct {
 
 //Transfer armazena as dependências para ações de uma transferência
 type Transfer struct {
-	transferRepository repository.TransferRepository
-	accountRepository  repository.AccountRepository
+	transferRepository domain.TransferRepository
+	accountRepository  domain.AccountRepository
 }
 
 //NewTransfer cria uma transferência com suas dependências
 func NewTransfer(
-	transferRepository repository.TransferRepository,
-	accountRepository repository.AccountRepository,
+	transferRepository domain.TransferRepository,
+	accountRepository domain.AccountRepository,
 ) Transfer {
 	return Transfer{
 		transferRepository: transferRepository,

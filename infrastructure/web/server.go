@@ -3,9 +3,9 @@ package web
 import (
 	"errors"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 type Server interface {
@@ -27,8 +27,8 @@ const (
 func NewWebServer(
 	instance int,
 	log logger.Logger,
-	dbConnSQL database.SQLHandler,
-	dbConnNoSQL database.NoSQLHandler,
+	dbConnSQL repository.SQLHandler,
+	dbConnNoSQL repository.NoSQLHandler,
 	validator validator.Validator,
 	port Port,
 ) (Server, error) {

@@ -7,9 +7,9 @@ import (
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
 	"github.com/gsabadini/go-bank-transfer/api/middleware"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/repository"
 	"github.com/gsabadini/go-bank-transfer/repository/postgres"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
@@ -21,14 +21,14 @@ type GorillaMux struct {
 	router     *mux.Router
 	middleware *negroni.Negroni
 	log        logger.Logger
-	db         database.SQLHandler
+	db         repository.SQLHandler
 	validator  validator.Validator
 	port       Port
 }
 
 func NewGorillaMux(
 	log logger.Logger,
-	dbConnSQL database.SQLHandler,
+	dbConnSQL repository.SQLHandler,
 	validator validator.Validator,
 	port Port,
 ) GorillaMux {

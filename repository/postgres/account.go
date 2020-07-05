@@ -4,18 +4,18 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/repository"
 
 	"github.com/pkg/errors"
 )
 
 //AccountRepository representa um repositório para manipulação de dados de uma conta
 type AccountRepository struct {
-	handler database.SQLHandler
+	handler repository.SQLHandler
 }
 
 //NewAccountRepository constrói um repository com suas dependências
-func NewAccountRepository(handler database.SQLHandler) AccountRepository {
+func NewAccountRepository(handler repository.SQLHandler) AccountRepository {
 	return AccountRepository{handler: handler}
 }
 
