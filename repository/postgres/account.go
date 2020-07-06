@@ -9,17 +9,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-//AccountRepository representa um repositório para manipulação de dados de uma conta
+//AccountRepository armazena a estrutura de dados de um repositório de Account
 type AccountRepository struct {
 	handler repository.SQLHandler
 }
 
-//NewAccountRepository constrói um repository com suas dependências
+//NewAccountRepository constrói um AccountRepository com suas dependências
 func NewAccountRepository(handler repository.SQLHandler) AccountRepository {
 	return AccountRepository{handler: handler}
 }
 
-//Store realiza a inserção de uma conta no banco de dados
+//Store insere uma Account no database
 func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
 	query := `
 		INSERT INTO 
@@ -42,7 +42,7 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 	return account, nil
 }
 
-//UpdateBalance realiza a atualização do saldo de uma conta no banco de dados
+//UpdateBalance atualiza o Balance de uma Account no database
 func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
@@ -53,7 +53,7 @@ func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
 	return nil
 }
 
-//FindAll realiza a busca de todas as contas no banco de dados
+//FindAlL busca todas as Account no database
 func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	var (
 		accounts = make([]domain.Account, 0)
@@ -97,7 +97,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	return accounts, nil
 }
 
-//FindByID realiza a busca de uma conta no banco de dados
+//FindByID busca uma Account por ID no database
 func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	var (
 		account   = &domain.Account{}
@@ -133,7 +133,7 @@ func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	return account, nil
 }
 
-//FindBalance realiza a busca do saldo de uma conta no banco de dados
+//FindBalance busca o Balance de uma Account no database
 func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 	var (
 		account = domain.Account{}

@@ -15,8 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/** TODO verificar middlewares */
-type Gin struct {
+type ginServer struct {
 	router    *gin.Engine
 	log       logger.Logger
 	db        repository.NoSQLHandler
@@ -24,13 +23,14 @@ type Gin struct {
 	port      Port
 }
 
-func NewGin(
+//NewGinServer constrói um ginServer com todas as suas dependências
+func NewGinServer(
 	log logger.Logger,
 	db repository.NoSQLHandler,
 	validator validator.Validator,
 	port Port,
-) Gin {
-	return Gin{
+) ginServer {
+	return ginServer{
 		router:    gin.New(),
 		log:       log,
 		db:        db,
@@ -39,7 +39,7 @@ func NewGin(
 	}
 }
 
-func (g Gin) Listen() {
+func (g ginServer) Listen() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.Recovery()
 
@@ -58,7 +58,7 @@ func (g Gin) Listen() {
 	}
 }
 
-func (g Gin) setAppHandlers(router *gin.Engine) {
+func (g ginServer) setAppHandlers(router *gin.Engine) {
 	router.POST("/api/transfers", g.buildActionStoreTransfer())
 	router.GET("/api/transfers", g.buildActionIndexTransfer())
 
@@ -69,7 +69,7 @@ func (g Gin) setAppHandlers(router *gin.Engine) {
 	router.GET("/api/healthcheck", g.healthcheck())
 }
 
-func (g Gin) buildActionStoreTransfer() gin.HandlerFunc {
+func (g ginServer) buildActionStoreTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			transferRepository = mongodb.NewTransferRepository(g.db)
@@ -83,7 +83,7 @@ func (g Gin) buildActionStoreTransfer() gin.HandlerFunc {
 	}
 }
 
-func (g Gin) buildActionIndexTransfer() gin.HandlerFunc {
+func (g ginServer) buildActionIndexTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			transferRepository = mongodb.NewTransferRepository(g.db)
@@ -96,7 +96,7 @@ func (g Gin) buildActionIndexTransfer() gin.HandlerFunc {
 	}
 }
 
-func (g Gin) buildActionStoreAccount() gin.HandlerFunc {
+func (g ginServer) buildActionStoreAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
@@ -108,7 +108,7 @@ func (g Gin) buildActionStoreAccount() gin.HandlerFunc {
 	}
 }
 
-func (g Gin) buildActionIndexAccount() gin.HandlerFunc {
+func (g ginServer) buildActionIndexAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
@@ -120,7 +120,7 @@ func (g Gin) buildActionIndexAccount() gin.HandlerFunc {
 	}
 }
 
-func (g Gin) buildActionFindBalanceAccount() gin.HandlerFunc {
+func (g ginServer) buildActionFindBalanceAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
@@ -136,7 +136,7 @@ func (g Gin) buildActionFindBalanceAccount() gin.HandlerFunc {
 	}
 }
 
-func (g Gin) healthcheck() gin.HandlerFunc {
+func (g ginServer) healthcheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		action.HealthCheck(c.Writer, c.Request)
 	}

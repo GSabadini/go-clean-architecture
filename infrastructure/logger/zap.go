@@ -11,6 +11,7 @@ type zapLogger struct {
 	logger *zap.SugaredLogger
 }
 
+//NewZapLogger constrói uma instância do logger Zap
 func NewZapLogger(isJSON bool) (Logger, error) {
 	log, err := zap.NewProduction()
 	if err != nil {

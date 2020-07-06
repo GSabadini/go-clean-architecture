@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -83,8 +82,6 @@ func TestTransfer_Store(t *testing.T) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 				return
 			}
-			fmt.Printf("\nGOT - %+v\n", got)
-			fmt.Printf("\nEXP - %+v\n", tt.expected)
 
 			if !reflect.DeepEqual(got, tt.expected) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.expected)

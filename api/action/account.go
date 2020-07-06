@@ -12,30 +12,30 @@ import (
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
-type AccountInput struct {
-	//ID        string     `json:"id" validate:"required,uuid4"`
+//accountInput armazena a estrutura de dados de entrada da API
+type accountInput struct {
 	Name    string  `json:"name" validate:"required"`
 	CPF     string  `json:"cpf" validate:"required"`
 	Balance float64 `json:"balance" validate:"gt=0,required"`
 }
 
-//Account armazena as dependências de uma conta
+//Account armazena as dependências para as ações de Account
 type Account struct {
 	usecase   usecase.AccountUseCase
 	log       logger.Logger
 	validator validator.Validator
 }
 
-//NewAccount constrói uma conta com suas dependências
+//NewAccount constrói um Account com suas dependências
 func NewAccount(uc usecase.AccountUseCase, l logger.Logger, v validator.Validator) Account {
 	return Account{usecase: uc, log: l, validator: v}
 }
 
-//Store é um handler para criação de conta
+//Store é um handler para criação de Account
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
 
-	var input AccountInput
+	var input accountInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		a.logError(
 			logKey,
@@ -54,14 +54,14 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 			logKey,
 			"input invalid",
 			http.StatusBadRequest,
-			errors.New("validate"),
+			errors.New("invalid input"),
 		)
 
 		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
 		return
 	}
 
-	result, err := a.usecase.Store(input.Name, input.CPF, input.Balance)
+	output, err := a.usecase.Store(input.Name, input.CPF, input.Balance)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -75,14 +75,14 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	a.logSuccess(logKey, "success creating account", http.StatusCreated)
 
-	response.NewSuccess(result, http.StatusCreated).Send(w)
+	response.NewSuccess(output, http.StatusCreated).Send(w)
 }
 
-//Index é um handler para retornar a lista de contas
+//Index é um handler para retornar todas as Account
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 
-	result, err := a.usecase.FindAll()
+	output, err := a.usecase.FindAll()
 	if err != nil {
 		a.logError(
 			logKey,
@@ -96,10 +96,10 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	}
 	a.logSuccess(logKey, "success when returning account list", http.StatusOK)
 
-	response.NewSuccess(result, http.StatusOK).Send(w)
+	response.NewSuccess(output, http.StatusOK).Send(w)
 }
 
-//FindBalance é um handler para retornar o saldo de uma conta
+//FindBalance é um handler para retornar o Balance de uma Account
 func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_balance"
 
@@ -117,7 +117,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := a.usecase.FindBalance(accountID)
+	output, err := a.usecase.FindBalance(accountID)
 	if err != nil {
 		switch err {
 		case domain.ErrNotFound:
@@ -144,10 +144,10 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	}
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)
 
-	response.NewSuccess(result, http.StatusOK).Send(w)
+	response.NewSuccess(output, http.StatusOK).Send(w)
 }
 
-func (a Account) validateInput(input AccountInput) []string {
+func (a Account) validateInput(input accountInput) []string {
 	var messages []string
 
 	err := a.validator.Validate(input)

@@ -6,7 +6,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//transferOutput armazena a estrutura de dados de retorno da API
+//transferOutput armazena a estrutura de dados de retorno do caso de uso
 type transferOutput struct {
 	ID                   string    `json:"id"`
 	AccountOriginID      string    `json:"account_origin_id"`
@@ -15,13 +15,13 @@ type transferOutput struct {
 	CreatedAt            time.Time `json:"created_at"`
 }
 
-//Transfer armazena as dependências para ações de uma transferência
+//Transfer armazena as dependências para os casos de uso de Transfer
 type Transfer struct {
 	transferRepository domain.TransferRepository
 	accountRepository  domain.AccountRepository
 }
 
-//NewTransfer cria uma transferência com suas dependências
+//NewTransfer constrói um Transfer com suas dependências
 func NewTransfer(
 	transferRepository domain.TransferRepository,
 	accountRepository domain.AccountRepository,
@@ -32,7 +32,7 @@ func NewTransfer(
 	}
 }
 
-//Store cria uma nova transferência
+//Store cria uma nova Transfer
 func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (transferOutput, error) {
 	if err := t.process(accountOriginID, accountDestinationID, amount); err != nil {
 		return transferOutput{}, err

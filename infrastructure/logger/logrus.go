@@ -6,7 +6,7 @@ type logrusLogger struct {
 	logger *logrus.Logger
 }
 
-//NewLogrusLogger constrói um logrus logger
+//NewLogrusLogger constrói uma instância do logger Logrus
 func NewLogrusLogger(isJSON bool) Logger {
 	log := logrus.New()
 

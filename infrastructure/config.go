@@ -23,7 +23,7 @@ type Config struct {
 	validator validator.Validator
 }
 
-//NewConfig retorna a configuração da aplicação
+//NewConfig configura a aplicação
 func NewConfig() Config {
 	port, err := strconv.ParseInt(os.Getenv("APP_PORT"), 10, 64)
 	if err != nil {

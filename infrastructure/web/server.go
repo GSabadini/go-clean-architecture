@@ -8,6 +8,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
+//Server é uma abstração para o server da aplicação
 type Server interface {
 	Listen()
 }
@@ -23,7 +24,7 @@ const (
 	InstanceGin
 )
 
-//NewWebServerFactory
+//NewWebServerFactory retorna a instância de um web server
 func NewWebServerFactory(
 	instance int,
 	log logger.Logger,
@@ -36,7 +37,7 @@ func NewWebServerFactory(
 	case InstanceGorillaMux:
 		return NewGorillaMux(log, dbConnSQL, validator, port), nil
 	case InstanceGin:
-		return NewGin(log, dbConnNoSQL, validator, port), nil
+		return NewGinServer(log, dbConnNoSQL, validator, port), nil
 	default:
 		return nil, errInvalidWebServerInstance
 	}

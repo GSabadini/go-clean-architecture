@@ -11,7 +11,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type accountBson struct {
+//accountBSON armazena a estrutura de dados do MongoDB
+type accountBSON struct {
 	ID        string    `bson:"id"`
 	Name      string    `bson:"name"`
 	CPF       string    `bson:"cpf"`
@@ -19,7 +20,7 @@ type accountBson struct {
 	CreatedAt time.Time `bson:"created_at"`
 }
 
-//AccountRepository representa um repositório para manipulação de dados de contas utilizando MongoDB
+//AccountRepository armazena a estrutura de dados de um repositório de Account
 type AccountRepository struct {
 	handler        repository.NoSQLHandler
 	collectionName string
@@ -30,9 +31,9 @@ func NewAccountRepository(dbHandler repository.NoSQLHandler) AccountRepository {
 	return AccountRepository{handler: dbHandler, collectionName: "accounts"}
 }
 
-//Store realiza a inserção de uma conta no banco de dados
+//Store insere uma Account no database
 func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
-	var accountBson = &accountBson{
+	var accountBSON = &accountBSON{
 		ID:        account.ID,
 		Name:      account.Name,
 		CPF:       account.CPF,
@@ -40,14 +41,14 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 		CreatedAt: account.CreatedAt,
 	}
 
-	if err := a.handler.Store(a.collectionName, accountBson); err != nil {
+	if err := a.handler.Store(a.collectionName, accountBSON); err != nil {
 		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
 
 	return account, nil
 }
 
-//UpdateBalance realiza a atualização do saldo de uma conta no banco de dados
+//UpdateBalance atualiza o Balance de uma Account no database
 func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
 	var (
 		query  = bson.M{"id": ID}
@@ -61,10 +62,10 @@ func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
 	return nil
 }
 
-//FindAll realiza a busca de todas as contas no banco de dados
+//FindAll busca todas as Account no database
 func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	var (
-		accountsBson = make([]accountBson, 0)
+		accountsBson = make([]accountBSON, 0)
 		accounts     = make([]domain.Account, 0)
 	)
 
@@ -72,13 +73,13 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 		return accounts, errors.Wrap(err, "error listing accounts")
 	}
 
-	for _, accountBson := range accountsBson {
+	for _, accountBSON := range accountsBson {
 		var account = domain.Account{
-			ID:        accountBson.ID,
-			Name:      accountBson.Name,
-			CPF:       accountBson.CPF,
-			Balance:   accountBson.Balance,
-			CreatedAt: accountBson.CreatedAt,
+			ID:        accountBSON.ID,
+			Name:      accountBSON.Name,
+			CPF:       accountBSON.CPF,
+			Balance:   accountBSON.Balance,
+			CreatedAt: accountBSON.CreatedAt,
 		}
 
 		accounts = append(accounts, account)
@@ -87,14 +88,14 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 	return accounts, nil
 }
 
-//FindByID realiza a busca de uma conta no banco de dados
+//FindByID busca uma Account por ID no database
 func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	var (
-		accountBson = &accountBson{}
+		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
 	)
 
-	if err := a.handler.FindOne(a.collectionName, query, nil, &accountBson); err != nil {
+	if err := a.handler.FindOne(a.collectionName, query, nil, &accountBSON); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
 			return &domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account")
@@ -104,23 +105,23 @@ func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	}
 
 	return &domain.Account{
-		ID:        accountBson.ID,
-		Name:      accountBson.Name,
-		CPF:       accountBson.CPF,
-		Balance:   accountBson.Balance,
-		CreatedAt: accountBson.CreatedAt,
+		ID:        accountBSON.ID,
+		Name:      accountBSON.Name,
+		CPF:       accountBSON.CPF,
+		Balance:   accountBSON.Balance,
+		CreatedAt: accountBSON.CreatedAt,
 	}, nil
 }
 
-//FindBalance realiza a busca do saldo de uma conta no banco de dados
+//FindBalance busca o Balance de uma Account no database
 func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 	var (
-		accountBson = &accountBson{}
+		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
 		selector    = bson.M{"balance": 1, "_id": 0}
 	)
 
-	if err := a.handler.FindOne(a.collectionName, query, selector, accountBson); err != nil {
+	if err := a.handler.FindOne(a.collectionName, query, selector, accountBSON); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
 			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
@@ -130,10 +131,10 @@ func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 	}
 
 	return domain.Account{
-		ID:        accountBson.ID,
-		Name:      accountBson.Name,
-		CPF:       accountBson.CPF,
-		Balance:   accountBson.Balance,
-		CreatedAt: accountBson.CreatedAt,
+		ID:        accountBSON.ID,
+		Name:      accountBSON.Name,
+		CPF:       accountBSON.CPF,
+		Balance:   accountBSON.Balance,
+		CreatedAt: accountBSON.CreatedAt,
 	}, nil
 }

@@ -9,7 +9,7 @@ import (
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
 
-type GoPlayground struct {
+type goPlayground struct {
 	validator *validator.Validate
 	translate ut.Translator
 	log       logger.Logger
@@ -17,6 +17,7 @@ type GoPlayground struct {
 	msg       []string
 }
 
+//NewGoPlayground constrói uma instância do validator GoPlayground
 func NewGoPlayground(log logger.Logger) Validator {
 	language := en.New()
 	uni := ut.New(language, language)
@@ -31,10 +32,10 @@ func NewGoPlayground(log logger.Logger) Validator {
 		log.Fatalln("translator not found")
 	}
 
-	return &GoPlayground{validator: v, translate: translate, log: log}
+	return &goPlayground{validator: v, translate: translate, log: log}
 }
 
-func (g *GoPlayground) Validate(i interface{}) error {
+func (g *goPlayground) Validate(i interface{}) error {
 	if len(g.msg) > 0 {
 		g.msg = nil
 	}
@@ -47,7 +48,7 @@ func (g *GoPlayground) Validate(i interface{}) error {
 	return nil
 }
 
-func (g *GoPlayground) Messages() []string {
+func (g *goPlayground) Messages() []string {
 	if g.err != nil {
 		for _, err := range g.err.(validator.ValidationErrors) {
 			g.msg = append(g.msg, err.Translate(g.translate))

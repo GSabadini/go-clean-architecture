@@ -14,7 +14,7 @@ const (
 	InstanceMongoDB int = iota
 )
 
-//NewDatabaseNoSQLFactory retorna o handler de um banco de dados NoSQL
+//NewDatabaseNoSQLFactory retorna a instância de um banco de dados NoSQL
 func NewDatabaseNoSQLFactory(instance int, host, dbName string) (repository.NoSQLHandler, error) {
 	switch instance {
 	case InstanceMongoDB:
@@ -32,7 +32,7 @@ const (
 	InstancePostgres int = iota
 )
 
-//NewDatabaseSQLFactory retorna o handler de um banco de dados SQL
+//NewDatabaseSQLFactory retorna a instância de um banco de dados SQL
 func NewDatabaseSQLFactory(instance int, dataSource string) (repository.SQLHandler, error) {
 	switch instance {
 	case InstancePostgres:

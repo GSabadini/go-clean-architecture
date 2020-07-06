@@ -2,6 +2,7 @@ package logger
 
 import "errors"
 
+//Logger é uma abstração para os loggers da aplicação
 type Logger interface {
 	Infof(format string, args ...interface{})
 

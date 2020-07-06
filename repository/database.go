@@ -14,7 +14,7 @@ type SQLHandler interface {
 	Query(string, ...interface{}) (Row, error)
 }
 
-//Row
+//Row expõe os métodos disponíveis para as abstrações de linhas de banco SQL
 type Row interface {
 	Scan(dest ...interface{}) error
 	Next() bool

@@ -9,17 +9,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-//TransferRepository representa um repositório para manipulação de dados de transferências utilizando Postgres
+//TransferRepository armazena a estrutura de dados de um repositório de Transfer
 type TransferRepository struct {
 	handler repository.SQLHandler
 }
 
-//NewTransferRepository cria um repositório utilizando Postgres
+//NewTransferRepository constrói um TransferRepository com suas dependências
 func NewTransferRepository(handler repository.SQLHandler) TransferRepository {
 	return TransferRepository{handler: handler}
 }
 
-//Store cria uma transferência
+//Store insere uma Transfer no database
 func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	query := `
 		INSERT INTO 
@@ -42,7 +42,7 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 	return transfer, nil
 }
 
-//FindAll retorna uma lista de transferências
+//FindAll busca todas as Transfer no database
 func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 	var (
 		transfers = make([]domain.Transfer, 0)
