@@ -2,39 +2,41 @@ package domain
 
 import "time"
 
-//Account armazena a estrutura de uma conta
-type Account struct {
-	ID        string     `json:"id,omitempty" bson:"id"`
-	Name      string     `json:"name,omitempty" bson:"name"`
-	CPF       string     `json:"cpf,omitempty" bson:"cpf"`
-	Balance   float64    `json:"balance" bson:"balance"`
-	CreatedAt *time.Time `json:"created_at,omitempty" bson:"created_at"`
+//AccountRepository expõe os métodos disponíveis para as abstrações do repositório de Account
+type AccountRepository interface {
+	Store(Account) (Account, error)
+	UpdateBalance(string, float64) error
+	FindAll() ([]Account, error)
+	FindByID(string) (*Account, error)
+	FindBalance(string) (Account, error)
 }
 
-//NewAccount cria uma conta
-func NewAccount(name string, CPF string, balance float64) Account {
-	timeNow := time.Now()
+//Account armazena a estrutura de uma conta
+type Account struct {
+	ID        string
+	Name      string
+	CPF       string
+	Balance   float64
+	CreatedAt time.Time
+}
 
+//NewAccount cria um Account
+func NewAccount(ID, name, CPF string, balance float64, createdAt time.Time) Account {
 	return Account{
-		ID:        uuid(),
+		ID:        ID,
 		Name:      name,
 		CPF:       CPF,
 		Balance:   balance,
-		CreatedAt: &timeNow,
+		CreatedAt: createdAt,
 	}
 }
 
-//GetBalance retorna o saldo
-func (a *Account) GetBalance() float64 {
-	return a.Balance
-}
-
-//Deposit adiciona um valor no saldo
+//Deposit adiciona um valor no Balance
 func (a *Account) Deposit(amount float64) {
 	a.Balance += amount
 }
 
-//Withdraw remove um valor do saldo
+//Withdraw remove um valor no Balance
 func (a *Account) Withdraw(amount float64) error {
 	if a.Balance < amount {
 		return ErrInsufficientBalance

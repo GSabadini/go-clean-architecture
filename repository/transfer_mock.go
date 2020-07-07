@@ -1,4 +1,4 @@
-package stub
+package repository
 
 import (
 	"time"
@@ -12,12 +12,12 @@ import (
 type TransferRepositoryStubSuccess struct{}
 
 //Store cria uma transferência pré-definida
-func (t TransferRepositoryStubSuccess) Store(_ domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepositoryStubSuccess) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	return domain.Transfer{
-		ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
-		AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
-		AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-		Amount:               20,
+		ID:                   "",
+		AccountOriginID:      transfer.AccountOriginID,
+		AccountDestinationID: transfer.AccountDestinationID,
+		Amount:               transfer.Amount,
 		CreatedAt:            time.Time{},
 	}, nil
 }

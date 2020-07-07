@@ -1,15 +1,10 @@
 package main
 
 import (
-	"github.com/gsabadini/go-bank-transfer/api"
-	"github.com/gsabadini/go-bank-transfer/config"
+	"github.com/gsabadini/go-bank-transfer/infrastructure"
 )
 
 func main() {
-	var (
-		appConfig = config.NewConfig()
-		server    = api.NewHTTPServer(appConfig)
-	)
-
-	server.Listen()
+	var config = infrastructure.NewConfig()
+	config.WebServer.Listen()
 }

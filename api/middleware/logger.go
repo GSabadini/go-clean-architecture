@@ -7,18 +7,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/negroni"
 )
 
 //Logger armazena a estrutura de logger para entrada e saídas da API
 type Logger struct {
-	logger *logrus.Logger
+	logger logger.Logger
 }
 
-//NewLogger constrói um logger com suas dependências
-func NewLogger(log *logrus.Logger) Logger {
+//NewLoggerFactory constrói um Logger com suas dependências
+func NewLogger(log logger.Logger) Logger {
 	return Logger{logger: log}
 }
 
@@ -34,33 +35,33 @@ func (l Logger) Execute(w http.ResponseWriter, r *http.Request, next http.Handle
 
 	body, err := getRequestPayload(r)
 	if err != nil {
-		l.logger.WithFields(logrus.Fields{
+		l.logger.WithFields(logger.Fields{
 			"key":         logKey,
 			"http_status": http.StatusBadRequest,
 			"error":       err.Error(),
-		}).Error("error when getting payload")
+		}).Errorf("error when getting payload")
 
 		return
 	}
 
-	l.logger.WithFields(logrus.Fields{
+	l.logger.WithFields(logger.Fields{
 		"key":         requestKey,
 		"payload":     body,
 		"url":         r.URL.Path,
 		"http_method": r.Method,
-	}).Info("started handling request")
+	}).Infof("started handling request")
 
 	next.ServeHTTP(w, r)
 
 	end := time.Since(start).Seconds()
 	res := w.(negroni.ResponseWriter)
-	l.logger.WithFields(logrus.Fields{
+	l.logger.WithFields(logger.Fields{
 		"key":           responseKey,
 		"url":           r.URL.Path,
 		"http_method":   r.Method,
 		"http_status":   res.Status(),
 		"response_time": end,
-	}).Info("completed handling request")
+	}).Infof("completed handling request")
 }
 
 func getRequestPayload(r *http.Request) (string, error) {

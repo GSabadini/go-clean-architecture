@@ -4,15 +4,17 @@ import (
 	"database/sql"
 	"os"
 
+	"github.com/gsabadini/go-bank-transfer/repository"
+
 	_ "github.com/lib/pq"
 )
 
-//PostgresHandler
+//PostgresHandler armazena a estrutura para o Postgres
 type PostgresHandler struct {
 	Database *sql.DB
 }
 
-//NewPostgresHandler
+//NewPostgresHandler constrói um novo handler de banco para Postgres
 func NewPostgresHandler(dataSource string) (*PostgresHandler, error) {
 	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), dataSource)
 	if err != nil {
@@ -38,7 +40,7 @@ func (p PostgresHandler) Execute(query string, args ...interface{}) error {
 }
 
 //Query
-func (p PostgresHandler) Query(query string, args ...interface{}) (Row, error) {
+func (p PostgresHandler) Query(query string, args ...interface{}) (repository.Row, error) {
 	rows, err := p.Database.Query(query, args...)
 	if err != nil {
 		return nil, err
@@ -76,4 +78,8 @@ func (pr PostgresRow) Next() bool {
 //Next
 func (pr PostgresRow) Err() error {
 	return pr.Rows.Err()
+}
+
+func (pr PostgresRow) Close() error {
+	return pr.Rows.Close()
 }

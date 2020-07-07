@@ -1,0 +1,13 @@
+FROM golang:1.14-stretch
+
+RUN go get github.com/go-delve/delve/cmd/dlv
+
+WORKDIR /go-bank-transfer
+
+COPY . .
+
+RUN go mod download
+
+EXPOSE 3001 40000
+
+ENTRYPOINT ["dlv", "debug", "--listen=:40000", "--headless", "--accept-multiclient", "--continue", "--api-version=2"]

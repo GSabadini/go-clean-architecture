@@ -1,22 +1,47 @@
 package database
 
-//NoSQLHandler expõe os métodos disponíveis para as abstrações de banco NoSQL
-type NoSQLHandler interface {
-	Store(string, interface{}) error
-	Update(string, interface{}, interface{}) error
-	FindAll(string, interface{}, interface{}) error
-	FindOne(string, interface{}, interface{}, interface{}) error
+import (
+	"errors"
+
+	"github.com/gsabadini/go-bank-transfer/repository"
+)
+
+var (
+	errInvalidDatabaseInstance = errors.New("invalid database instance")
+)
+
+const (
+	InstanceMongoDB int = iota
+)
+
+//NewDatabaseNoSQLFactory retorna a instância de um banco de dados NoSQL
+func NewDatabaseNoSQLFactory(instance int, host, dbName string) (repository.NoSQLHandler, error) {
+	switch instance {
+	case InstanceMongoDB:
+		db, err := NewMongoHandler(host, dbName)
+		if err != nil {
+			return nil, err
+		}
+		return db, nil
+	default:
+		return nil, errInvalidDatabaseInstance
+	}
 }
 
-//SQLHandler expõe os métodos disponíveis para as abstrações de banco SQL
-type SQLHandler interface {
-	Execute(string, ...interface{}) error
-	Query(string, ...interface{}) (Row, error)
-}
+const (
+	InstancePostgres int = iota
+)
 
-//Row
-type Row interface {
-	Scan(dest ...interface{}) error
-	Next() bool
-	Err() error
+//NewDatabaseSQLFactory retorna a instância de um banco de dados SQL
+func NewDatabaseSQLFactory(instance int, dataSource string) (repository.SQLHandler, error) {
+	switch instance {
+	case InstancePostgres:
+		db, err := NewPostgresHandler(dataSource)
+		if err != nil {
+			return nil, err
+		}
+		return db, nil
+	default:
+		return nil, errInvalidDatabaseInstance
+	}
 }

@@ -1,26 +1,26 @@
-package repository
+package postgres
 
 import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
+	"github.com/gsabadini/go-bank-transfer/repository"
 
 	"github.com/pkg/errors"
 )
 
-//TransferPostgres representa um repositório para manipulação de dados de transferências utilizando Postgres
-type TransferPostgres struct {
-	handler database.SQLHandler
+//TransferRepository armazena a estrutura de dados de um repositório de Transfer
+type TransferRepository struct {
+	handler repository.SQLHandler
 }
 
-//NewTransferPostgres cria um repositório utilizando Postgres
-func NewTransferPostgres(handler database.SQLHandler) TransferPostgres {
-	return TransferPostgres{handler: handler}
+//NewTransferRepository constrói um TransferRepository com suas dependências
+func NewTransferRepository(handler repository.SQLHandler) TransferRepository {
+	return TransferRepository{handler: handler}
 }
 
-//Store cria uma transferência
-func (t TransferPostgres) Store(transfer domain.Transfer) (domain.Transfer, error) {
+//Store insere uma Transfer no database
+func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	query := `
 		INSERT INTO 
 			transfers (id, account_origin_id, account_destination_id, amount, created_at)
@@ -42,8 +42,8 @@ func (t TransferPostgres) Store(transfer domain.Transfer) (domain.Transfer, erro
 	return transfer, nil
 }
 
-//FindAll retorna uma lista de transferências
-func (t TransferPostgres) FindAll() ([]domain.Transfer, error) {
+//FindAll busca todas as Transfer no database
+func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 	var (
 		transfers = make([]domain.Transfer, 0)
 		query     = "SELECT * FROM transfers"
@@ -54,6 +54,7 @@ func (t TransferPostgres) FindAll() ([]domain.Transfer, error) {
 		return transfers, errors.Wrap(err, "error listing transfers")
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			ID                   string
@@ -64,7 +65,7 @@ func (t TransferPostgres) FindAll() ([]domain.Transfer, error) {
 		)
 
 		if err = rows.Scan(&ID, &accountOriginID, &accountDestinationID, &amount, &createdAt); err != nil {
-			return transfers, errors.Wrap(err, "error listing transfers")
+			return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 		}
 
 		transfer := domain.Transfer{
@@ -76,6 +77,10 @@ func (t TransferPostgres) FindAll() ([]domain.Transfer, error) {
 		}
 
 		transfers = append(transfers, transfer)
+	}
+
+	if err = rows.Err(); err != nil {
+		return []domain.Transfer{}, err
 	}
 
 	return transfers, nil

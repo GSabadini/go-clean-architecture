@@ -2,31 +2,41 @@ package action
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gsabadini/go-bank-transfer/api/response"
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
-	"github.com/sirupsen/logrus"
 )
 
-//Account armazena as dependências de uma conta
+//accountInput armazena a estrutura de dados de entrada da API
+type accountInput struct {
+	Name    string  `json:"name" validate:"required"`
+	CPF     string  `json:"cpf" validate:"required"`
+	Balance float64 `json:"balance" validate:"gt=0,required"`
+}
+
+//Account armazena as dependências para as ações de Account
 type Account struct {
-	usecase usecase.AccountUseCase
-	logger  *logrus.Logger
+	usecase   usecase.AccountUseCase
+	log       logger.Logger
+	validator validator.Validator
 }
 
-//NewAccount constrói uma conta com suas dependências
-func NewAccount(usecase usecase.AccountUseCase, log *logrus.Logger) Account {
-	return Account{usecase: usecase, logger: log}
+//NewAccount constrói um Account com suas dependências
+func NewAccount(uc usecase.AccountUseCase, l logger.Logger, v validator.Validator) Account {
+	return Account{usecase: uc, log: l, validator: v}
 }
 
-//Store é um handler para criação de conta
+//Store é um handler para criação de Account
 func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
 
-	var account domain.Account
-	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
+	var input accountInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		a.logError(
 			logKey,
 			"error when decoding json",
@@ -34,12 +44,24 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 			err,
 		)
 
-		ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 	defer r.Body.Close()
 
-	result, err := a.usecase.Store(account)
+	if errs := a.validateInput(input); len(errs) > 0 {
+		a.logError(
+			logKey,
+			"input invalid",
+			http.StatusBadRequest,
+			errors.New("invalid input"),
+		)
+
+		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
+		return
+	}
+
+	output, err := a.usecase.Store(input.Name, input.CPF, input.Balance)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -48,20 +70,19 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 			err,
 		)
 
-		ErrorMessage(err, http.StatusInternalServerError).Send(w)
+		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-
 	a.logSuccess(logKey, "success creating account", http.StatusCreated)
 
-	Success(result, http.StatusCreated).Send(w)
+	response.NewSuccess(output, http.StatusCreated).Send(w)
 }
 
-//Index é um handler para retornar a lista de contas
+//Index é um handler para retornar todas as Account
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 
-	result, err := a.usecase.FindAll()
+	output, err := a.usecase.FindAll()
 	if err != nil {
 		a.logError(
 			logKey,
@@ -70,24 +91,21 @@ func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 			err,
 		)
 
-		ErrorMessage(err, http.StatusInternalServerError).Send(w)
+		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-
 	a.logSuccess(logKey, "success when returning account list", http.StatusOK)
 
-	Success(result, http.StatusOK).Send(w)
+	response.NewSuccess(output, http.StatusOK).Send(w)
 }
 
-//FindBalance é um handler para retornar o saldo de uma conta
+//FindBalance é um handler para retornar o Balance de uma Account
 func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_balance"
 
-	var vars = mux.Vars(r)
-	accountID, ok := vars["account_id"]
-	if !ok || !domain.IsValidUUID(accountID) {
-		var err = errParameterInvalid
-
+	var accountID = r.URL.Query().Get("account_id")
+	if !domain.IsValidUUID(accountID) {
+		var err = response.ErrParameterInvalid
 		a.logError(
 			logKey,
 			"parameter invalid",
@@ -95,11 +113,11 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 			err,
 		)
 
-		ErrorMessage(err, http.StatusBadRequest).Send(w)
+		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
 	}
 
-	result, err := a.usecase.FindBalance(accountID)
+	output, err := a.usecase.FindBalance(accountID)
 	if err != nil {
 		switch err {
 		case domain.ErrNotFound:
@@ -110,7 +128,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 				err,
 			)
 
-			ErrorMessage(err, http.StatusBadRequest).Send(w)
+			response.NewError(err, http.StatusBadRequest).Send(w)
 			return
 		default:
 			a.logError(
@@ -120,27 +138,39 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 				err,
 			)
 
-			ErrorMessage(err, http.StatusInternalServerError).Send(w)
+			response.NewError(err, http.StatusInternalServerError).Send(w)
 			return
 		}
 	}
-
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)
 
-	Success(result, http.StatusOK).Send(w)
+	response.NewSuccess(output, http.StatusOK).Send(w)
+}
+
+func (a Account) validateInput(input accountInput) []string {
+	var messages []string
+
+	err := a.validator.Validate(input)
+	if err != nil {
+		for _, msg := range a.validator.Messages() {
+			messages = append(messages, msg)
+		}
+	}
+
+	return messages
 }
 
 func (a Account) logSuccess(key string, message string, httpStatus int) {
-	a.logger.WithFields(logrus.Fields{
+	a.log.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
-	}).Info(message)
+	}).Infof(message)
 }
 
 func (a Account) logError(key string, message string, httpStatus int, err error) {
-	a.logger.WithFields(logrus.Fields{
+	a.log.WithFields(logger.Fields{
 		"key":         key,
 		"http_status": httpStatus,
 		"error":       err.Error(),
-	}).Error(message)
+	}).Errorf(message)
 }

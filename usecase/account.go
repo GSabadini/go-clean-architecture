@@ -2,51 +2,93 @@ package usecase
 
 import (
 	"strings"
+	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
-//Account armazena as depedências para ações de uma conta
-type Account struct {
-	repository repository.AccountRepository
+//TransferOutput armazena a estrutura de dados de retorno do caso de uso
+type AccountOutput struct {
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	CPF       string    `json:"cpf"`
+	Balance   float64   `json:"balance"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
-//NewAccount cria uma conta com suas dependências
-func NewAccount(repository repository.AccountRepository) Account {
+//TransferOutput armazena a estrutura de dados de retorno do caso de uso
+type AccountBalanceOutput struct {
+	Balance float64 `json:"balance"`
+}
+
+//Account armazena as dependências para os casos de uso de Account
+type Account struct {
+	repository domain.AccountRepository
+}
+
+//NewAccount constrói um Account com suas dependências
+func NewAccount(repository domain.AccountRepository) Account {
 	return Account{repository: repository}
 }
 
-//Store cria uma nova conta
-func (a Account) Store(data domain.Account) (domain.Account, error) {
-	var account = domain.NewAccount(data.Name, a.cleanCPF(data.CPF), data.Balance)
+//Store cria uma nova Account
+func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error) {
+	var account = domain.NewAccount(
+		domain.NewUUID(),
+		name,
+		a.cleanCPF(CPF),
+		balance,
+		time.Now(),
+	)
 
-	result, err := a.repository.Store(account)
+	account, err := a.repository.Store(account)
 	if err != nil {
-		return result, err
+		return AccountOutput{}, err
 	}
 
-	return result, nil
+	return AccountOutput{
+		ID:        account.ID,
+		Name:      account.Name,
+		CPF:       account.CPF,
+		Balance:   account.Balance,
+		CreatedAt: account.CreatedAt,
+	}, nil
 }
 
-//FindAll retorna uma lista de contas
-func (a Account) FindAll() ([]domain.Account, error) {
-	result, err := a.repository.FindAll()
+//FindAll retorna uma lista de Accounts
+func (a Account) FindAll() ([]AccountOutput, error) {
+	var output = make([]AccountOutput, 0)
+
+	accounts, err := a.repository.FindAll()
 	if err != nil {
-		return result, err
+		return output, err
 	}
 
-	return result, nil
+	for _, account := range accounts {
+		var account = AccountOutput{
+			ID:        account.ID,
+			Name:      account.Name,
+			CPF:       account.CPF,
+			Balance:   account.Balance,
+			CreatedAt: account.CreatedAt,
+		}
+
+		output = append(output, account)
+	}
+
+	return output, nil
 }
 
-//FindBalance retorna o saldo de uma conta
-func (a Account) FindBalance(ID string) (domain.Account, error) {
-	result, err := a.repository.FindBalance(ID)
+//FindBalance retorna o saldo de uma Account
+func (a Account) FindBalance(ID string) (AccountBalanceOutput, error) {
+	account, err := a.repository.FindBalance(ID)
 	if err != nil {
-		return result, err
+		return AccountBalanceOutput{}, err
 	}
 
-	return result, nil
+	return AccountBalanceOutput{
+		Balance: account.Balance,
+	}, nil
 }
 
 func (a Account) cleanCPF(cpf string) string {
