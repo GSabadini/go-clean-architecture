@@ -9,12 +9,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
-//PostgresHandler
+//PostgresHandler armazena a estrutura para o Postgres
 type PostgresHandler struct {
 	Database *sql.DB
 }
 
-//NewPostgresHandler
+//NewPostgresHandler constrói um novo handler de banco para Postgres
 func NewPostgresHandler(dataSource string) (*PostgresHandler, error) {
 	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), dataSource)
 	if err != nil {

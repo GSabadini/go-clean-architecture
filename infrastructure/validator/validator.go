@@ -6,6 +6,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 )
 
+//Validator é uma abstração para os validator da aplicação
 type Validator interface {
 	Validate(interface{}) error
 	Messages() []string
@@ -19,7 +20,7 @@ const (
 	InstanceGoPlayground int = iota
 )
 
-//NewValidatorFactory
+//NewValidatorFactory retorna a instância de um validator
 func NewValidatorFactory(instance int, log logger.Logger) (Validator, error) {
 	switch instance {
 	case InstanceGoPlayground:

@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-/* TODO remover dependecia do gorilla mux */
+/** TODO remover dependencia do gorilla */
 func TestAccount_Store(t *testing.T) {
 	t.Parallel()
 
@@ -110,12 +110,12 @@ func TestAccount_Store(t *testing.T) {
 			}
 
 			var (
-				rr = httptest.NewRecorder()
-				r  = mux.NewRouter()
+				rr      = httptest.NewRecorder()
+				handler = http.NewServeMux()
 			)
 
-			r.HandleFunc("/accounts", tt.accountAction.Store).Methods(http.MethodPost)
-			r.ServeHTTP(rr, req)
+			handler.HandleFunc("/accounts", tt.accountAction.Store)
+			handler.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
 				t.Errorf(
@@ -159,12 +159,12 @@ func TestAccount_Index(t *testing.T) {
 			}
 
 			var (
-				rr = httptest.NewRecorder()
-				r  = mux.NewRouter()
+				rr      = httptest.NewRecorder()
+				handler = http.NewServeMux()
 			)
 
-			r.HandleFunc("/accounts", tt.accountAction.Index).Methods(http.MethodGet)
-			r.ServeHTTP(rr, req)
+			handler.HandleFunc("/accounts", tt.accountAction.Index)
+			handler.ServeHTTP(rr, req)
 
 			if rr.Code != tt.expectedStatusCode {
 				t.Errorf(
@@ -198,7 +198,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 			accountAction:      NewAccount(usecase.AccountUseCaseStubSuccess{}, logger.LoggerMock{}, validator),
 			args: args{
-				accountID: "59e09306b5174ba2986a7ce36aa2afd9",
+				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 		},
 		{
@@ -257,9 +257,4 @@ func TestAccount_FindBalance(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestAccount_Find(t *testing.T) {
-	r := domain.IsValidUUID("59e09306b5174ba2986a7ce36aa2afd9")
-	t.Log(r)
 }

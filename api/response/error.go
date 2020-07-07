@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-/* TODO definir local de errors da API */
 var (
 	ErrParameterInvalid = errors.New("parameter invalid")
 )

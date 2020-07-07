@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-//TransferRepository expõe os métodos disponíveis para as abstrações do repositório de transferências
+//TransferRepository expõe os métodos disponíveis para as abstrações do repositório de Transfer
 type TransferRepository interface {
 	Store(Transfer) (Transfer, error)
 	FindAll() ([]Transfer, error)
@@ -17,13 +17,13 @@ type Transfer struct {
 	CreatedAt            time.Time
 }
 
-//NewTransfer cria uma transferência
-func NewTransfer(accountOriginID string, accountDestinationID string, amount float64) Transfer {
+//NewTransfer cria um Transfer
+func NewTransfer(ID, accountOriginID, accountDestinationID string, amount float64, createdAt time.Time) Transfer {
 	return Transfer{
-		ID:                   uuid(),
+		ID:                   ID,
 		AccountOriginID:      accountOriginID,
 		AccountDestinationID: accountDestinationID,
 		Amount:               amount,
-		CreatedAt:            time.Now(),
+		CreatedAt:            createdAt,
 	}
 }

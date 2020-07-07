@@ -18,7 +18,7 @@ type Logger struct {
 	logger logger.Logger
 }
 
-//NewLoggerFactory constrói um logger com suas dependências
+//NewLoggerFactory constrói um Logger com suas dependências
 func NewLogger(log logger.Logger) Logger {
 	return Logger{logger: log}
 }

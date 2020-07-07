@@ -2,13 +2,13 @@ package database
 
 import mongo "gopkg.in/mgo.v2"
 
-//MongoHandler armazena a estrutura para MongoDb
+//MongoHandler armazena a estrutura para MongoDB
 type MongoHandler struct {
 	Database *mongo.Database
 	Session  *mongo.Session
 }
 
-//NewMongoHandler constrói um novo handler de banco para MongoDb
+//NewMongoHandler constrói um novo handler de banco para MongoDB
 func NewMongoHandler(host, databaseName string) (*MongoHandler, error) {
 	session, err := mongo.Dial(host)
 	if err != nil {

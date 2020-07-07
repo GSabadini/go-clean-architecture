@@ -13,26 +13,26 @@ import (
 	"github.com/pkg/errors"
 )
 
-//transferInput armazena a estruturas de dados de entrada da API
+//transferInput armazena a estrutura de dados de entrada da API
 type transferInput struct {
 	AccountOriginID      string  `json:"account_origin_id" validate:"required,uuid4"`
 	AccountDestinationID string  `json:"account_destination_id" validate:"required,uuid4"`
 	Amount               float64 `json:"amount" validate:"gt=0,required"`
 }
 
-//Transfer armazena as dependências de uma transferência
+//Transfer armazena as dependências para as ações de Transfer
 type Transfer struct {
 	validator validator.Validator
 	log       logger.Logger
 	usecase   usecase.TransferUseCase
 }
 
-//NewTransfer constrói uma transferência com suas dependências
+//NewTransfer constrói um Transfer com suas dependências
 func NewTransfer(uc usecase.TransferUseCase, l logger.Logger, v validator.Validator) Transfer {
 	return Transfer{usecase: uc, log: l, validator: v}
 }
 
-//Store é um handler para criação de transferência
+//Store é um handler para criação de Transfer
 func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 
@@ -55,14 +55,14 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 			logKey,
 			"input invalid",
 			http.StatusBadRequest,
-			errors.New("validate"),
+			errors.New("invalid input"),
 		)
 
 		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
 		return
 	}
 
-	result, err := t.usecase.Store(
+	output, err := t.usecase.Store(
 		input.AccountOriginID,
 		input.AccountDestinationID,
 		input.Amount,
@@ -93,14 +93,14 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 	t.logSuccess(logKey, "success create transfer", http.StatusCreated)
 
-	response.NewSuccess(result, http.StatusCreated).Send(w)
+	response.NewSuccess(output, http.StatusCreated).Send(w)
 }
 
-//Index é um handler para retornar a lista de transferências
+//Index é um handler para retornar todas as Transfer
 func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_transfer"
 
-	result, err := t.usecase.FindAll()
+	output, err := t.usecase.FindAll()
 	if err != nil {
 		t.logError(
 			logKey,
@@ -113,16 +113,18 @@ func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	}
 	t.logSuccess(logKey, "success when returning transfer list", http.StatusOK)
 
-	response.NewSuccess(result, http.StatusOK).Send(w)
+	response.NewSuccess(output, http.StatusOK).Send(w)
 }
 
 func (t Transfer) validateInput(input transferInput) []string {
 	var (
 		messages          []string
 		errAccountsEquals = errors.New("account origin equals destination account")
+		accountIsEquals   = input.AccountOriginID == input.AccountDestinationID
+		accountsIsEmpty   = input.AccountOriginID == "" && input.AccountDestinationID == ""
 	)
 
-	if input.AccountOriginID == input.AccountDestinationID {
+	if !accountsIsEmpty && accountIsEquals {
 		messages = append(messages, errAccountsEquals.Error())
 	}
 

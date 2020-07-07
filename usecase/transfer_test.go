@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -22,7 +21,7 @@ func TestTransfer_Store(t *testing.T) {
 		name          string
 		args          args
 		usecase       TransferUseCase
-		expected      transferOutput
+		expected      TransferOutput
 		expectedError string
 	}{
 		{
@@ -33,7 +32,7 @@ func TestTransfer_Store(t *testing.T) {
 				amount:               20,
 			},
 			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
-			expected: transferOutput{
+			expected: TransferOutput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 				Amount:               20,
@@ -49,7 +48,7 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
-			expected:      transferOutput{},
+			expected:      TransferOutput{},
 		},
 		{
 			name: "Create transfer amount not have sufficient",
@@ -60,7 +59,7 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "origin account does not have sufficient balance",
-			expected:      transferOutput{},
+			expected:      TransferOutput{},
 		},
 		{
 			name: "Create transfer error find account",
@@ -71,7 +70,7 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
-			expected:      transferOutput{},
+			expected:      TransferOutput{},
 		},
 	}
 
@@ -83,8 +82,6 @@ func TestTransfer_Store(t *testing.T) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 				return
 			}
-			fmt.Printf("\nGOT - %+v\n", got)
-			fmt.Printf("\nEXP - %+v\n", tt.expected)
 
 			if !reflect.DeepEqual(got, tt.expected) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.expected)
@@ -98,14 +95,14 @@ func TestTransfer_FindAll(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		expected      []transferOutput
+		expected      []TransferOutput
 		usecase       TransferUseCase
 		expectedError string
 	}{
 		{
 			name:    "Success when returning the transfer list",
 			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
-			expected: []transferOutput{
+			expected: []TransferOutput{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -126,7 +123,7 @@ func TestTransfer_FindAll(t *testing.T) {
 			name:          "Error when returning the transfer list",
 			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
 			expectedError: "Error",
-			expected:      []transferOutput{},
+			expected:      []TransferOutput{},
 		},
 	}
 

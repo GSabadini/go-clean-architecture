@@ -9,7 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type transferBson struct {
+//transferBSON armazena a estrutura de dados do MongoDB
+type transferBSON struct {
 	ID                   string    `bson:"id"`
 	AccountOriginID      string    `bson:"account_origin_id"`
 	AccountDestinationID string    `bson:"account_destination_id"`
@@ -17,20 +18,20 @@ type transferBson struct {
 	CreatedAt            time.Time `bson:"created_at"`
 }
 
-//TransferRepository representa um repositório para manipulação de dados de transferências utilizando MongoDB
+//TransferRepository armazena a estrutura de dados de um repositório de Transfer
 type TransferRepository struct {
 	handler        repository.NoSQLHandler
 	collectionName string
 }
 
-//NewTransferRepository cria um repository com suas dependências
+//NewTransferRepository constrói um repository com suas dependências
 func NewTransferRepository(handler repository.NoSQLHandler) TransferRepository {
 	return TransferRepository{handler: handler, collectionName: "transfers"}
 }
 
-//Store cria uma transferência através da implementação real do database
+//Store insere uma Transfer no database
 func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
-	transferBson := &transferBson{
+	transferBson := &transferBSON{
 		ID:                   transfer.ID,
 		AccountOriginID:      transfer.AccountOriginID,
 		AccountDestinationID: transfer.AccountDestinationID,
@@ -45,10 +46,10 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 	return transfer, nil
 }
 
-//FindAll realiza uma busca através da implementação real do database
+//FindAll busca todas as Transfer no database
 func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 	var (
-		transfersBson = make([]transferBson, 0)
+		transfersBson = make([]transferBSON, 0)
 		transfers     = make([]domain.Transfer, 0)
 	)
 
