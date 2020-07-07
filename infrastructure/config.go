@@ -110,7 +110,7 @@ func dbNoSQL(log logger.Logger) repository.NoSQLHandler {
 		panic(err)
 	}
 
-	log.Infof("Successfully connected to the database")
+	log.Infof("Successfully connected to the NoSQL database")
 
 	return handler
 }
@@ -130,7 +130,7 @@ func dbSQL(log logger.Logger) repository.SQLHandler {
 		panic(err)
 	}
 
-	log.Infof("Successfully connected to the database")
+	log.Infof("Successfully connected to the SQL database")
 
 	return handler
 }

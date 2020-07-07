@@ -120,9 +120,11 @@ func (t Transfer) validateInput(input transferInput) []string {
 	var (
 		messages          []string
 		errAccountsEquals = errors.New("account origin equals destination account")
+		accountIsEquals   = input.AccountOriginID == input.AccountDestinationID
+		accountsIsEmpty   = input.AccountOriginID == "" && input.AccountDestinationID == ""
 	)
 
-	if input.AccountOriginID == input.AccountDestinationID {
+	if !accountsIsEmpty && accountIsEquals {
 		messages = append(messages, errAccountsEquals.Error())
 	}
 
