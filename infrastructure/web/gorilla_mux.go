@@ -162,8 +162,7 @@ func (g gorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
 			q    = req.URL.Query()
 		)
 
-		accountID, _ := vars["account_id"]
-		q.Add("account_id", accountID)
+		q.Add("account_id", vars["account_id"])
 		req.URL.RawQuery = q.Encode()
 
 		accountAction.FindBalance(res, req)

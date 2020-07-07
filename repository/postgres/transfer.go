@@ -68,15 +68,13 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 			return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 		}
 
-		transfer := domain.Transfer{
+		transfers = append(transfers, domain.Transfer{
 			ID:                   ID,
 			AccountOriginID:      accountOriginID,
 			AccountDestinationID: accountDestinationID,
 			Amount:               amount,
 			CreatedAt:            createdAt,
-		}
-
-		transfers = append(transfers, transfer)
+		})
 	}
 
 	if err = rows.Err(); err != nil {

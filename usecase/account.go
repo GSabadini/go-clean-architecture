@@ -7,7 +7,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//TransferOutput armazena a estrutura de dados de retorno do caso de uso
+//AccountOutput armazena a estrutura de dados de retorno do caso de uso
 type AccountOutput struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
@@ -16,7 +16,7 @@ type AccountOutput struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-//TransferOutput armazena a estrutura de dados de retorno do caso de uso
+//AccountBalanceOutput armazena a estrutura de dados de retorno do caso de uso
 type AccountBalanceOutput struct {
 	Balance float64 `json:"balance"`
 }
@@ -65,15 +65,13 @@ func (a Account) FindAll() ([]AccountOutput, error) {
 	}
 
 	for _, account := range accounts {
-		var account = AccountOutput{
+		output = append(output, AccountOutput{
 			ID:        account.ID,
 			Name:      account.Name,
 			CPF:       account.CPF,
 			Balance:   account.Balance,
 			CreatedAt: account.CreatedAt,
-		}
-
-		output = append(output, account)
+		})
 	}
 
 	return output, nil

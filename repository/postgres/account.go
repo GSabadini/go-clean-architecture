@@ -79,15 +79,13 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 			return accounts, errors.Wrap(err, "error listing accounts")
 		}
 
-		account := domain.Account{
+		accounts = append(accounts, domain.Account{
 			ID:        ID,
 			Name:      name,
 			CPF:       CPF,
 			Balance:   balance,
 			CreatedAt: createdAt,
-		}
-
-		accounts = append(accounts, account)
+		})
 	}
 
 	if err = rows.Err(); err != nil {

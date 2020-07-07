@@ -15,7 +15,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-/** TODO remover dependencia do gorilla */
 func TestAccount_Store(t *testing.T) {
 	t.Parallel()
 
