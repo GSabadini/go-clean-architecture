@@ -37,8 +37,8 @@ func NewConfig() Config {
 	}
 
 	config.validator = validation(config.Logger)
-	config.dbSQL = dbSQLConn(config.Logger)
-	config.dbNoSQL = dbNoSQLConn(config.Logger)
+	config.dbSQL = dbSQL(config.Logger)
+	config.dbNoSQL = dbNoSQL(config.Logger)
 
 	config.WebServer = webServer(
 		config.Logger,
@@ -64,16 +64,16 @@ func validation(log logger.Logger) validator.Validator {
 
 func webServer(
 	log logger.Logger,
-	dbSQLConn repository.SQLHandler,
-	dbNoSQLConn repository.NoSQLHandler,
+	dbSQL repository.SQLHandler,
+	dbNoSQL repository.NoSQLHandler,
 	validator validator.Validator,
 	port web.Port,
 ) web.Server {
 	server, err := web.NewWebServerFactory(
 		web.InstanceGorillaMux,
 		log,
-		dbSQLConn,
-		dbNoSQLConn,
+		dbSQL,
+		dbNoSQL,
 		validator,
 		port,
 	)
@@ -98,7 +98,7 @@ func log() logger.Logger {
 	return log
 }
 
-func dbNoSQLConn(log logger.Logger) repository.NoSQLHandler {
+func dbNoSQL(log logger.Logger) repository.NoSQLHandler {
 	var (
 		host   = verifyExistEnvironmentParams("MONGODB_HOST")
 		dbName = verifyExistEnvironmentParams("MONGODB_DATABASE")
@@ -115,7 +115,7 @@ func dbNoSQLConn(log logger.Logger) repository.NoSQLHandler {
 	return handler
 }
 
-func dbSQLConn(log logger.Logger) repository.SQLHandler {
+func dbSQL(log logger.Logger) repository.SQLHandler {
 	var ds = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 		verifyExistEnvironmentParams("POSTGRES_HOST"),
 		verifyExistEnvironmentParams("POSTGRES_PORT"),

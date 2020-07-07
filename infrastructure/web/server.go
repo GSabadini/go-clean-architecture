@@ -28,16 +28,16 @@ const (
 func NewWebServerFactory(
 	instance int,
 	log logger.Logger,
-	dbConnSQL repository.SQLHandler,
-	dbConnNoSQL repository.NoSQLHandler,
+	dbSQL repository.SQLHandler,
+	dbNoSQL repository.NoSQLHandler,
 	validator validator.Validator,
 	port Port,
 ) (Server, error) {
 	switch instance {
 	case InstanceGorillaMux:
-		return NewGorillaMux(log, dbConnSQL, validator, port), nil
+		return NewGorillaMux(log, dbSQL, validator, port), nil
 	case InstanceGin:
-		return NewGinServer(log, dbConnNoSQL, validator, port), nil
+		return NewGinServer(log, dbNoSQL, validator, port), nil
 	default:
 		return nil, errInvalidWebServerInstance
 	}

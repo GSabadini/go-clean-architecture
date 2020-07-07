@@ -9,8 +9,8 @@ import (
 type AccountUseCaseStubSuccess struct{}
 
 //Store
-func (a AccountUseCaseStubSuccess) Store(name, CPF string, balance float64) (accountOutput, error) {
-	return accountOutput{
+func (a AccountUseCaseStubSuccess) Store(name, CPF string, balance float64) (AccountOutput, error) {
+	return AccountOutput{
 		Name:      name,
 		CPF:       CPF,
 		Balance:   balance,
@@ -19,13 +19,13 @@ func (a AccountUseCaseStubSuccess) Store(name, CPF string, balance float64) (acc
 }
 
 //FindAll
-func (a AccountUseCaseStubSuccess) FindAll() ([]accountOutput, error) {
-	return []accountOutput{}, nil
+func (a AccountUseCaseStubSuccess) FindAll() ([]AccountOutput, error) {
+	return []AccountOutput{}, nil
 }
 
 //FindBalance
-func (a AccountUseCaseStubSuccess) FindBalance(_ string) (accountBalanceOutput, error) {
-	return accountBalanceOutput{}, nil
+func (a AccountUseCaseStubSuccess) FindBalance(_ string) (AccountBalanceOutput, error) {
+	return AccountBalanceOutput{}, nil
 }
 
 //AccountUseCaseStubSuccess implementa a interface de AccountUseCase com resultados de erro
@@ -34,21 +34,21 @@ type AccountUseCaseStubError struct {
 }
 
 //Store
-func (a AccountUseCaseStubError) Store(_, _ string, _ float64) (accountOutput, error) {
-	return accountOutput{}, errors.New("Error")
+func (a AccountUseCaseStubError) Store(_, _ string, _ float64) (AccountOutput, error) {
+	return AccountOutput{}, errors.New("Error")
 }
 
 //FindAll
-func (a AccountUseCaseStubError) FindAll() ([]accountOutput, error) {
-	return []accountOutput{}, errors.New("Error")
+func (a AccountUseCaseStubError) FindAll() ([]AccountOutput, error) {
+	return []AccountOutput{}, errors.New("Error")
 }
 
 //FindBalance
-func (a AccountUseCaseStubError) FindBalance(_ string) (accountBalanceOutput, error) {
+func (a AccountUseCaseStubError) FindBalance(_ string) (AccountBalanceOutput, error) {
 	var err = errors.New("Error")
 	if a.TypeErr != nil {
 		err = a.TypeErr
 	}
 
-	return accountBalanceOutput{}, err
+	return AccountBalanceOutput{}, err
 }

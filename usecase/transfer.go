@@ -6,8 +6,8 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//transferOutput armazena a estrutura de dados de retorno do caso de uso
-type transferOutput struct {
+//TransferOutput armazena a estrutura de dados de retorno do caso de uso
+type TransferOutput struct {
 	ID                   string    `json:"id"`
 	AccountOriginID      string    `json:"account_origin_id"`
 	AccountDestinationID string    `json:"account_destination_id"`
@@ -33,19 +33,19 @@ func NewTransfer(
 }
 
 //Store cria uma nova Transfer
-func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (transferOutput, error) {
+func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (TransferOutput, error) {
 	if err := t.process(accountOriginID, accountDestinationID, amount); err != nil {
-		return transferOutput{}, err
+		return TransferOutput{}, err
 	}
 
-	var transfer = domain.NewTransfer(accountOriginID, accountDestinationID, amount)
+	var transfer = domain.NewTransfer(domain.NewUUID(), accountOriginID, accountDestinationID, amount, time.Now())
 
 	transfer, err := t.transferRepository.Store(transfer)
 	if err != nil {
-		return transferOutput{}, err
+		return TransferOutput{}, err
 	}
 
-	return transferOutput{
+	return TransferOutput{
 		ID:                   transfer.ID,
 		AccountOriginID:      transfer.AccountOriginID,
 		AccountDestinationID: transfer.AccountDestinationID,
@@ -84,8 +84,8 @@ func (t Transfer) process(accountOriginID, accountDestinationID string, amount f
 }
 
 //FindAll retorna uma lista de transferências
-func (t Transfer) FindAll() ([]transferOutput, error) {
-	var output = make([]transferOutput, 0)
+func (t Transfer) FindAll() ([]TransferOutput, error) {
+	var output = make([]TransferOutput, 0)
 
 	transfers, err := t.transferRepository.FindAll()
 	if err != nil {
@@ -93,7 +93,7 @@ func (t Transfer) FindAll() ([]transferOutput, error) {
 	}
 
 	for _, transfer := range transfers {
-		var transfer = transferOutput{
+		var transfer = TransferOutput{
 			ID:                   transfer.ID,
 			AccountOriginID:      transfer.AccountOriginID,
 			AccountDestinationID: transfer.AccountDestinationID,

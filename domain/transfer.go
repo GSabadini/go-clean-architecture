@@ -18,12 +18,12 @@ type Transfer struct {
 }
 
 //NewTransfer cria um Transfer
-func NewTransfer(accountOriginID string, accountDestinationID string, amount float64) Transfer {
+func NewTransfer(ID, accountOriginID, accountDestinationID string, amount float64, createdAt time.Time) Transfer {
 	return Transfer{
-		ID:                   uuid(),
+		ID:                   ID,
 		AccountOriginID:      accountOriginID,
 		AccountDestinationID: accountDestinationID,
 		Amount:               amount,
-		CreatedAt:            time.Now(),
+		CreatedAt:            createdAt,
 	}
 }

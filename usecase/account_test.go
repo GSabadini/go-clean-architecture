@@ -19,7 +19,7 @@ func TestAccount_Store(t *testing.T) {
 		name          string
 		args          args
 		usecase       AccountUseCase
-		expected      accountOutput
+		expected      AccountOutput
 		expectedError interface{}
 	}{
 		{
@@ -30,7 +30,7 @@ func TestAccount_Store(t *testing.T) {
 				balance: 0,
 			},
 			usecase: NewAccount(repository.AccountRepositoryStubSuccess{}),
-			expected: accountOutput{
+			expected: AccountOutput{
 				ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:    "Test",
 				CPF:     "02815517078",
@@ -46,7 +46,7 @@ func TestAccount_Store(t *testing.T) {
 			},
 			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
-			expected:      accountOutput{},
+			expected:      AccountOutput{},
 		},
 	}
 
@@ -71,13 +71,13 @@ func TestAccount_FindAll(t *testing.T) {
 	tests := []struct {
 		name          string
 		usecase       AccountUseCase
-		expected      []accountOutput
+		expected      []AccountOutput
 		expectedError interface{}
 	}{
 		{
 			name:    "Success when returning the account list",
 			usecase: NewAccount(repository.AccountRepositoryStubSuccess{}),
-			expected: []accountOutput{
+			expected: []AccountOutput{
 				{
 					ID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:    "Test-0",
@@ -96,7 +96,7 @@ func TestAccount_FindAll(t *testing.T) {
 			name:          "Error when returning the list of accounts",
 			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
-			expected:      []accountOutput{},
+			expected:      []AccountOutput{},
 		},
 	}
 
@@ -126,7 +126,7 @@ func TestAccount_FindBalance(t *testing.T) {
 		name          string
 		args          args
 		usecase       AccountUseCase
-		expected      accountBalanceOutput
+		expected      AccountBalanceOutput
 		expectedError interface{}
 	}{
 		{
@@ -135,7 +135,7 @@ func TestAccount_FindBalance(t *testing.T) {
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			usecase: NewAccount(repository.AccountRepositoryStubSuccess{}),
-			expected: accountBalanceOutput{
+			expected: AccountBalanceOutput{
 				Balance: 100.00,
 			},
 		},
@@ -146,7 +146,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			},
 			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
 			expectedError: "Error",
-			expected:      accountBalanceOutput{},
+			expected:      AccountBalanceOutput{},
 		},
 	}
 

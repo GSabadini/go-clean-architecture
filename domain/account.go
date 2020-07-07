@@ -11,7 +11,6 @@ type AccountRepository interface {
 	FindBalance(string) (Account, error)
 }
 
-/** TODO criar testes para os domain */
 //Account armazena a estrutura de uma conta
 type Account struct {
 	ID        string
@@ -22,13 +21,13 @@ type Account struct {
 }
 
 //NewAccount cria um Account
-func NewAccount(name string, CPF string, balance float64) Account {
+func NewAccount(ID, name, CPF string, balance float64, createdAt time.Time) Account {
 	return Account{
-		ID:        uuid(),
+		ID:        ID,
 		Name:      name,
 		CPF:       CPF,
 		Balance:   balance,
-		CreatedAt: time.Now(),
+		CreatedAt: createdAt,
 	}
 }
 
@@ -37,7 +36,7 @@ func (a *Account) Deposit(amount float64) {
 	a.Balance += amount
 }
 
-//Withdraw remove um valor do Balance
+//Withdraw remove um valor no Balance
 func (a *Account) Withdraw(amount float64) error {
 	if a.Balance < amount {
 		return ErrInsufficientBalance

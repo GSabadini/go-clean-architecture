@@ -29,7 +29,7 @@ type gorillaMux struct {
 //NewGorillaMux constrói um gorillaMux com todas as suas dependências
 func NewGorillaMux(
 	log logger.Logger,
-	dbConnSQL repository.SQLHandler,
+	db repository.SQLHandler,
 	validator validator.Validator,
 	port Port,
 ) gorillaMux {
@@ -37,7 +37,7 @@ func NewGorillaMux(
 		router:     mux.NewRouter(),
 		middleware: negroni.New(),
 		log:        log,
-		db:         dbConnSQL,
+		db:         db,
 		validator:  validator,
 		port:       port,
 	}
