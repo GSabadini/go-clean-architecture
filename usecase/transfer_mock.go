@@ -30,7 +30,7 @@ type TransferUseCaseStubError struct {
 
 //Store
 func (t TransferUseCaseStubError) Store(_, _ string, _ float64) (TransferOutput, error) {
-	var err = errors.New("Errors")
+	var err = errors.New("Error")
 	if t.TypeErr != nil {
 		err = t.TypeErr
 	}
@@ -40,5 +40,5 @@ func (t TransferUseCaseStubError) Store(_, _ string, _ float64) (TransferOutput,
 
 //FindAll
 func (t TransferUseCaseStubError) FindAll() ([]TransferOutput, error) {
-	return []TransferOutput{}, errors.New("Errors")
+	return []TransferOutput{}, errors.New("Error")
 }

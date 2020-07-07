@@ -68,25 +68,25 @@ type AccountRepositoryStubError struct{}
 
 //Store retorna um error ao criar uma conta
 func (a AccountRepositoryStubError) Store(_ domain.Account) (domain.Account, error) {
-	return domain.Account{}, errors.New("Errors")
+	return domain.Account{}, errors.New("Error")
 }
 
 //UpdateBalance retorna um error ao atualizar uma conta
 func (a AccountRepositoryStubError) UpdateBalance(_ string, _ float64) error {
-	return errors.New("Errors")
+	return errors.New("Error")
 }
 
 //FindAll retorna um error ao atualizar uma conta
 func (a AccountRepositoryStubError) FindAll() ([]domain.Account, error) {
-	return []domain.Account{}, errors.New("Errors")
+	return []domain.Account{}, errors.New("Error")
 }
 
 //FindByID retorna um error ao buscar uma conta
 func (a AccountRepositoryStubError) FindByID(_ string) (*domain.Account, error) {
-	return &domain.Account{}, errors.New("Errors")
+	return &domain.Account{}, errors.New("Error")
 }
 
 //FindBalance retorna um error ao buscar uma conta com campo específico
 func (a AccountRepositoryStubError) FindBalance(_ string) (domain.Account, error) {
-	return domain.Account{}, errors.New("Errors")
+	return domain.Account{}, errors.New("Error")
 }
