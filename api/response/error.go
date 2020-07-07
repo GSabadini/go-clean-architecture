@@ -10,7 +10,7 @@ var (
 	ErrParameterInvalid = errors.New("parameter invalid")
 )
 
-//Errors armazena a estrutura de response com error da API
+//Error armazena a estrutura de response com error da API
 type Error struct {
 	statusCode int
 	Errors     []string `json:"errors"`

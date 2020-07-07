@@ -45,7 +45,7 @@ func TestAccount_Store(t *testing.T) {
 				balance: 0,
 			},
 			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
-			expectedError: "Errors",
+			expectedError: "Error",
 			expected:      AccountOutput{},
 		},
 	}
@@ -93,9 +93,9 @@ func TestAccount_FindAll(t *testing.T) {
 			},
 		},
 		{
-			name:          "Errors when returning the list of accounts",
+			name:          "Error when returning the list of accounts",
 			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
-			expectedError: "Errors",
+			expectedError: "Error",
 			expected:      []AccountOutput{},
 		},
 	}
@@ -140,12 +140,12 @@ func TestAccount_FindBalance(t *testing.T) {
 			},
 		},
 		{
-			name: "Errors returning account balance",
+			name: "Error returning account balance",
 			args: args{
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			usecase:       NewAccount(repository.AccountRepositoryStubError{}),
-			expectedError: "Errors",
+			expectedError: "Error",
 			expected:      AccountBalanceOutput{},
 		},
 	}

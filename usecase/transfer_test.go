@@ -47,7 +47,7 @@ func TestTransfer_Store(t *testing.T) {
 				amount:               20,
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
-			expectedError: "Errors",
+			expectedError: "Error",
 			expected:      TransferOutput{},
 		},
 		{
@@ -69,7 +69,7 @@ func TestTransfer_Store(t *testing.T) {
 				amount:               200,
 			},
 			usecase:       NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubError{}),
-			expectedError: "Errors",
+			expectedError: "Error",
 			expected:      TransferOutput{},
 		},
 	}
@@ -120,9 +120,9 @@ func TestTransfer_FindAll(t *testing.T) {
 			},
 		},
 		{
-			name:          "Errors when returning the transfer list",
+			name:          "Error when returning the transfer list",
 			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
-			expectedError: "Errors",
+			expectedError: "Error",
 			expected:      []TransferOutput{},
 		},
 	}
