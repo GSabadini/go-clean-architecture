@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"os"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -20,23 +18,11 @@ func NewZapLogger(isJSON bool) (Logger, error) {
 	sugar := log.Sugar()
 	defer log.Sync()
 
-	var encoderConfig zapcore.EncoderConfig
 	if isJSON {
 		encoderConfig := zap.NewProductionEncoderConfig()
 		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 		zapcore.NewJSONEncoder(encoderConfig)
 	}
-
-	var (
-		zapCoreLevel zapcore.Level
-		cores        []zapcore.Core
-	)
-	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
-		zapcore.Lock(os.Stdout),
-		zapCoreLevel,
-	)
-	cores = append(cores, core)
 
 	return &zapLogger{logger: sugar}, nil
 }

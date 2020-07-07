@@ -52,7 +52,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	if errs := a.validateInput(input); len(errs) > 0 {
 		a.logError(
 			logKey,
-			"input invalid",
+			"invalid input",
 			http.StatusBadRequest,
 			errors.New("invalid input"),
 		)

@@ -93,15 +93,13 @@ func (t Transfer) FindAll() ([]TransferOutput, error) {
 	}
 
 	for _, transfer := range transfers {
-		var transfer = TransferOutput{
+		output = append(output, TransferOutput{
 			ID:                   transfer.ID,
 			AccountOriginID:      transfer.AccountOriginID,
 			AccountDestinationID: transfer.AccountDestinationID,
 			Amount:               transfer.Amount,
 			CreatedAt:            transfer.CreatedAt,
-		}
-
-		output = append(output, transfer)
+		})
 	}
 
 	return output, nil
