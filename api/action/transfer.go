@@ -53,7 +53,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	if errs := t.validateInput(input); len(errs) > 0 {
 		t.logError(
 			logKey,
-			"input invalid",
+			"invalid input",
 			http.StatusBadRequest,
 			errors.New("invalid input"),
 		)

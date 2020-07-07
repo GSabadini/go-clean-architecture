@@ -10,11 +10,10 @@ var (
 	ErrParameterInvalid = errors.New("parameter invalid")
 )
 
-//Error armazena a estrutura de response com error da API
+//Errors armazena a estrutura de response com error da API
 type Error struct {
 	statusCode int
-	Message    string   `json:"message,omitempty"`
-	Messages   []string `json:"messages,omitempty"`
+	Errors     []string `json:"errors"`
 }
 
 //Send envia um response de error
@@ -28,7 +27,7 @@ func (e Error) Send(w http.ResponseWriter) error {
 func NewError(err error, status int) *Error {
 	return &Error{
 		statusCode: status,
-		Message:    err.Error(),
+		Errors:     []string{err.Error()},
 	}
 }
 
@@ -36,6 +35,6 @@ func NewError(err error, status int) *Error {
 func NewErrorMessage(messages []string, status int) *Error {
 	return &Error{
 		statusCode: status,
-		Messages:   messages,
+		Errors:     messages,
 	}
 }

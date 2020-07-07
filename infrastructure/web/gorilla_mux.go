@@ -57,7 +57,7 @@ func (g gorillaMux) Listen() {
 
 	g.log.WithFields(logger.Fields{"port": g.port}).Infof("Starting HTTP Server")
 	if err := server.ListenAndServe(); err != nil {
-		g.log.WithError(err).Fatalln("Error starting HTTP server")
+		g.log.WithError(err).Fatalln("Errors starting HTTP server")
 	}
 }
 
@@ -162,8 +162,7 @@ func (g gorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
 			q    = req.URL.Query()
 		)
 
-		accountID, _ := vars["account_id"]
-		q.Add("account_id", accountID)
+		q.Add("account_id", vars["account_id"])
 		req.URL.RawQuery = q.Encode()
 
 		accountAction.FindBalance(res, req)

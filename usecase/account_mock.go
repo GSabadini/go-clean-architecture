@@ -35,17 +35,17 @@ type AccountUseCaseStubError struct {
 
 //Store
 func (a AccountUseCaseStubError) Store(_, _ string, _ float64) (AccountOutput, error) {
-	return AccountOutput{}, errors.New("Error")
+	return AccountOutput{}, errors.New("Errors")
 }
 
 //FindAll
 func (a AccountUseCaseStubError) FindAll() ([]AccountOutput, error) {
-	return []AccountOutput{}, errors.New("Error")
+	return []AccountOutput{}, errors.New("Errors")
 }
 
 //FindBalance
 func (a AccountUseCaseStubError) FindBalance(_ string) (AccountBalanceOutput, error) {
-	var err = errors.New("Error")
+	var err = errors.New("Errors")
 	if a.TypeErr != nil {
 		err = a.TypeErr
 	}

@@ -54,7 +54,7 @@ func (g ginServer) Listen() {
 
 	g.log.WithFields(logger.Fields{"port": g.port}).Infof("Starting HTTP Server")
 	if err := server.ListenAndServe(); err != nil {
-		g.log.WithError(err).Fatalln("Error starting HTTP server")
+		g.log.WithError(err).Fatalln("Errors starting HTTP server")
 	}
 }
 

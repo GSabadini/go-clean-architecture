@@ -47,10 +47,10 @@ type TransferRepositoryStubError struct{}
 
 //Store retorna um error ao criar uma transferência
 func (t TransferRepositoryStubError) Store(_ domain.Transfer) (domain.Transfer, error) {
-	return domain.Transfer{}, errors.New("Error")
+	return domain.Transfer{}, errors.New("Errors")
 }
 
 //FindAll retorna um error ao listar as transferências
 func (t TransferRepositoryStubError) FindAll() ([]domain.Transfer, error) {
-	return []domain.Transfer{}, errors.New("Error")
+	return []domain.Transfer{}, errors.New("Errors")
 }

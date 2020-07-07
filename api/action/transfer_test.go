@@ -2,11 +2,11 @@ package action
 
 import (
 	"bytes"
+	"github.com/gsabadini/go-bank-transfer/domain"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gsabadini/go-bank-transfer/domain"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
@@ -38,7 +38,7 @@ func TestTransfer_Store(t *testing.T) {
 				rawPayload: []byte(`{
 					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
 					"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
-					"amount": 10 
+					"amount": 10
 				}`),
 			},
 			expectedStatusCode: http.StatusCreated,
@@ -80,9 +80,27 @@ func TestTransfer_Store(t *testing.T) {
 			expectedStatusCode: http.StatusUnprocessableEntity,
 		},
 		{
+			name: "Store action account origin equals account destination",
+			transferAction: NewTransfer(
+				usecase.TransferUseCaseStubSuccess{},
+				logger.LoggerMock{},
+				validator,
+			),
+			args: args{
+				rawPayload: []byte(
+					`{
+						"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+						"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+						"amount": 10
+					}`,
+				),
+			},
+			expectedStatusCode: http.StatusBadRequest,
+		},
+		{
 			name: "Store action invalid JSON",
 			transferAction: NewTransfer(
-				usecase.TransferUseCaseStubError{},
+				usecase.TransferUseCaseStubSuccess{},
 				logger.LoggerMock{},
 				validator,
 			),
@@ -100,7 +118,7 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Store action invalid amount",
 			transferAction: NewTransfer(
-				usecase.TransferUseCaseStubError{},
+				usecase.TransferUseCaseStubSuccess{},
 				logger.LoggerMock{},
 				validator,
 			),
@@ -118,7 +136,7 @@ func TestTransfer_Store(t *testing.T) {
 		{
 			name: "Store action invalid name fields",
 			transferAction: NewTransfer(
-				usecase.TransferUseCaseStubError{},
+				usecase.TransferUseCaseStubSuccess{},
 				logger.LoggerMock{},
 				validator,
 			),
