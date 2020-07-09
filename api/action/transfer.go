@@ -24,12 +24,12 @@ type transferInput struct {
 type Transfer struct {
 	validator validator.Validator
 	log       logger.Logger
-	usecase   usecase.TransferUseCase
+	uc        usecase.TransferUseCase
 }
 
 //NewTransfer constrói um Transfer com suas dependências
 func NewTransfer(uc usecase.TransferUseCase, l logger.Logger, v validator.Validator) Transfer {
-	return Transfer{usecase: uc, log: l, validator: v}
+	return Transfer{uc: uc, log: l, validator: v}
 }
 
 //Store é um handler para criação de Transfer
@@ -62,7 +62,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := t.usecase.Store(
+	output, err := t.uc.Store(
 		input.AccountOriginID,
 		input.AccountDestinationID,
 		input.Amount,
@@ -100,7 +100,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_transfer"
 
-	output, err := t.usecase.FindAll()
+	output, err := t.uc.FindAll()
 	if err != nil {
 		t.logError(
 			logKey,

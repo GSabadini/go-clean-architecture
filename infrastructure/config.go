@@ -124,7 +124,7 @@ func dbSQL(log logger.Logger) repository.SQLHandler {
 		verifyExistEnvironmentParams("POSTGRES_PASSWORD"),
 	)
 
-	handler, err := database.NewDatabaseSQLFactory(database.InstanceMongoDB, ds)
+	handler, err := database.NewDatabaseSQLFactory(database.InstancePostgres, ds)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)
