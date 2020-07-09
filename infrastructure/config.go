@@ -70,7 +70,7 @@ func webServer(
 	port web.Port,
 ) web.Server {
 	server, err := web.NewWebServerFactory(
-		web.InstanceGorillaMux,
+		web.InstanceGin,
 		log,
 		dbSQL,
 		dbNoSQL,

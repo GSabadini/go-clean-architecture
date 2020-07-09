@@ -36,7 +36,6 @@ func TestTransfer_Store(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		transferAction     Transfer
 		args               args
 		usecaseMock        usecase.TransferUseCase
 		expectedBody       []byte
@@ -44,11 +43,6 @@ func TestTransfer_Store(t *testing.T) {
 	}{
 		{
 			name: "Store action success",
-			transferAction: NewTransfer(
-				usecase.TransferUseCaseStubSuccess{},
-				logger.LoggerMock{},
-				validator,
-			),
 			args: args{
 				rawPayload: []byte(`{
 					"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -216,6 +210,17 @@ func TestTransfer_Store(t *testing.T) {
 	}
 }
 
+type mockTransferFindAll struct {
+	usecase.TransferUseCase
+
+	result []usecase.TransferOutput
+	err    error
+}
+
+func (m mockTransferFindAll) FindAll() ([]usecase.TransferOutput, error) {
+	return m.result, m.err
+}
+
 func TestTransfer_Index(t *testing.T) {
 	t.Parallel()
 
@@ -223,50 +228,73 @@ func TestTransfer_Index(t *testing.T) {
 
 	tests := []struct {
 		name               string
+		usecaseMock        usecase.TransferUseCase
+		expectedBody       []byte
 		expectedStatusCode int
-		transferAction     Transfer
 	}{
 		{
-			name:               "Index action success",
+			name: "Index handler success one transfer",
+			usecaseMock: mockTransferFindAll{
+				result: []usecase.TransferOutput{
+					{
+						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04679",
+						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+						Amount:               10,
+						CreatedAt:            time.Time{},
+					},
+				},
+				err: nil,
+			},
+			expectedBody:       []byte(`[{"id":"3c096a40-ccba-4b58-93ed-57379ab04679","account_origin_id":"3c096a40-ccba-4b58-93ed-57379ab04680","account_destination_id":"3c096a40-ccba-4b58-93ed-57379ab04681","amount":10,"created_at":"0001-01-01T00:00:00Z"}]`),
 			expectedStatusCode: http.StatusOK,
-			transferAction: NewTransfer(
-				usecase.TransferUseCaseStubSuccess{},
-				logger.LoggerMock{},
-				validator,
-			),
 		},
 		{
-			name:               "Index action error",
+			name: "Index handler success empty",
+			usecaseMock: mockTransferFindAll{
+				result: []usecase.TransferOutput{},
+				err:    nil,
+			},
+			expectedBody:       []byte(`[]`),
+			expectedStatusCode: http.StatusOK,
+		},
+		{
+			name: "Index handler generic error",
+			usecaseMock: mockTransferFindAll{
+				err: errors.New("error"),
+			},
+			expectedBody:       []byte(`{"errors":["error"]}`),
 			expectedStatusCode: http.StatusInternalServerError,
-			transferAction: NewTransfer(
-				usecase.TransferUseCaseStubError{},
-				logger.LoggerMock{},
-				validator,
-			),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req, err := http.NewRequest(http.MethodGet, "/transfers", nil)
-			if err != nil {
-				t.Fatal(err)
-			}
+			req, _ := http.NewRequest(http.MethodGet, "/transfers", nil)
 
 			var (
-				rr      = httptest.NewRecorder()
-				handler = http.NewServeMux()
+				w      = httptest.NewRecorder()
+				action = NewTransfer(tt.usecaseMock, logger.LoggerMock{}, validator)
 			)
 
-			handler.HandleFunc("/transfers", tt.transferAction.Index)
-			handler.ServeHTTP(rr, req)
+			action.Index(w, req)
 
-			if rr.Code != tt.expectedStatusCode {
+			if w.Code != tt.expectedStatusCode {
 				t.Errorf(
 					"[TestCase '%s'] O handler retornou um HTTP status code inesperado: retornado '%v' esperado '%v'",
 					tt.name,
-					rr.Code,
+					w.Code,
 					tt.expectedStatusCode,
+				)
+			}
+
+			var result = bytes.TrimSpace(w.Body.Bytes())
+			if !bytes.Equal(result, tt.expectedBody) {
+				t.Errorf(
+					"[TestCase '%s'] Result: '%v' | Expected: '%v'",
+					tt.name,
+					result,
+					tt.expectedBody,
 				)
 			}
 		})

@@ -13,6 +13,7 @@ type Server interface {
 	Listen()
 }
 
+//Port define uma porta para o servidor
 type Port int64
 
 var (
