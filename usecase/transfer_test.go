@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"reflect"
 	"testing"
@@ -107,98 +108,137 @@ func TestTransfer_Store(t *testing.T) {
 				CreatedAt:            time.Time{},
 			},
 		},
-		//{
-		//	name: "Create transfer generic error transfer repository",
-		//	args: args{
-		//		accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
-		//		accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-		//		amount:               20,
-		//	},
-		//	transferRepo: mockTransferRepoStore{
-		//		result:             domain.Transfer{},
-		//		err:                errors.New("error"),
-		//	},
-		//		accountRepo: mockAccountRepo{
-		//		AccountRepository: nil,
-		//		updateBalanceFake: func() error {
-		//			return nil
-		//		},
-		//		findByIDOriginFake: func() (*domain.Account, error) {
-		//			return &domain.Account{}, nil
-		//		},
-		//	},
-		//	expectedError: "error",
-		//	expected:      TransferOutput{},
-		//},
-		//{
-		//	name: "Create transfer generic error account repository",
-		//	args: args{
-		//		accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
-		//		accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-		//		amount:               20,
-		//	},
-		//	transferRepo: mockTransferRepoStore{
-		//		result:             domain.Transfer{},
-		//		err:                nil,
-		//	},
-		//		accountRepo: mockAccountRepo{
-		//		AccountRepository: nil,
-		//		updateBalanceFake: func() error {
-		//			return nil
-		//		},
-		//		findByIDOriginFake: func() (*domain.Account, error) {
-		//			return &domain.Account{}, nil
-		//		},
-		//	},
-		//	expectedError: "error",
-		//	expected:      TransferOutput{},
-		//},
-		//{
-		//	name: "Create transfer amount not have sufficient",
-		//	args: args{
-		//		accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
-		//		accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-		//		amount:               200,
-		//	},
-		//			transferRepo: mockTransferRepoStore{
-		//		result:             domain.Transfer{},
-		//		err:                nil,
-		//	},
-		//		accountRepo: mockAccountRepo{
-		//		AccountRepository: nil,
-		//		updateBalanceFake: func() error {
-		//			return nil
-		//		},
-		//		findByIDOriginFake: func() (*domain.Account, error) {
-		//			return &domain.Account{}, nil
-		//		},
-		//	},
-		//	expectedError: "origin account does not have sufficient balance",
-		//	expected:      TransferOutput{},
-		//},
-		//{
-		//	name: "Create transfer error find account",
-		//	args: args{
-		//		accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
-		//		accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-		//		amount:               200,
-		//	},
-		//			transferRepo: mockTransferRepoStore{
-		//		result:             domain.Transfer{},
-		//		err:                nil,
-		//	},
-		//		accountRepo: mockAccountRepo{
-		//		AccountRepository: nil,
-		//		updateBalanceFake: func() error {
-		//			return nil
-		//		},
-		//		findByIDOriginFake: func() (*domain.Account, error) {
-		//			return &domain.Account{}, nil
-		//		},
-		//	},
-		//	expectedError: "Error",
-		//	expected:      TransferOutput{},
-		//},
+		{
+			name: "Create transfer generic error transfer repository",
+			args: args{
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               20,
+			},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    errors.New("error"),
+			},
+			accountRepo: mockAccountRepo{
+				AccountRepository: nil,
+				updateBalanceFake: func() error {
+					return nil
+				},
+				findByIDOriginFake: func() (*domain.Account, error) {
+					return &domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
+						Name:      "Test",
+						CPF:       "08098565895",
+						Balance:   50,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+				findByIDDestinationFake: func() (*domain.Account, error) {
+					return &domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Name:      "Test2",
+						CPF:       "13098565491",
+						Balance:   30,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+			},
+			expectedError: "error",
+			expected:      TransferOutput{},
+		},
+		{
+			name: "Create transfer error find origin account",
+			args: args{
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               20,
+			},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: mockAccountRepo{
+				AccountRepository: nil,
+				updateBalanceFake: func() error {
+					return nil
+				},
+				findByIDOriginFake: func() (*domain.Account, error) {
+					return &domain.Account{}, errors.New("error")
+				},
+			},
+			expectedError: "error",
+			expected:      TransferOutput{},
+		},
+		{
+			name: "Create transfer error find destination account",
+			args: args{
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               20,
+			},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: mockAccountRepo{
+				AccountRepository: nil,
+				updateBalanceFake: func() error {
+					return nil
+				},
+				findByIDOriginFake: func() (*domain.Account, error) {
+					return &domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
+						Name:      "Test",
+						CPF:       "08098565895",
+						Balance:   50,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+				findByIDDestinationFake: func() (*domain.Account, error) {
+					return &domain.Account{}, errors.New("error")
+				},
+			},
+			expectedError: "error",
+			expected:      TransferOutput{},
+		},
+		{
+			name: "Create transfer amount not have sufficient",
+			args: args{
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               200,
+			},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: mockAccountRepo{
+				AccountRepository: nil,
+				updateBalanceFake: func() error {
+					return nil
+				},
+				findByIDOriginFake: func() (*domain.Account, error) {
+					return &domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
+						Name:      "Test",
+						CPF:       "08098565895",
+						Balance:   0,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+				findByIDDestinationFake: func() (*domain.Account, error) {
+					return &domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Name:      "Test2",
+						CPF:       "13098565491",
+						Balance:   0,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+			},
+			expectedError: "origin account does not have sufficient balance",
+			expected:      TransferOutput{},
+		},
 	}
 
 	for _, tt := range tests {
