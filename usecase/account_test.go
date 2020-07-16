@@ -150,6 +150,14 @@ func TestAccount_FindAll(t *testing.T) {
 			},
 		},
 		{
+			name: "Success when returning the empty account list",
+			repository: mockAccountRepoFindAll{
+				result: []domain.Account{},
+				err:    nil,
+			},
+			expected: []AccountOutput{},
+		},
+		{
 			name: "Error when returning the list of accounts",
 			repository: mockAccountRepoFindAll{
 				result: []domain.Account{},

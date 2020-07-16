@@ -6,8 +6,6 @@ import (
 	"reflect"
 	"testing"
 	"time"
-
-	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
 type mockTransferRepoStore struct {
@@ -28,18 +26,19 @@ type mockAccountRepo struct {
 
 	findByIDOriginFake      func() (*domain.Account, error)
 	findByIDDestinationFake func() (*domain.Account, error)
-	findByIDInvoked         bool
+	findByIDOriginInvoked   bool
 }
 
 func (m mockAccountRepo) UpdateBalance(_ string, _ float64) error {
 	return m.updateBalanceFake()
 }
+
 func (m mockAccountRepo) FindByID(_ string) (*domain.Account, error) {
-	if m.findByIDInvoked {
+	if m.findByIDOriginInvoked {
 		return m.findByIDDestinationFake()
 	}
 
-	m.findByIDInvoked = true
+	m.findByIDOriginInvoked = true
 	return m.findByIDOriginFake()
 }
 
@@ -181,7 +180,6 @@ func TestTransfer_Store(t *testing.T) {
 				err:    nil,
 			},
 			accountRepo: mockAccountRepo{
-				AccountRepository: nil,
 				updateBalanceFake: func() error {
 					return nil
 				},
@@ -258,18 +256,49 @@ func TestTransfer_Store(t *testing.T) {
 	}
 }
 
+type mockTransferRepoFindAll struct {
+	domain.TransferRepository
+
+	result []domain.Transfer
+	err    error
+}
+
+func (m mockTransferRepoFindAll) FindAll() ([]domain.Transfer, error) {
+	return m.result, m.err
+}
+
 func TestTransfer_FindAll(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		name          string
 		expected      []TransferOutput
-		usecase       TransferUseCase
+		transferRepo  domain.TransferRepository
+		accountRepo   domain.AccountRepository
 		expectedError string
 	}{
 		{
-			name:    "Success when returning the transfer list",
-			usecase: NewTransfer(repository.TransferRepositoryStubSuccess{}, repository.AccountRepositoryStubSuccess{}),
+			name: "Success when returning the transfer list",
+			transferRepo: mockTransferRepoFindAll{
+				result: []domain.Transfer{
+					{
+						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Amount:               100,
+						CreatedAt:            time.Time{},
+					},
+					{
+						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Amount:               500,
+						CreatedAt:            time.Time{},
+					},
+				},
+				err: nil,
+			},
+			accountRepo: mockAccountRepo{},
 			expected: []TransferOutput{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -288,16 +317,30 @@ func TestTransfer_FindAll(t *testing.T) {
 			},
 		},
 		{
-			name:          "Error when returning the transfer list",
-			usecase:       NewTransfer(repository.TransferRepositoryStubError{}, repository.AccountRepositoryStubSuccess{}),
-			expectedError: "Error",
+			name: "Success when returning the empty transfer list",
+			transferRepo: mockTransferRepoFindAll{
+				result: []domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: mockAccountRepo{},
+			expected:    []TransferOutput{},
+		},
+		{
+			name: "Error when returning the transfer list",
+			transferRepo: mockTransferRepoFindAll{
+				result: []domain.Transfer{},
+				err:    errors.New("error"),
+			},
+			accountRepo:   mockAccountRepo{},
 			expected:      []TransferOutput{},
+			expectedError: "error",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.usecase.FindAll()
+			var uc = NewTransfer(tt.transferRepo, tt.accountRepo)
+			result, err := uc.FindAll()
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
