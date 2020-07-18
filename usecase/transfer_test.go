@@ -24,8 +24,8 @@ type mockAccountRepo struct {
 
 	updateBalanceFake func() error
 
-	findByIDOriginFake      func() (*domain.Account, error)
-	findByIDDestinationFake func() (*domain.Account, error)
+	findByIDOriginFake      func() (domain.Account, error)
+	findByIDDestinationFake func() (domain.Account, error)
 	findByIDOriginInvoked   bool
 }
 
@@ -33,7 +33,7 @@ func (m mockAccountRepo) UpdateBalance(_ string, _ float64) error {
 	return m.updateBalanceFake()
 }
 
-func (m mockAccountRepo) FindByID(_ string) (*domain.Account, error) {
+func (m mockAccountRepo) FindByID(_ string) (domain.Account, error) {
 	if m.findByIDOriginInvoked {
 		return m.findByIDDestinationFake()
 	}
@@ -80,8 +80,8 @@ func TestTransfer_Store(t *testing.T) {
 				updateBalanceFake: func() error {
 					return nil
 				},
-				findByIDOriginFake: func() (*domain.Account, error) {
-					return &domain.Account{
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
@@ -89,8 +89,8 @@ func TestTransfer_Store(t *testing.T) {
 						CreatedAt: time.Time{},
 					}, nil
 				},
-				findByIDDestinationFake: func() (*domain.Account, error) {
-					return &domain.Account{
+				findByIDDestinationFake: func() (domain.Account, error) {
+					return domain.Account{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Name:      "Test2",
 						CPF:       "13098565491",
@@ -123,8 +123,8 @@ func TestTransfer_Store(t *testing.T) {
 				updateBalanceFake: func() error {
 					return nil
 				},
-				findByIDOriginFake: func() (*domain.Account, error) {
-					return &domain.Account{
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
@@ -132,8 +132,8 @@ func TestTransfer_Store(t *testing.T) {
 						CreatedAt: time.Time{},
 					}, nil
 				},
-				findByIDDestinationFake: func() (*domain.Account, error) {
-					return &domain.Account{
+				findByIDDestinationFake: func() (domain.Account, error) {
+					return domain.Account{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Name:      "Test2",
 						CPF:       "13098565491",
@@ -161,8 +161,8 @@ func TestTransfer_Store(t *testing.T) {
 				updateBalanceFake: func() error {
 					return nil
 				},
-				findByIDOriginFake: func() (*domain.Account, error) {
-					return &domain.Account{}, errors.New("error")
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{}, errors.New("error")
 				},
 			},
 			expectedError: "error",
@@ -183,8 +183,8 @@ func TestTransfer_Store(t *testing.T) {
 				updateBalanceFake: func() error {
 					return nil
 				},
-				findByIDOriginFake: func() (*domain.Account, error) {
-					return &domain.Account{
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
@@ -192,8 +192,8 @@ func TestTransfer_Store(t *testing.T) {
 						CreatedAt: time.Time{},
 					}, nil
 				},
-				findByIDDestinationFake: func() (*domain.Account, error) {
-					return &domain.Account{}, errors.New("error")
+				findByIDDestinationFake: func() (domain.Account, error) {
+					return domain.Account{}, errors.New("error")
 				},
 			},
 			expectedError: "error",
@@ -215,8 +215,8 @@ func TestTransfer_Store(t *testing.T) {
 				updateBalanceFake: func() error {
 					return nil
 				},
-				findByIDOriginFake: func() (*domain.Account, error) {
-					return &domain.Account{
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
@@ -224,8 +224,8 @@ func TestTransfer_Store(t *testing.T) {
 						CreatedAt: time.Time{},
 					}, nil
 				},
-				findByIDDestinationFake: func() (*domain.Account, error) {
-					return &domain.Account{
+				findByIDDestinationFake: func() (domain.Account, error) {
+					return domain.Account{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Name:      "Test2",
 						CPF:       "13098565491",

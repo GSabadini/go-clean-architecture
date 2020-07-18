@@ -96,9 +96,9 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID busca uma Account por ID no database
-func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
+func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 	var (
-		account   = &domain.Account{}
+		account   = domain.Account{}
 		query     = "SELECT * FROM accounts WHERE id = $1"
 		id        string
 		name      string
@@ -119,7 +119,7 @@ func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
 	}
 
 	if err = row.Err(); err != nil {
-		return &domain.Account{}, err
+		return domain.Account{}, err
 	}
 
 	account.ID = id

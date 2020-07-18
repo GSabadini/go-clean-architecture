@@ -7,7 +7,7 @@ type AccountRepository interface {
 	Store(Account) (Account, error)
 	UpdateBalance(string, float64) error
 	FindAll() ([]Account, error)
-	FindByID(string) (*Account, error)
+	FindByID(string) (Account, error)
 	FindBalance(string) (Account, error)
 }
 
