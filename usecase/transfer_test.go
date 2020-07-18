@@ -19,26 +19,41 @@ func (m mockTransferRepoStore) Store(_ domain.Transfer) (domain.Transfer, error)
 	return m.result, m.err
 }
 
+type invoked struct {
+	call bool
+}
+
 type mockAccountRepo struct {
 	domain.AccountRepository
 
-	updateBalanceFake func() error
+	updateBalanceOriginFake      func() error
+	updateBalanceDestinationFake func() error
+	invokedUpdate                *invoked
 
 	findByIDOriginFake      func() (domain.Account, error)
 	findByIDDestinationFake func() (domain.Account, error)
-	findByIDOriginInvoked   bool
+	invokedFind             *invoked
 }
 
 func (m mockAccountRepo) UpdateBalance(_ string, _ float64) error {
-	return m.updateBalanceFake()
+	if m.invokedUpdate != nil && m.invokedUpdate.call {
+		return m.updateBalanceDestinationFake()
+	}
+
+	if m.invokedUpdate != nil {
+		m.invokedUpdate.call = true
+	}
+	return m.updateBalanceOriginFake()
 }
 
 func (m mockAccountRepo) FindByID(_ string) (domain.Account, error) {
-	if m.findByIDOriginInvoked {
+	if m.invokedFind != nil && m.invokedFind.call {
 		return m.findByIDDestinationFake()
 	}
 
-	m.findByIDOriginInvoked = true
+	if m.invokedFind != nil {
+		m.invokedFind.call = true
+	}
 	return m.findByIDOriginFake()
 }
 
@@ -77,7 +92,10 @@ func TestTransfer_Store(t *testing.T) {
 				err: nil,
 			},
 			accountRepo: mockAccountRepo{
-				updateBalanceFake: func() error {
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
@@ -120,7 +138,10 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			accountRepo: mockAccountRepo{
 				AccountRepository: nil,
-				updateBalanceFake: func() error {
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
@@ -157,8 +178,10 @@ func TestTransfer_Store(t *testing.T) {
 				err:    nil,
 			},
 			accountRepo: mockAccountRepo{
-				AccountRepository: nil,
-				updateBalanceFake: func() error {
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
@@ -179,8 +202,11 @@ func TestTransfer_Store(t *testing.T) {
 				result: domain.Transfer{},
 				err:    nil,
 			},
-			accountRepo: mockAccountRepo{
-				updateBalanceFake: func() error {
+			accountRepo: &mockAccountRepo{
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
@@ -194,6 +220,88 @@ func TestTransfer_Store(t *testing.T) {
 				},
 				findByIDDestinationFake: func() (domain.Account, error) {
 					return domain.Account{}, errors.New("error")
+				},
+				invokedFind: &invoked{call: false},
+			},
+			expectedError: "error",
+			expected:      TransferOutput{},
+		},
+		{
+			name: "Create transfer error update origin account",
+			args: args{
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               20,
+			},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: mockAccountRepo{
+				updateBalanceOriginFake: func() error {
+					return errors.New("error")
+				},
+				updateBalanceDestinationFake: func() error {
+					return nil
+				},
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
+						Name:      "Test",
+						CPF:       "08098565895",
+						Balance:   50,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+				findByIDDestinationFake: func() (domain.Account, error) {
+					return domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Name:      "Test2",
+						CPF:       "13098565491",
+						Balance:   30,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+			},
+			expectedError: "error",
+			expected:      TransferOutput{},
+		},
+		{
+			name: "Create transfer error update destination account",
+			args: args{
+				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				amount:               20,
+			},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: mockAccountRepo{
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
+					return errors.New("error")
+				},
+				invokedUpdate: &invoked{call: false},
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
+						Name:      "Test",
+						CPF:       "08098565895",
+						Balance:   50,
+						CreatedAt: time.Time{},
+					}, nil
+				},
+				findByIDDestinationFake: func() (domain.Account, error) {
+					return domain.Account{
+						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Name:      "Test2",
+						CPF:       "13098565491",
+						Balance:   30,
+						CreatedAt: time.Time{},
+					}, nil
 				},
 			},
 			expectedError: "error",
@@ -212,7 +320,10 @@ func TestTransfer_Store(t *testing.T) {
 			},
 			accountRepo: mockAccountRepo{
 				AccountRepository: nil,
-				updateBalanceFake: func() error {
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
