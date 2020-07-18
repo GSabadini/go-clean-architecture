@@ -21,14 +21,34 @@ func TestAccount_Deposit(t *testing.T) {
 	}{
 		{
 			name: "Successful depositing balance",
-			account: Account{
-				Balance: 0,
-			},
 			args: args{
 				amount: 10,
 			},
+			account: Account{
+				Balance: 0,
+			},
 			expected: 10,
 		},
+		{
+			name: "Successful depositing balance",
+			args: args{
+				amount: 1020.98,
+			},
+			account: Account{
+				Balance: 0,
+			},
+			expected: 1020.98,
+		},
+		//{
+		//	name: "Successful depositing balance",
+		//	args: args{
+		//		amount: 44.98,
+		//	},
+		//	account: Account{
+		//		Balance: 0.98,
+		//	},
+		//	expected: 45.96,
+		//},
 	}
 
 	for _, tt := range tests {
@@ -62,29 +82,73 @@ func TestAccount_Withdraw(t *testing.T) {
 	}{
 		{
 			name: "Success in withdrawing balance",
-			account: Account{
-				Balance: 10,
-			},
 			args: args{
 				amount: 10,
+			},
+			account: Account{
+				Balance: 10,
 			},
 			expected: 0,
 		},
 		{
-			name: "error when withdrawing account balance without sufficient balance",
-			account: Account{
-				Balance: 0,
+			name: "Success in withdrawing balance",
+			args: args{
+				amount: 10.12,
 			},
+			account: Account{
+				Balance: 101.25,
+			},
+			expected: 91.13,
+		},
+		{
+			name: "Success in withdrawing balance",
+			args: args{
+				amount: 0.25,
+			},
+			account: Account{
+				Balance: 10.12,
+			},
+			expected: 9.87,
+		},
+		{
+			name: "error when withdrawing account balance without sufficient balance",
+			args: args{
+				amount: 5.64,
+			},
+			account: Account{
+				Balance: 0.62,
+			},
+			expected:    0.62,
+			expectedErr: ErrInsufficientBalance,
+		},
+		{
+			name: "error when withdrawing account balance without sufficient balance",
+			args: args{
+				amount: 5,
+			},
+			account: Account{
+				Balance: 1,
+			},
+			expected:    1,
+			expectedErr: ErrInsufficientBalance,
+		},
+		{
+			name: "error when withdrawing account balance without sufficient balance",
 			args: args{
 				amount: 10,
 			},
+			account: Account{
+				Balance: 0,
+			},
+			expected:    0,
 			expectedErr: ErrInsufficientBalance,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.account.Withdraw(tt.args.amount); (err != nil) && (err.Error() != tt.expectedErr.Error()) {
+			var err error
+			if err = tt.account.Withdraw(tt.args.amount); (err != nil) && (err.Error() != tt.expectedErr.Error()) {
 				t.Errorf("[TestCase '%s'] ResultError: '%v' | ExpectedError: '%v'",
 					tt.name,
 					err,

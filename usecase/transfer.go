@@ -17,18 +17,18 @@ type TransferOutput struct {
 
 //Transfer armazena as dependências para os casos de uso de Transfer
 type Transfer struct {
-	transferRepository domain.TransferRepository
-	accountRepository  domain.AccountRepository
+	transferRepo domain.TransferRepository
+	accountRepo  domain.AccountRepository
 }
 
 //NewTransfer constrói um Transfer com suas dependências
 func NewTransfer(
-	transferRepository domain.TransferRepository,
-	accountRepository domain.AccountRepository,
+	transferRepo domain.TransferRepository,
+	accountRepo domain.AccountRepository,
 ) Transfer {
 	return Transfer{
-		transferRepository: transferRepository,
-		accountRepository:  accountRepository,
+		transferRepo: transferRepo,
+		accountRepo:  accountRepo,
 	}
 }
 
@@ -40,7 +40,7 @@ func (t Transfer) Store(accountOriginID, accountDestinationID string, amount flo
 
 	var transfer = domain.NewTransfer(domain.NewUUID(), accountOriginID, accountDestinationID, amount, time.Now())
 
-	transfer, err := t.transferRepository.Store(transfer)
+	transfer, err := t.transferRepo.Store(transfer)
 	if err != nil {
 		return TransferOutput{}, err
 	}
@@ -56,12 +56,12 @@ func (t Transfer) Store(accountOriginID, accountDestinationID string, amount flo
 
 /* TODO melhorar processsamento de transação */
 func (t Transfer) process(accountOriginID, accountDestinationID string, amount float64) error {
-	origin, err := t.accountRepository.FindByID(accountOriginID)
+	origin, err := t.accountRepo.FindByID(accountOriginID)
 	if err != nil {
 		return err
 	}
 
-	destination, err := t.accountRepository.FindByID(accountDestinationID)
+	destination, err := t.accountRepo.FindByID(accountDestinationID)
 	if err != nil {
 		return err
 	}
@@ -72,11 +72,11 @@ func (t Transfer) process(accountOriginID, accountDestinationID string, amount f
 
 	destination.Deposit(amount)
 
-	if err = t.accountRepository.UpdateBalance(origin.ID, origin.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(origin.ID, origin.Balance); err != nil {
 		return err
 	}
 
-	if err = t.accountRepository.UpdateBalance(destination.ID, destination.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(destination.ID, destination.Balance); err != nil {
 		return err
 	}
 
@@ -87,7 +87,7 @@ func (t Transfer) process(accountOriginID, accountDestinationID string, amount f
 func (t Transfer) FindAll() ([]TransferOutput, error) {
 	var output = make([]TransferOutput, 0)
 
-	transfers, err := t.transferRepository.FindAll()
+	transfers, err := t.transferRepo.FindAll()
 	if err != nil {
 		return output, err
 	}

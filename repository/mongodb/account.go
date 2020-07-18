@@ -89,22 +89,22 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID busca uma Account por ID no database
-func (a AccountRepository) FindByID(ID string) (*domain.Account, error) {
+func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 	var (
 		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
 	)
 
-	if err := a.handler.FindOne(a.collectionName, query, nil, &accountBSON); err != nil {
+	if err := a.handler.FindOne(a.collectionName, query, nil, accountBSON); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
-			return &domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account")
+			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account")
 		default:
-			return &domain.Account{}, errors.Wrap(err, "error fetching account")
+			return domain.Account{}, errors.Wrap(err, "error fetching account")
 		}
 	}
 
-	return &domain.Account{
+	return domain.Account{
 		ID:        accountBSON.ID,
 		Name:      accountBSON.Name,
 		CPF:       accountBSON.CPF,
