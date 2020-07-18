@@ -21,14 +21,14 @@ type accountInput struct {
 
 //Account armazena as dependências para as ações de Account
 type Account struct {
-	usecase   usecase.AccountUseCase
+	uc        usecase.AccountUseCase
 	log       logger.Logger
 	validator validator.Validator
 }
 
 //NewAccount constrói um Account com suas dependências
 func NewAccount(uc usecase.AccountUseCase, l logger.Logger, v validator.Validator) Account {
-	return Account{usecase: uc, log: l, validator: v}
+	return Account{uc: uc, log: l, validator: v}
 }
 
 //Store é um handler para criação de Account
@@ -61,7 +61,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := a.usecase.Store(input.Name, input.CPF, input.Balance)
+	output, err := a.uc.Store(input.Name, input.CPF, input.Balance)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -82,7 +82,7 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
 	const logKey = "index_account"
 
-	output, err := a.usecase.FindAll()
+	output, err := a.uc.FindAll()
 	if err != nil {
 		a.logError(
 			logKey,
@@ -117,7 +117,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := a.usecase.FindBalance(accountID)
+	output, err := a.uc.FindBalance(accountID)
 	if err != nil {
 		switch err {
 		case domain.ErrNotFound:
