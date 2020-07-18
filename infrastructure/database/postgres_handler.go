@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 
 	"github.com/gsabadini/go-bank-transfer/repository"
@@ -9,16 +10,24 @@ import (
 	_ "github.com/lib/pq"
 )
 
-//PostgresHandler armazena a estrutura para o Postgres
-type PostgresHandler struct {
-	Database *sql.DB
+//postgresHandler armazena a estrutura para o Postgres
+type postgresHandler struct {
+	database *sql.DB
 }
 
 //NewPostgresHandler constrói um novo handler de banco para Postgres
-func NewPostgresHandler(dataSource string) (*PostgresHandler, error) {
-	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), dataSource)
+func NewPostgresHandler(c *config) (*postgresHandler, error) {
+	var ds = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
+		c.host,
+		c.port,
+		c.user,
+		c.database,
+		c.password,
+	)
+
+	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), ds)
 	if err != nil {
-		return &PostgresHandler{}, err
+		return &postgresHandler{}, err
 	}
 
 	err = db.Ping()
@@ -26,12 +35,12 @@ func NewPostgresHandler(dataSource string) (*PostgresHandler, error) {
 		panic(err)
 	}
 
-	return &PostgresHandler{Database: db}, nil
+	return &postgresHandler{database: db}, nil
 }
 
 //Execute
-func (p PostgresHandler) Execute(query string, args ...interface{}) error {
-	_, err := p.Database.Exec(query, args...)
+func (p postgresHandler) Execute(query string, args ...interface{}) error {
+	_, err := p.database.Exec(query, args...)
 	if err != nil {
 		return err
 	}
@@ -40,46 +49,47 @@ func (p PostgresHandler) Execute(query string, args ...interface{}) error {
 }
 
 //Query
-func (p PostgresHandler) Query(query string, args ...interface{}) (repository.Row, error) {
-	rows, err := p.Database.Query(query, args...)
+func (p postgresHandler) Query(query string, args ...interface{}) (repository.Row, error) {
+	rows, err := p.database.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	row := NewPostgresRow(rows)
+	row := newPostgresRow(rows)
 
 	return row, nil
 }
 
-//PostgresRow
-type PostgresRow struct {
-	Rows *sql.Rows
+//postgresRow
+type postgresRow struct {
+	rows *sql.Rows
 }
 
-//NewPostgresRow
-func NewPostgresRow(rows *sql.Rows) PostgresRow {
-	return PostgresRow{Rows: rows}
+//newPostgresRow
+func newPostgresRow(rows *sql.Rows) postgresRow {
+	return postgresRow{rows: rows}
 }
 
 //Scan
-func (pr PostgresRow) Scan(dest ...interface{}) error {
-	if err := pr.Rows.Scan(dest...); err != nil {
+func (pr postgresRow) Scan(dest ...interface{}) error {
+	if err := pr.rows.Scan(dest...); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-//Next
-func (pr PostgresRow) Next() bool {
-	return pr.Rows.Next()
+//Next retorna o método next
+func (pr postgresRow) Next() bool {
+	return pr.rows.Next()
 }
 
-//Next
-func (pr PostgresRow) Err() error {
-	return pr.Rows.Err()
+//Err retorna o método err
+func (pr postgresRow) Err() error {
+	return pr.rows.Err()
 }
 
-func (pr PostgresRow) Close() error {
-	return pr.Rows.Close()
+//Close retorna o método close
+func (pr postgresRow) Close() error {
+	return pr.rows.Close()
 }

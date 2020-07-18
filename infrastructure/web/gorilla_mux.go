@@ -17,7 +17,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
-type gorillaMux struct {
+type GorillaMux struct {
 	router     *mux.Router
 	middleware *negroni.Negroni
 	log        logger.Logger
@@ -26,14 +26,14 @@ type gorillaMux struct {
 	port       Port
 }
 
-//NewGorillaMux constrói um gorillaMux com todas as suas dependências
+//NewGorillaMux constrói um GorillaMux com todas as suas dependências
 func NewGorillaMux(
 	log logger.Logger,
 	db repository.SQLHandler,
 	validator validator.Validator,
 	port Port,
-) gorillaMux {
-	return gorillaMux{
+) GorillaMux {
+	return GorillaMux{
 		router:     mux.NewRouter(),
 		middleware: negroni.New(),
 		log:        log,
@@ -44,7 +44,7 @@ func NewGorillaMux(
 }
 
 //Listen inicia o servidor HTTP
-func (g gorillaMux) Listen() {
+func (g GorillaMux) Listen() {
 	g.setAppHandlers(g.router)
 	g.middleware.UseHandler(g.router)
 
@@ -61,8 +61,8 @@ func (g gorillaMux) Listen() {
 	}
 }
 
-func (g gorillaMux) setAppHandlers(router *mux.Router) {
-	api := router.PathPrefix("/api").Subrouter()
+func (g GorillaMux) setAppHandlers(router *mux.Router) {
+	api := router.PathPrefix("/v1").Subrouter()
 
 	api.Handle("/transfers", g.buildActionStoreTransfer()).Methods(http.MethodPost)
 	api.Handle("/transfers", g.buildActionIndexTransfer()).Methods(http.MethodGet)
@@ -74,7 +74,7 @@ func (g gorillaMux) setAppHandlers(router *mux.Router) {
 	api.HandleFunc("/healthcheck", action.HealthCheck).Methods(http.MethodGet)
 }
 
-func (g gorillaMux) buildActionStoreTransfer() *negroni.Negroni {
+func (g GorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			transferRepository = postgres.NewTransferRepository(g.db)
@@ -94,7 +94,7 @@ func (g gorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionIndexTransfer() *negroni.Negroni {
+func (g GorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			transferRepository = postgres.NewTransferRepository(g.db)
@@ -113,7 +113,7 @@ func (g gorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionStoreAccount() *negroni.Negroni {
+func (g GorillaMux) buildActionStoreAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			accountRepository = postgres.NewAccountRepository(g.db)
@@ -131,7 +131,7 @@ func (g gorillaMux) buildActionStoreAccount() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionIndexAccount() *negroni.Negroni {
+func (g GorillaMux) buildActionIndexAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			accountRepository = postgres.NewAccountRepository(g.db)
@@ -149,7 +149,7 @@ func (g gorillaMux) buildActionIndexAccount() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
+func (g GorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			accountRepository = postgres.NewAccountRepository(g.db)

@@ -23,12 +23,12 @@ type AccountBalanceOutput struct {
 
 //Account armazena as dependências para os casos de uso de Account
 type Account struct {
-	repository domain.AccountRepository
+	repo domain.AccountRepository
 }
 
 //NewAccount constrói um Account com suas dependências
-func NewAccount(repository domain.AccountRepository) Account {
-	return Account{repository: repository}
+func NewAccount(repo domain.AccountRepository) Account {
+	return Account{repo: repo}
 }
 
 //Store cria uma nova Account
@@ -41,7 +41,7 @@ func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error)
 		time.Now(),
 	)
 
-	account, err := a.repository.Store(account)
+	account, err := a.repo.Store(account)
 	if err != nil {
 		return AccountOutput{}, err
 	}
@@ -59,7 +59,7 @@ func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error)
 func (a Account) FindAll() ([]AccountOutput, error) {
 	var output = make([]AccountOutput, 0)
 
-	accounts, err := a.repository.FindAll()
+	accounts, err := a.repo.FindAll()
 	if err != nil {
 		return output, err
 	}
@@ -79,7 +79,7 @@ func (a Account) FindAll() ([]AccountOutput, error) {
 
 //FindBalance retorna o saldo de uma Account
 func (a Account) FindBalance(ID string) (AccountBalanceOutput, error) {
-	account, err := a.repository.FindBalance(ID)
+	account, err := a.repo.FindBalance(ID)
 	if err != nil {
 		return AccountBalanceOutput{}, err
 	}
