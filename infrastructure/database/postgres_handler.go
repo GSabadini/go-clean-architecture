@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 
 	"github.com/gsabadini/go-bank-transfer/repository"
@@ -15,8 +16,16 @@ type postgresHandler struct {
 }
 
 //NewPostgresHandler constrói um novo handler de banco para Postgres
-func NewPostgresHandler(dataSource string) (*postgresHandler, error) {
-	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), dataSource)
+func NewPostgresHandler(c *config) (*postgresHandler, error) {
+	var ds = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
+		c.host,
+		c.port,
+		c.user,
+		c.database,
+		c.password,
+	)
+
+	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), ds)
 	if err != nil {
 		return &postgresHandler{}, err
 	}
@@ -70,17 +79,17 @@ func (pr postgresRow) Scan(dest ...interface{}) error {
 	return nil
 }
 
-//Next
+//Next retorna o método next
 func (pr postgresRow) Next() bool {
 	return pr.rows.Next()
 }
 
-//Err
+//Err retorna o método err
 func (pr postgresRow) Err() error {
 	return pr.rows.Err()
 }
 
-//CLose
+//Close retorna o método close
 func (pr postgresRow) Close() error {
 	return pr.rows.Close()
 }

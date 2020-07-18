@@ -64,11 +64,11 @@ make enter-container
 
 | Endpoint        | HTTP Method           | Description       |
 | --------------- | :---------------------: | :-----------------: |
-| `/api/accounts` | `POST`                | `Create accounts` |
-| `/api/accounts` | `GET`                 | `List accounts`   |
-| `/api/accounts/{{account_id}}/balance`   | `GET`                |    `Find balance account` |
-| `/api/transfers`| `POST`                | `Create transfer` |
-| `/api/transfers`| `GET`                 | `List transfers`  |
+| `/v1/accounts` | `POST`                | `Create accounts` |
+| `/v1/accounts` | `GET`                 | `List accounts`   |
+| `/v1/accounts/{{account_id}}/balance`   | `GET`                |    `Find balance account` |
+| `/v1/transfers`| `POST`                | `Create transfer` |
+| `/v1/transfers`| `GET`                 | `List transfers`  |
 
 #### Test endpoints API using Postman
 
@@ -79,7 +79,7 @@ make enter-container
 - Creating new account
 
 ```bash
-curl -i --request POST 'http://localhost:3001/api/accounts' \
+curl -i --request POST 'http://localhost:3001/v1/accounts' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "Test",
@@ -91,19 +91,19 @@ curl -i --request POST 'http://localhost:3001/api/accounts' \
 - Listing accounts
 
 ```bash
-curl -i --request GET 'http://localhost:3001/api/accounts'
+curl -i --request GET 'http://localhost:3001/v1/accounts'
 ```
 
 - Fetching account balance
 
 ```bash
-curl -i --request GET 'http://localhost:3001/api/accounts/{{account_id}}/balance'
+curl -i --request GET 'http://localhost:3001/v1/accounts/{{account_id}}/balance'
 ```
 
 - Creating new transfer
 
 ```bash
-curl -i --request POST 'http://localhost:3001/api/transfers' \
+curl -i --request POST 'http://localhost:3001/v1/transfers' \
 --header 'Content-Type: application/json' \
 --data-raw '{
 	"account_destination_id": "{{account_id}}",
@@ -115,7 +115,7 @@ curl -i --request POST 'http://localhost:3001/api/transfers' \
 - Listing transfers
 
 ```bash
-curl -i --request GET 'http://localhost:3001/api/transfers'
+curl -i --request GET 'http://localhost:3001/v1/transfers'
 ```
 
 ## Git workflow

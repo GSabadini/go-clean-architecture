@@ -15,10 +15,10 @@ const (
 )
 
 //NewDatabaseNoSQLFactory retorna a instância de um banco de dados NoSQL
-func NewDatabaseNoSQLFactory(instance int, host, dbName string) (repository.NoSQLHandler, error) {
+func NewDatabaseNoSQLFactory(instance int, c *config) (repository.NoSQLHandler, error) {
 	switch instance {
 	case InstanceMongoDB:
-		db, err := NewMongoHandler(host, dbName)
+		db, err := NewMongoHandler(c)
 		if err != nil {
 			return nil, err
 		}
@@ -33,10 +33,10 @@ const (
 )
 
 //NewDatabaseSQLFactory retorna a instância de um banco de dados SQL
-func NewDatabaseSQLFactory(instance int, dataSource string) (repository.SQLHandler, error) {
+func NewDatabaseSQLFactory(instance int, c *config) (repository.SQLHandler, error) {
 	switch instance {
 	case InstancePostgres:
-		db, err := NewPostgresHandler(dataSource)
+		db, err := NewPostgresHandler(c)
 		if err != nil {
 			return nil, err
 		}

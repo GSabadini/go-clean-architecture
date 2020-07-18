@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
@@ -37,8 +36,8 @@ func NewConfig() Config {
 	}
 
 	config.validator = validation(config.Logger)
-	config.dbSQL = dbSQL(config.Logger)
-	config.dbNoSQL = dbNoSQL(config.Logger)
+	config.dbSQL = postgresConn(config.Logger)
+	config.dbNoSQL = mongoDBConn(config.Logger)
 
 	config.WebServer = webServer(
 		config.Logger,
@@ -98,13 +97,10 @@ func log() logger.Logger {
 	return log
 }
 
-func dbNoSQL(log logger.Logger) repository.NoSQLHandler {
-	var (
-		host   = verifyExistEnvironmentParams("MONGODB_HOST")
-		dbName = verifyExistEnvironmentParams("MONGODB_DATABASE")
-	)
+func mongoDBConn(log logger.Logger) repository.NoSQLHandler {
+	c := database.NewConfigMongoDB()
 
-	handler, err := database.NewDatabaseNoSQLFactory(database.InstanceMongoDB, host, dbName)
+	handler, err := database.NewDatabaseNoSQLFactory(database.InstanceMongoDB, c)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)
@@ -115,16 +111,10 @@ func dbNoSQL(log logger.Logger) repository.NoSQLHandler {
 	return handler
 }
 
-func dbSQL(log logger.Logger) repository.SQLHandler {
-	var ds = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
-		verifyExistEnvironmentParams("POSTGRES_HOST"),
-		verifyExistEnvironmentParams("POSTGRES_PORT"),
-		verifyExistEnvironmentParams("POSTGRES_USER"),
-		verifyExistEnvironmentParams("POSTGRES_DATABASE"),
-		verifyExistEnvironmentParams("POSTGRES_PASSWORD"),
-	)
+func postgresConn(log logger.Logger) repository.SQLHandler {
+	c := database.NewConfigPostgres()
 
-	handler, err := database.NewDatabaseSQLFactory(database.InstancePostgres, ds)
+	handler, err := database.NewDatabaseSQLFactory(database.InstancePostgres, c)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)
@@ -133,12 +123,4 @@ func dbSQL(log logger.Logger) repository.SQLHandler {
 	log.Infof("Successfully connected to the SQL database")
 
 	return handler
-}
-
-func verifyExistEnvironmentParams(parameter string) string {
-	if value := os.Getenv(parameter); value != "" {
-		return value
-	}
-
-	panic(fmt.Sprintf("Environment variable '%s' has not been defined", parameter))
 }

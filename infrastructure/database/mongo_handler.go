@@ -9,15 +9,15 @@ type mongoHandler struct {
 }
 
 //NewMongoHandler constrói um novo handler de banco para MongoDB
-func NewMongoHandler(host, databaseName string) (*mongoHandler, error) {
-	session, err := mongo.Dial(host)
+func NewMongoHandler(c *config) (*mongoHandler, error) {
+	session, err := mongo.Dial(c.host)
 	if err != nil {
 		return &mongoHandler{}, err
 	}
 
 	handler := new(mongoHandler)
 	handler.session = session
-	handler.database = handler.session.DB(databaseName)
+	handler.database = handler.session.DB(c.database)
 
 	return handler, nil
 }
