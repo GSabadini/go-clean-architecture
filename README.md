@@ -1,7 +1,9 @@
 <h1 align="center">Welcome to Go Bank Transfer :bank:</h1>
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-1.4.0-blue.svg?cacheSeconds=2592000" />
-  <img alt="Report" src="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" />
+  <a href="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" target="_blank">
+    <img alt="Build" src="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" />
+  </a>
   <a href="#" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
