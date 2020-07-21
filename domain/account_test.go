@@ -172,7 +172,7 @@ func TestNewAccount(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		ID        string
+		ID        AccountID
 		name      string
 		CPF       string
 		balance   float64

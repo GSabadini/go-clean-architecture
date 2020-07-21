@@ -39,9 +39,9 @@ type Account struct {
 }
 
 //NewAccount cria um Account
-func NewAccount(ID, name, CPF string, balance float64, createdAt time.Time) Account {
+func NewAccount(ID AccountID, name, CPF string, balance float64, createdAt time.Time) Account {
 	return Account{
-		ID:        AccountID(ID),
+		ID:        ID,
 		Name:      name,
 		CPF:       CPF,
 		Balance:   balance,

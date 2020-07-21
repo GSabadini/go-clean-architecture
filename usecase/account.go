@@ -34,7 +34,7 @@ func NewAccount(repo domain.AccountRepository) Account {
 //Store cria uma nova Account
 func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error) {
 	var account = domain.NewAccount(
-		domain.NewUUID(),
+		domain.AccountID(domain.NewUUID()),
 		name,
 		a.cleanCPF(CPF),
 		balance,
