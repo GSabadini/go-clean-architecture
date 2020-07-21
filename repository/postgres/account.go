@@ -43,7 +43,7 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 }
 
 //UpdateBalance atualiza o Balance de uma Account no database
-func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
+func (a AccountRepository) UpdateBalance(ID domain.AccountID, balance float64) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
 	if err := a.handler.Execute(query, balance, ID); err != nil {
@@ -80,7 +80,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 		}
 
 		accounts = append(accounts, domain.Account{
-			ID:        ID,
+			ID:        domain.AccountID(ID),
 			Name:      name,
 			CPF:       CPF,
 			Balance:   balance,
@@ -96,7 +96,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID busca uma Account por ID no database
-func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
+func (a AccountRepository) FindByID(ID domain.AccountID) (domain.Account, error) {
 	var (
 		account   = domain.Account{}
 		query     = "SELECT * FROM accounts WHERE id = $1"
@@ -122,7 +122,7 @@ func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 		return domain.Account{}, err
 	}
 
-	account.ID = id
+	account.ID = domain.AccountID(id)
 	account.Name = name
 	account.CPF = CPF
 	account.Balance = balance
@@ -132,7 +132,7 @@ func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 }
 
 //FindBalance busca o Balance de uma Account no database
-func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
+func (a AccountRepository) FindBalance(ID domain.AccountID) (domain.Account, error) {
 	var (
 		account = domain.Account{}
 		query   = "SELECT balance FROM accounts WHERE id = $1"

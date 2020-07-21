@@ -19,6 +19,7 @@ type TransferOutput struct {
 type Transfer struct {
 	transferRepo domain.TransferRepository
 	accountRepo  domain.AccountRepository
+	//sync.Mutex
 }
 
 //NewTransfer constrói um Transfer com suas dependências
@@ -33,12 +34,22 @@ func NewTransfer(
 }
 
 //Store cria uma nova Transfer
-func (t Transfer) Store(accountOriginID, accountDestinationID string, amount float64) (TransferOutput, error) {
+func (t Transfer) Store(
+	accountOriginID,
+	accountDestinationID domain.AccountID,
+	amount float64,
+) (TransferOutput, error) {
 	if err := t.process(accountOriginID, accountDestinationID, amount); err != nil {
 		return TransferOutput{}, err
 	}
 
-	var transfer = domain.NewTransfer(domain.NewUUID(), accountOriginID, accountDestinationID, amount, time.Now())
+	var transfer = domain.NewTransfer(
+		domain.TransferID(domain.NewUUID()),
+		accountOriginID,
+		accountDestinationID,
+		amount,
+		time.Now(),
+	)
 
 	transfer, err := t.transferRepo.Store(transfer)
 	if err != nil {
@@ -46,16 +57,23 @@ func (t Transfer) Store(accountOriginID, accountDestinationID string, amount flo
 	}
 
 	return TransferOutput{
-		ID:                   transfer.ID,
-		AccountOriginID:      transfer.AccountOriginID,
-		AccountDestinationID: transfer.AccountDestinationID,
+		ID:                   string(transfer.ID),
+		AccountOriginID:      string(transfer.AccountOriginID),
+		AccountDestinationID: string(transfer.AccountDestinationID),
 		Amount:               transfer.Amount,
 		CreatedAt:            transfer.CreatedAt,
 	}, nil
 }
 
 /* TODO melhorar processsamento de transação */
-func (t Transfer) process(accountOriginID, accountDestinationID string, amount float64) error {
+func (t Transfer) process(
+	accountOriginID,
+	accountDestinationID domain.AccountID,
+	amount float64,
+) error {
+	//uc.Lock()
+	//defer uc.Unlock()
+
 	origin, err := t.accountRepo.FindByID(accountOriginID)
 	if err != nil {
 		return err
@@ -94,9 +112,9 @@ func (t Transfer) FindAll() ([]TransferOutput, error) {
 
 	for _, transfer := range transfers {
 		output = append(output, TransferOutput{
-			ID:                   transfer.ID,
-			AccountOriginID:      transfer.AccountOriginID,
-			AccountDestinationID: transfer.AccountDestinationID,
+			ID:                   string(transfer.ID),
+			AccountOriginID:      string(transfer.AccountOriginID),
+			AccountDestinationID: string(transfer.AccountDestinationID),
 			Amount:               transfer.Amount,
 			CreatedAt:            transfer.CreatedAt,
 		})

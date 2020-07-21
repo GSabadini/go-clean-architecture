@@ -32,9 +32,9 @@ func NewTransferRepository(handler repository.NoSQLHandler) TransferRepository {
 //Store insere uma Transfer no database
 func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
 	transferBson := &transferBSON{
-		ID:                   transfer.ID,
-		AccountOriginID:      transfer.AccountOriginID,
-		AccountDestinationID: transfer.AccountDestinationID,
+		ID:                   string(transfer.ID),
+		AccountOriginID:      string(transfer.AccountOriginID),
+		AccountDestinationID: string(transfer.AccountDestinationID),
 		Amount:               transfer.Amount,
 		CreatedAt:            transfer.CreatedAt,
 	}
@@ -59,9 +59,9 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 
 	for _, transferBson := range transfersBson {
 		var transfer = domain.Transfer{
-			ID:                   transferBson.ID,
-			AccountOriginID:      transferBson.AccountOriginID,
-			AccountDestinationID: transferBson.AccountDestinationID,
+			ID:                   domain.TransferID(transferBson.ID),
+			AccountOriginID:      domain.AccountID(transferBson.AccountOriginID),
+			AccountDestinationID: domain.AccountID(transferBson.AccountDestinationID),
 			Amount:               transferBson.Amount,
 			CreatedAt:            transferBson.CreatedAt,
 		}

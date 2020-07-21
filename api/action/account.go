@@ -117,7 +117,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := a.uc.FindBalance(accountID)
+	output, err := a.uc.FindBalance(domain.AccountID(accountID))
 	if err != nil {
 		switch err {
 		case domain.ErrNotFound:

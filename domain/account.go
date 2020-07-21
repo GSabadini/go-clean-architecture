@@ -1,19 +1,37 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+/* TODO rever errors */
+var (
+	//ErrNotFound é um erro de Account não encontrado
+	ErrNotFound = errors.New("not found")
+
+	//ErrInsufficientBalance é um erro de saldo insuficiente
+	ErrInsufficientBalance = errors.New("origin account does not have sufficient balance")
+
+	//ErrInsufficientBalance é um erro ao atualizar o saldo de uma conta
+	ErrUpdateBalance = errors.New("error update account balance")
+)
 
 //AccountRepository expõe os métodos disponíveis para as abstrações do repositório de Account
 type AccountRepository interface {
 	Store(Account) (Account, error)
-	UpdateBalance(string, float64) error
+	UpdateBalance(AccountID, float64) error
 	FindAll() ([]Account, error)
-	FindByID(string) (Account, error)
-	FindBalance(string) (Account, error)
+	FindByID(AccountID) (Account, error)
+	FindBalance(AccountID) (Account, error)
 }
+
+//AccountID define o tipo identificador de uma Account
+type AccountID string
 
 //Account armazena a estrutura de uma conta
 type Account struct {
-	ID        string
+	ID        AccountID
 	Name      string
 	CPF       string
 	Balance   float64
@@ -23,7 +41,7 @@ type Account struct {
 //NewAccount cria um Account
 func NewAccount(ID, name, CPF string, balance float64, createdAt time.Time) Account {
 	return Account{
-		ID:        ID,
+		ID:        AccountID(ID),
 		Name:      name,
 		CPF:       CPF,
 		Balance:   balance,

@@ -98,9 +98,10 @@ func log() logger.Logger {
 }
 
 func mongoDBConn(log logger.Logger) repository.NoSQLHandler {
-	c := database.NewConfigMongoDB()
-
-	handler, err := database.NewDatabaseNoSQLFactory(database.InstanceMongoDB, c)
+	handler, err := database.NewDatabaseNoSQLFactory(
+		database.InstanceMongoDB,
+		database.NewConfigMongoDB(),
+	)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)
@@ -112,9 +113,10 @@ func mongoDBConn(log logger.Logger) repository.NoSQLHandler {
 }
 
 func postgresConn(log logger.Logger) repository.SQLHandler {
-	c := database.NewConfigPostgres()
-
-	handler, err := database.NewDatabaseSQLFactory(database.InstancePostgres, c)
+	handler, err := database.NewDatabaseSQLFactory(
+		database.InstancePostgres,
+		database.NewConfigPostgres(),
+	)
 	if err != nil {
 		log.Fatalln("Could not make a connection to the database")
 		panic(err)

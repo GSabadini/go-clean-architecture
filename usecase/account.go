@@ -47,7 +47,7 @@ func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error)
 	}
 
 	return AccountOutput{
-		ID:        account.ID,
+		ID:        string(account.ID),
 		Name:      account.Name,
 		CPF:       account.CPF,
 		Balance:   account.Balance,
@@ -66,7 +66,7 @@ func (a Account) FindAll() ([]AccountOutput, error) {
 
 	for _, account := range accounts {
 		output = append(output, AccountOutput{
-			ID:        account.ID,
+			ID:        string(account.ID),
 			Name:      account.Name,
 			CPF:       account.CPF,
 			Balance:   account.Balance,
@@ -78,7 +78,7 @@ func (a Account) FindAll() ([]AccountOutput, error) {
 }
 
 //FindBalance retorna o saldo de uma Account
-func (a Account) FindBalance(ID string) (AccountBalanceOutput, error) {
+func (a Account) FindBalance(ID domain.AccountID) (AccountBalanceOutput, error) {
 	account, err := a.repo.FindBalance(ID)
 	if err != nil {
 		return AccountBalanceOutput{}, err

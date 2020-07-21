@@ -8,17 +8,26 @@ type TransferRepository interface {
 	FindAll() ([]Transfer, error)
 }
 
+//TransferID define o tipo identificador de uma Transfer
+type TransferID string
+
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
-	ID                   string
-	AccountOriginID      string
-	AccountDestinationID string
+	ID                   TransferID
+	AccountOriginID      AccountID
+	AccountDestinationID AccountID
 	Amount               float64
 	CreatedAt            time.Time
 }
 
 //NewTransfer cria um Transfer
-func NewTransfer(ID, accountOriginID, accountDestinationID string, amount float64, createdAt time.Time) Transfer {
+func NewTransfer(
+	ID TransferID,
+	accountOriginID,
+	accountDestinationID AccountID,
+	amount float64,
+	createdAt time.Time,
+) Transfer {
 	return Transfer{
 		ID:                   ID,
 		AccountOriginID:      accountOriginID,

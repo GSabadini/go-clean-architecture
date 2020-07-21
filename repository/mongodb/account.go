@@ -34,7 +34,7 @@ func NewAccountRepository(dbHandler repository.NoSQLHandler) AccountRepository {
 //Store insere uma Account no database
 func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
 	var accountBSON = &accountBSON{
-		ID:        account.ID,
+		ID:        string(account.ID),
 		Name:      account.Name,
 		CPF:       account.CPF,
 		Balance:   account.Balance,
@@ -49,7 +49,7 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 }
 
 //UpdateBalance atualiza o Balance de uma Account no database
-func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
+func (a AccountRepository) UpdateBalance(ID domain.AccountID, balance float64) error {
 	var (
 		query  = bson.M{"id": ID}
 		update = bson.M{"$set": bson.M{"balance": balance}}
@@ -75,7 +75,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 
 	for _, accountBSON := range accountsBson {
 		var account = domain.Account{
-			ID:        accountBSON.ID,
+			ID:        domain.AccountID(accountBSON.ID),
 			Name:      accountBSON.Name,
 			CPF:       accountBSON.CPF,
 			Balance:   accountBSON.Balance,
@@ -89,7 +89,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID busca uma Account por ID no database
-func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
+func (a AccountRepository) FindByID(ID domain.AccountID) (domain.Account, error) {
 	var (
 		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
@@ -105,7 +105,7 @@ func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 	}
 
 	return domain.Account{
-		ID:        accountBSON.ID,
+		ID:        domain.AccountID(accountBSON.ID),
 		Name:      accountBSON.Name,
 		CPF:       accountBSON.CPF,
 		Balance:   accountBSON.Balance,
@@ -114,7 +114,7 @@ func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 }
 
 //FindBalance busca o Balance de uma Account no database
-func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
+func (a AccountRepository) FindBalance(ID domain.AccountID) (domain.Account, error) {
 	var (
 		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
@@ -131,7 +131,7 @@ func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 	}
 
 	return domain.Account{
-		ID:        accountBSON.ID,
+		ID:        domain.AccountID(accountBSON.ID),
 		Name:      accountBSON.Name,
 		CPF:       accountBSON.CPF,
 		Balance:   accountBSON.Balance,

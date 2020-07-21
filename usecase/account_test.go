@@ -191,7 +191,7 @@ type mockAccountRepoFindBalance struct {
 	err    error
 }
 
-func (m mockAccountRepoFindBalance) FindBalance(_ string) (domain.Account, error) {
+func (m mockAccountRepoFindBalance) FindBalance(_ domain.AccountID) (domain.Account, error) {
 	return m.result, m.err
 }
 
@@ -199,7 +199,7 @@ func TestAccount_FindBalance(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		ID string
+		ID domain.AccountID
 	}
 
 	tests := []struct {

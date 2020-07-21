@@ -63,8 +63,8 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 
 	output, err := t.uc.Store(
-		input.AccountOriginID,
-		input.AccountDestinationID,
+		domain.AccountID(input.AccountOriginID),
+		domain.AccountID(input.AccountDestinationID),
 		input.Amount,
 	)
 	if err != nil {

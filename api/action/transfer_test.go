@@ -21,7 +21,7 @@ type mockTransferStore struct {
 	err    error
 }
 
-func (m mockTransferStore) Store(_, _ string, _ float64) (usecase.TransferOutput, error) {
+func (m mockTransferStore) Store(_, _ domain.AccountID, _ float64) (usecase.TransferOutput, error) {
 	return m.result, m.err
 }
 
@@ -37,7 +37,7 @@ func TestTransfer_Store(t *testing.T) {
 	tests := []struct {
 		name               string
 		args               args
-		usecaseMock        usecase.TransferUseCase
+		ucMock             usecase.TransferUseCase
 		expectedBody       []byte
 		expectedStatusCode int
 	}{
@@ -50,7 +50,7 @@ func TestTransfer_Store(t *testing.T) {
 					"amount": 10
 				}`),
 			},
-			usecaseMock: mockTransferStore{
+			ucMock: mockTransferStore{
 				result: usecase.TransferOutput{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04679",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -74,7 +74,7 @@ func TestTransfer_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockTransferStore{
+			ucMock: mockTransferStore{
 				result: usecase.TransferOutput{},
 				err:    errors.New("error"),
 			},
@@ -92,7 +92,7 @@ func TestTransfer_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockTransferStore{
+			ucMock: mockTransferStore{
 				result: usecase.TransferOutput{},
 				err:    domain.ErrInsufficientBalance,
 			},
@@ -110,7 +110,7 @@ func TestTransfer_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockTransferStore{
+			ucMock: mockTransferStore{
 				result: usecase.TransferOutput{},
 				err:    nil,
 			},
@@ -128,7 +128,7 @@ func TestTransfer_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockTransferStore{
+			ucMock: mockTransferStore{
 				result: usecase.TransferOutput{},
 				err:    nil,
 			},
@@ -146,7 +146,7 @@ func TestTransfer_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockTransferStore{
+			ucMock: mockTransferStore{
 				result: usecase.TransferOutput{},
 				err:    nil,
 			},
@@ -164,7 +164,7 @@ func TestTransfer_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockTransferStore{
+			ucMock: mockTransferStore{
 				result: usecase.TransferOutput{},
 				err:    nil,
 			},
@@ -183,7 +183,7 @@ func TestTransfer_Store(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewTransfer(tt.usecaseMock, logger.LoggerMock{}, validator)
+				action = NewTransfer(tt.ucMock, logger.LoggerMock{}, validator)
 			)
 
 			action.Store(w, req)
@@ -228,13 +228,13 @@ func TestTransfer_Index(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		usecaseMock        usecase.TransferUseCase
+		ucMock             usecase.TransferUseCase
 		expectedBody       []byte
 		expectedStatusCode int
 	}{
 		{
 			name: "Index handler success one transfer",
-			usecaseMock: mockTransferFindAll{
+			ucMock: mockTransferFindAll{
 				result: []usecase.TransferOutput{
 					{
 						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04679",
@@ -251,7 +251,7 @@ func TestTransfer_Index(t *testing.T) {
 		},
 		{
 			name: "Index handler success empty",
-			usecaseMock: mockTransferFindAll{
+			ucMock: mockTransferFindAll{
 				result: []usecase.TransferOutput{},
 				err:    nil,
 			},
@@ -260,7 +260,7 @@ func TestTransfer_Index(t *testing.T) {
 		},
 		{
 			name: "Index handler generic error",
-			usecaseMock: mockTransferFindAll{
+			ucMock: mockTransferFindAll{
 				err: errors.New("error"),
 			},
 			expectedBody:       []byte(`{"errors":["error"]}`),
@@ -274,7 +274,7 @@ func TestTransfer_Index(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewTransfer(tt.usecaseMock, logger.LoggerMock{}, validator)
+				action = NewTransfer(tt.ucMock, logger.LoggerMock{}, validator)
 			)
 
 			action.Index(w, req)

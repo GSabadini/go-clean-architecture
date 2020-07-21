@@ -69,9 +69,9 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 		}
 
 		transfers = append(transfers, domain.Transfer{
-			ID:                   ID,
-			AccountOriginID:      accountOriginID,
-			AccountDestinationID: accountDestinationID,
+			ID:                   domain.TransferID(ID),
+			AccountOriginID:      domain.AccountID(accountOriginID),
+			AccountDestinationID: domain.AccountID(accountDestinationID),
 			Amount:               amount,
 			CreatedAt:            createdAt,
 		})

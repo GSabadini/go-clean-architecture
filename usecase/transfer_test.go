@@ -35,7 +35,7 @@ type mockAccountRepo struct {
 	invokedFind             *invoked
 }
 
-func (m mockAccountRepo) UpdateBalance(_ string, _ float64) error {
+func (m mockAccountRepo) UpdateBalance(_ domain.AccountID, _ float64) error {
 	if m.invokedUpdate != nil && m.invokedUpdate.call {
 		return m.updateBalanceDestinationFake()
 	}
@@ -46,7 +46,7 @@ func (m mockAccountRepo) UpdateBalance(_ string, _ float64) error {
 	return m.updateBalanceOriginFake()
 }
 
-func (m mockAccountRepo) FindByID(_ string) (domain.Account, error) {
+func (m mockAccountRepo) FindByID(_ domain.AccountID) (domain.Account, error) {
 	if m.invokedFind != nil && m.invokedFind.call {
 		return m.findByIDDestinationFake()
 	}
@@ -61,8 +61,8 @@ func TestTransfer_Store(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		accountOriginID      string
-		accountDestinationID string
+		accountOriginID      domain.AccountID
+		accountDestinationID domain.AccountID
 		amount               float64
 	}
 
