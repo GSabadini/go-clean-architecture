@@ -28,7 +28,7 @@ func (m mockTransferStore) Store(_, _ domain.AccountID, _ float64) (usecase.Tran
 func TestTransfer_Store(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	type args struct {
 		rawPayload []byte
@@ -224,7 +224,7 @@ func (m mockTransferFindAll) FindAll() ([]usecase.TransferOutput, error) {
 func TestTransfer_Index(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	tests := []struct {
 		name               string

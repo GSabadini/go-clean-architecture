@@ -29,7 +29,7 @@ func (m mockAccountStore) Store(_, _ string, _ float64) (usecase.AccountOutput, 
 func TestAccount_Store(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	type args struct {
 		rawPayload []byte
@@ -189,7 +189,7 @@ func (m mockAccountFindAll) FindAll() ([]usecase.AccountOutput, error) {
 func TestAccount_Index(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	tests := []struct {
 		name               string
@@ -280,7 +280,7 @@ func (m mockAccountFindBalance) FindBalance(_ domain.AccountID) (usecase.Account
 func TestAccount_FindBalance(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	type args struct {
 		accountID string

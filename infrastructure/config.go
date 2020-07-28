@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"os"
 	"strconv"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
@@ -11,118 +10,106 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 )
 
-//Config armazena a estrutura de configuração da aplicação
-type Config struct {
-	appName   string
-	port      web.Port
-	WebServer web.Server
-	Logger    logger.Logger
-	dbSQL     repository.SQLHandler
-	dbNoSQL   repository.NoSQLHandler
-	validator validator.Validator
+//config armazena a estrutura de configuração da aplicação
+type config struct {
+	appName       string
+	webServerPort web.Port
+	webServer     web.Server
+	logger        logger.Logger
+	dbSQL         repository.SQLHandler
+	dbNoSQL       repository.NoSQLHandler
+	validator     validator.Validator
 }
 
 //NewConfig configura a aplicação
-func NewConfig() Config {
-	port, err := strconv.ParseInt(os.Getenv("APP_PORT"), 10, 64)
+func NewConfig() *config {
+	return &config{}
+}
+
+func (c *config) AppName(n string) *config {
+	c.appName = n
+	return c
+}
+
+func (c *config) WebServerPort(p string) *config {
+	port, err := strconv.ParseInt(p, 10, 64)
 	if err != nil {
 		panic(err)
 	}
 
-	config := Config{
-		appName: os.Getenv("APP_NAME"),
-		port:    web.Port(port),
-		Logger:  log(),
-	}
-
-	config.validator = validation(config.Logger)
-	config.dbSQL = postgresConn(config.Logger)
-	config.dbNoSQL = mongoDBConn(config.Logger)
-
-	config.WebServer = webServer(
-		config.Logger,
-		config.dbSQL,
-		config.dbNoSQL,
-		config.validator,
-		config.port,
-	)
-
-	return config
+	c.webServerPort = web.Port(port)
+	return c
 }
 
-func validation(log logger.Logger) validator.Validator {
-	v, err := validator.NewValidatorFactory(validator.InstanceGoPlayground, log)
+func (c *config) Logger(instance int) *config {
+	log, err := logger.NewLoggerFactory(instance, true)
 	if err != nil {
 		panic(err)
 	}
 
-	log.Infof("Successfully configured validator")
-
-	return v
+	c.logger = log
+	c.logger.Infof("Successfully configured log")
+	return c
 }
 
-func webServer(
-	log logger.Logger,
-	dbSQL repository.SQLHandler,
-	dbNoSQL repository.NoSQLHandler,
-	validator validator.Validator,
-	port web.Port,
-) web.Server {
+func (c *config) DbSQL(instance int) *config {
+	handler, err := database.NewDatabaseSQLFactory(instance)
+	if err != nil {
+		c.logger.Fatalln("Could not make a connection to the database")
+		panic(err)
+	}
+
+	c.logger.Infof("Successfully connected to the SQL database")
+
+	c.dbSQL = handler
+	return c
+}
+
+func (c *config) DbNoSQL(instance int) *config {
+	handler, err := database.NewDatabaseNoSQLFactory(instance)
+	if err != nil {
+		c.logger.Fatalln("Could not make a connection to the database")
+		panic(err)
+	}
+
+	c.logger.Infof("Successfully connected to the NoSQL database")
+
+	c.dbNoSQL = handler
+	return c
+}
+
+func (c *config) Validator(instance int) *config {
+	v, err := validator.NewValidatorFactory(instance)
+	if err != nil {
+		panic(err)
+	}
+
+	c.logger.Infof("Successfully configured validator")
+
+	c.validator = v
+	return c
+}
+
+func (c *config) WebServer(instance int) *config {
 	server, err := web.NewWebServerFactory(
-		web.InstanceGorillaMux,
-		log,
-		dbSQL,
-		dbNoSQL,
-		validator,
-		port,
+		instance,
+		c.logger,
+		c.dbSQL,
+		c.dbNoSQL,
+		c.validator,
+		c.webServerPort,
 	)
 
 	if err != nil {
 		panic(err)
 	}
 
-	log.Infof("Successfully configured web server")
+	c.logger.Infof("Successfully configured web server")
 
-	return server
+	c.webServer = server
+	return c
 }
 
-func log() logger.Logger {
-	log, err := logger.NewLoggerFactory(logger.InstanceLogrusLogger, true)
-	if err != nil {
-		panic(err)
-	}
-
-	log.Infof("Successfully configured logger")
-
-	return log
-}
-
-func mongoDBConn(log logger.Logger) repository.NoSQLHandler {
-	handler, err := database.NewDatabaseNoSQLFactory(
-		database.InstanceMongoDB,
-		database.NewConfigMongoDB(),
-	)
-	if err != nil {
-		log.Fatalln("Could not make a connection to the database")
-		panic(err)
-	}
-
-	log.Infof("Successfully connected to the NoSQL database")
-
-	return handler
-}
-
-func postgresConn(log logger.Logger) repository.SQLHandler {
-	handler, err := database.NewDatabaseSQLFactory(
-		database.InstancePostgres,
-		database.NewConfigPostgres(),
-	)
-	if err != nil {
-		log.Fatalln("Could not make a connection to the database")
-		panic(err)
-	}
-
-	log.Infof("Successfully connected to the SQL database")
-
-	return handler
+func (c *config) StartApp() {
+	c.webServer.Listen()
 }
