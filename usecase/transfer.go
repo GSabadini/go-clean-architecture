@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -35,11 +36,12 @@ func NewTransfer(
 
 //Store cria uma nova Transfer
 func (t Transfer) Store(
+	ctx context.Context,
 	accountOriginID,
 	accountDestinationID domain.AccountID,
 	amount float64,
 ) (TransferOutput, error) {
-	if err := t.process(accountOriginID, accountDestinationID, amount); err != nil {
+	if err := t.process(ctx, accountOriginID, accountDestinationID, amount); err != nil {
 		return TransferOutput{}, err
 	}
 
@@ -51,7 +53,7 @@ func (t Transfer) Store(
 		time.Now(),
 	)
 
-	transfer, err := t.transferRepo.Store(transfer)
+	transfer, err := t.transferRepo.Store(ctx, transfer)
 	if err != nil {
 		return TransferOutput{}, err
 	}
@@ -67,6 +69,7 @@ func (t Transfer) Store(
 
 /* TODO melhorar processsamento de transação */
 func (t Transfer) process(
+	ctx context.Context,
 	accountOriginID,
 	accountDestinationID domain.AccountID,
 	amount float64,
@@ -74,12 +77,12 @@ func (t Transfer) process(
 	//uc.Lock()
 	//defer uc.Unlock()
 
-	origin, err := t.accountRepo.FindByID(accountOriginID)
+	origin, err := t.accountRepo.FindByID(ctx, accountOriginID)
 	if err != nil {
 		return err
 	}
 
-	destination, err := t.accountRepo.FindByID(accountDestinationID)
+	destination, err := t.accountRepo.FindByID(ctx, accountDestinationID)
 	if err != nil {
 		return err
 	}
@@ -90,11 +93,11 @@ func (t Transfer) process(
 
 	destination.Deposit(amount)
 
-	if err = t.accountRepo.UpdateBalance(origin.ID, origin.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(ctx, origin.ID, origin.Balance); err != nil {
 		return err
 	}
 
-	if err = t.accountRepo.UpdateBalance(destination.ID, destination.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(ctx, destination.ID, destination.Balance); err != nil {
 		return err
 	}
 
@@ -102,10 +105,10 @@ func (t Transfer) process(
 }
 
 //FindAll retorna uma lista de transferências
-func (t Transfer) FindAll() ([]TransferOutput, error) {
+func (t Transfer) FindAll(ctx context.Context) ([]TransferOutput, error) {
 	var output = make([]TransferOutput, 0)
 
-	transfers, err := t.transferRepo.FindAll()
+	transfers, err := t.transferRepo.FindAll(ctx)
 	if err != nil {
 		return output, err
 	}

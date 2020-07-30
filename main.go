@@ -11,13 +11,14 @@ import (
 )
 
 func main() {
-	infrastructure.NewConfig().
+	var app = infrastructure.NewConfig().
 		AppName(os.Getenv("APP_NAME")).
 		Logger(logger.InstanceLogrusLogger).
 		DbSQL(database.InstancePostgres).
 		DbNoSQL(database.InstanceMongoDB).
-		Validator(validator.InstanceGoPlayground).
+		Validator(validator.InstanceGoPlayground)
+
+	app.WebServer(web.InstanceGorillaMux).
 		WebServerPort(os.Getenv("APP_PORT")).
-		WebServer(web.InstanceGorillaMux).
-		StartApp()
+		Start()
 }

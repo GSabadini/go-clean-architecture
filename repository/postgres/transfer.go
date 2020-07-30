@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -20,7 +21,7 @@ func NewTransferRepository(handler repository.SQLHandler) TransferRepository {
 }
 
 //Store insere uma Transfer no database
-func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	query := `
 		INSERT INTO 
 			transfers (id, account_origin_id, account_destination_id, amount, created_at)
@@ -43,7 +44,7 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 }
 
 //FindAll busca todas as Transfer no database
-func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
+func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	var (
 		transfers = make([]domain.Transfer, 0)
 		query     = "SELECT * FROM transfers"

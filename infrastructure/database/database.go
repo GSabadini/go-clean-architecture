@@ -18,7 +18,7 @@ const (
 func NewDatabaseNoSQLFactory(instance int) (repository.NoSQLHandler, error) {
 	switch instance {
 	case InstanceMongoDB:
-		db, err := NewMongoHandler(NewConfigMongoDB())
+		db, err := NewMongoHandler(newConfigMongoDB())
 		if err != nil {
 			return nil, err
 		}
@@ -36,7 +36,7 @@ const (
 func NewDatabaseSQLFactory(instance int) (repository.SQLHandler, error) {
 	switch instance {
 	case InstancePostgres:
-		db, err := NewPostgresHandler(NewConfigPostgres())
+		db, err := NewPostgresHandler(newConfigPostgres())
 		if err != nil {
 			return nil, err
 		}

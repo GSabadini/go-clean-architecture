@@ -13,11 +13,11 @@ type config struct {
 	password string
 }
 
-func NewConfigMongoDB() *config {
+func newConfigMongoDB() *config {
 	return &config{host: os.Getenv("MONGODB_HOST"), database: os.Getenv("MONGODB_DATABASE")}
 }
 
-func NewConfigPostgres() *config {
+func newConfigPostgres() *config {
 	return &config{
 		host:     os.Getenv("POSTGRES_HOST"),
 		database: os.Getenv("POSTGRES_DATABASE"),

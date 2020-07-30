@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"errors"
 	"time"
 )
@@ -19,11 +20,11 @@ var (
 
 //AccountRepository expõe os métodos disponíveis para as abstrações do repositório de Account
 type AccountRepository interface {
-	Store(Account) (Account, error)
-	UpdateBalance(AccountID, float64) error
-	FindAll() ([]Account, error)
-	FindByID(AccountID) (Account, error)
-	FindBalance(AccountID) (Account, error)
+	Store(context.Context, Account) (Account, error)
+	UpdateBalance(context.Context, AccountID, float64) error
+	FindAll(context.Context) ([]Account, error)
+	FindByID(context.Context, AccountID) (Account, error)
+	FindBalance(context.Context, AccountID) (Account, error)
 }
 
 //AccountID define o tipo identificador de uma Account

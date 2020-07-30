@@ -36,9 +36,9 @@ func NewWebServerFactory(
 ) (Server, error) {
 	switch instance {
 	case InstanceGorillaMux:
-		return NewGorillaMux(log, dbSQL, validator, port), nil
+		return newGorillaMux(log, dbSQL, validator, port), nil
 	case InstanceGin:
-		return NewGinServer(log, dbNoSQL, validator, port), nil
+		return newGinServer(log, dbNoSQL, validator, port), nil
 	default:
 		return nil, errInvalidWebServerInstance
 	}

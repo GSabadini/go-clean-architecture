@@ -15,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type GinEngine struct {
+type ginEngine struct {
 	router    *gin.Engine
 	log       logger.Logger
 	db        repository.NoSQLHandler
@@ -23,14 +23,13 @@ type GinEngine struct {
 	port      Port
 }
 
-//NewGinServer constrói um GinEngine com todas as suas dependências
-func NewGinServer(
+func newGinServer(
 	log logger.Logger,
 	db repository.NoSQLHandler,
 	validator validator.Validator,
 	port Port,
-) GinEngine {
-	return GinEngine{
+) *ginEngine {
+	return &ginEngine{
 		router:    gin.New(),
 		log:       log,
 		db:        db,
@@ -39,7 +38,7 @@ func NewGinServer(
 	}
 }
 
-func (g GinEngine) Listen() {
+func (g ginEngine) Listen() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.Recovery()
 
@@ -58,7 +57,7 @@ func (g GinEngine) Listen() {
 	}
 }
 
-func (g GinEngine) setAppHandlers(router *gin.Engine) {
+func (g ginEngine) setAppHandlers(router *gin.Engine) {
 	router.POST("/v1/transfers", g.buildActionStoreTransfer())
 	router.GET("/v1/transfers", g.buildActionIndexTransfer())
 
@@ -69,7 +68,7 @@ func (g GinEngine) setAppHandlers(router *gin.Engine) {
 	router.GET("/v1/healthcheck", g.healthcheck())
 }
 
-func (g GinEngine) buildActionStoreTransfer() gin.HandlerFunc {
+func (g ginEngine) buildActionStoreTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			transferRepository = mongodb.NewTransferRepository(g.db)
@@ -83,7 +82,7 @@ func (g GinEngine) buildActionStoreTransfer() gin.HandlerFunc {
 	}
 }
 
-func (g GinEngine) buildActionIndexTransfer() gin.HandlerFunc {
+func (g ginEngine) buildActionIndexTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			transferRepository = mongodb.NewTransferRepository(g.db)
@@ -96,7 +95,7 @@ func (g GinEngine) buildActionIndexTransfer() gin.HandlerFunc {
 	}
 }
 
-func (g GinEngine) buildActionStoreAccount() gin.HandlerFunc {
+func (g ginEngine) buildActionStoreAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
@@ -108,7 +107,7 @@ func (g GinEngine) buildActionStoreAccount() gin.HandlerFunc {
 	}
 }
 
-func (g GinEngine) buildActionIndexAccount() gin.HandlerFunc {
+func (g ginEngine) buildActionIndexAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
@@ -120,7 +119,7 @@ func (g GinEngine) buildActionIndexAccount() gin.HandlerFunc {
 	}
 }
 
-func (g GinEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
+func (g ginEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
@@ -136,7 +135,7 @@ func (g GinEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
 	}
 }
 
-func (g GinEngine) healthcheck() gin.HandlerFunc {
+func (g ginEngine) healthcheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		action.HealthCheck(c.Writer, c.Request)
 	}

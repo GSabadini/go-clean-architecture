@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -32,7 +33,7 @@ func NewAccount(repo domain.AccountRepository) Account {
 }
 
 //Store cria uma nova Account
-func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error) {
+func (a Account) Store(ctx context.Context, name, CPF string, balance float64) (AccountOutput, error) {
 	var account = domain.NewAccount(
 		domain.AccountID(domain.NewUUID()),
 		name,
@@ -41,7 +42,7 @@ func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error)
 		time.Now(),
 	)
 
-	account, err := a.repo.Store(account)
+	account, err := a.repo.Store(ctx, account)
 	if err != nil {
 		return AccountOutput{}, err
 	}
@@ -56,10 +57,10 @@ func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error)
 }
 
 //FindAll retorna uma lista de Accounts
-func (a Account) FindAll() ([]AccountOutput, error) {
+func (a Account) FindAll(ctx context.Context) ([]AccountOutput, error) {
 	var output = make([]AccountOutput, 0)
 
-	accounts, err := a.repo.FindAll()
+	accounts, err := a.repo.FindAll(ctx)
 	if err != nil {
 		return output, err
 	}
@@ -78,8 +79,8 @@ func (a Account) FindAll() ([]AccountOutput, error) {
 }
 
 //FindBalance retorna o saldo de uma Account
-func (a Account) FindBalance(ID domain.AccountID) (AccountBalanceOutput, error) {
-	account, err := a.repo.FindBalance(ID)
+func (a Account) FindBalance(ctx context.Context, ID domain.AccountID) (AccountBalanceOutput, error) {
+	account, err := a.repo.FindBalance(ctx, ID)
 	if err != nil {
 		return AccountBalanceOutput{}, err
 	}

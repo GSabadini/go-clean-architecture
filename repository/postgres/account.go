@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -20,7 +21,7 @@ func NewAccountRepository(handler repository.SQLHandler) AccountRepository {
 }
 
 //Store insere uma Account no database
-func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
+func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
 	query := `
 		INSERT INTO 
 			accounts (id, name, cpf, balance, created_at)
@@ -43,7 +44,7 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 }
 
 //UpdateBalance atualiza o Balance de uma Account no database
-func (a AccountRepository) UpdateBalance(ID domain.AccountID, balance float64) error {
+func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance float64) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
 	if err := a.handler.Execute(query, balance, ID); err != nil {
@@ -54,7 +55,7 @@ func (a AccountRepository) UpdateBalance(ID domain.AccountID, balance float64) e
 }
 
 //FindAlL busca todas as Account no database
-func (a AccountRepository) FindAll() ([]domain.Account, error) {
+func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error) {
 	var (
 		accounts = make([]domain.Account, 0)
 		query    = "SELECT * FROM accounts"
@@ -96,7 +97,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID busca uma Account por ID no database
-func (a AccountRepository) FindByID(ID domain.AccountID) (domain.Account, error) {
+func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		account   = domain.Account{}
 		query     = "SELECT * FROM accounts WHERE id = $1"
@@ -132,7 +133,7 @@ func (a AccountRepository) FindByID(ID domain.AccountID) (domain.Account, error)
 }
 
 //FindBalance busca o Balance de uma Account no database
-func (a AccountRepository) FindBalance(ID domain.AccountID) (domain.Account, error) {
+func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		account = domain.Account{}
 		query   = "SELECT balance FROM accounts WHERE id = $1"

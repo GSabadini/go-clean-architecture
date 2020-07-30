@@ -1,11 +1,13 @@
 package usecase
 
 import (
+	"context"
 	"errors"
-	"github.com/gsabadini/go-bank-transfer/domain"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
 type mockTransferRepoStore struct {
@@ -15,7 +17,7 @@ type mockTransferRepoStore struct {
 	err    error
 }
 
-func (m mockTransferRepoStore) Store(_ domain.Transfer) (domain.Transfer, error) {
+func (m mockTransferRepoStore) Store(_ context.Context, _ domain.Transfer) (domain.Transfer, error) {
 	return m.result, m.err
 }
 
@@ -35,7 +37,7 @@ type mockAccountRepo struct {
 	invokedFind             *invoked
 }
 
-func (m mockAccountRepo) UpdateBalance(_ domain.AccountID, _ float64) error {
+func (m mockAccountRepo) UpdateBalance(_ context.Context, _ domain.AccountID, _ float64) error {
 	if m.invokedUpdate != nil && m.invokedUpdate.call {
 		return m.updateBalanceDestinationFake()
 	}
@@ -46,7 +48,7 @@ func (m mockAccountRepo) UpdateBalance(_ domain.AccountID, _ float64) error {
 	return m.updateBalanceOriginFake()
 }
 
-func (m mockAccountRepo) FindByID(_ domain.AccountID) (domain.Account, error) {
+func (m mockAccountRepo) FindByID(_ context.Context, _ domain.AccountID) (domain.Account, error) {
 	if m.invokedFind != nil && m.invokedFind.call {
 		return m.findByIDDestinationFake()
 	}
@@ -353,7 +355,7 @@ func TestTransfer_Store(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var uc = NewTransfer(tt.transferRepo, tt.accountRepo)
-			got, err := uc.Store(tt.args.accountOriginID, tt.args.accountDestinationID, tt.args.amount)
+			got, err := uc.Store(context.TODO(), tt.args.accountOriginID, tt.args.accountDestinationID, tt.args.amount)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -374,7 +376,7 @@ type mockTransferRepoFindAll struct {
 	err    error
 }
 
-func (m mockTransferRepoFindAll) FindAll() ([]domain.Transfer, error) {
+func (m mockTransferRepoFindAll) FindAll(_ context.Context) ([]domain.Transfer, error) {
 	return m.result, m.err
 }
 
@@ -451,7 +453,7 @@ func TestTransfer_FindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var uc = NewTransfer(tt.transferRepo, tt.accountRepo)
-			result, err := uc.FindAll()
+			result, err := uc.FindAll(context.TODO())
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

@@ -110,6 +110,6 @@ func (c *config) WebServer(instance int) *config {
 	return c
 }
 
-func (c *config) StartApp() {
+func (c *config) Start() {
 	c.webServer.Listen()
 }

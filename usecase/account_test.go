@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"reflect"
@@ -15,7 +16,7 @@ type mockAccountRepoStore struct {
 	err    error
 }
 
-func (m mockAccountRepoStore) Store(_ domain.Account) (domain.Account, error) {
+func (m mockAccountRepoStore) Store(_ context.Context, _ domain.Account) (domain.Account, error) {
 	return m.result, m.err
 }
 
@@ -78,7 +79,7 @@ func TestAccount_Store(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var uc = NewAccount(tt.repository)
-			result, err := uc.Store(tt.args.name, tt.args.CPF, tt.args.balance)
+			result, err := uc.Store(context.TODO(), tt.args.name, tt.args.CPF, tt.args.balance)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -98,7 +99,7 @@ type mockAccountRepoFindAll struct {
 	err    error
 }
 
-func (m mockAccountRepoFindAll) FindAll() ([]domain.Account, error) {
+func (m mockAccountRepoFindAll) FindAll(_ context.Context) ([]domain.Account, error) {
 	return m.result, m.err
 }
 
@@ -171,7 +172,7 @@ func TestAccount_FindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var uc = NewAccount(tt.repository)
-			result, err := uc.FindAll()
+			result, err := uc.FindAll(context.TODO())
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -191,7 +192,7 @@ type mockAccountRepoFindBalance struct {
 	err    error
 }
 
-func (m mockAccountRepoFindBalance) FindBalance(_ domain.AccountID) (domain.Account, error) {
+func (m mockAccountRepoFindBalance) FindBalance(_ context.Context, _ domain.AccountID) (domain.Account, error) {
 	return m.result, m.err
 }
 
@@ -240,7 +241,7 @@ func TestAccount_FindBalance(t *testing.T) {
 
 	for _, tt := range tests {
 		var uc = NewAccount(tt.repository)
-		result, err := uc.FindBalance(tt.args.ID)
+		result, err := uc.FindBalance(context.TODO(), tt.args.ID)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

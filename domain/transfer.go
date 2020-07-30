@@ -1,11 +1,14 @@
 package domain
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 //TransferRepository expõe os métodos disponíveis para as abstrações do repositório de Transfer
 type TransferRepository interface {
-	Store(Transfer) (Transfer, error)
-	FindAll() ([]Transfer, error)
+	Store(context.Context, Transfer) (Transfer, error)
+	FindAll(context.Context) ([]Transfer, error)
 }
 
 //TransferID define o tipo identificador de uma Transfer

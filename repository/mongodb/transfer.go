@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -30,7 +31,7 @@ func NewTransferRepository(handler repository.NoSQLHandler) TransferRepository {
 }
 
 //Store insere uma Transfer no database
-func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	transferBson := &transferBSON{
 		ID:                   string(transfer.ID),
 		AccountOriginID:      string(transfer.AccountOriginID),
@@ -47,7 +48,7 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 }
 
 //FindAll busca todas as Transfer no database
-func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
+func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	var (
 		transfersBson = make([]transferBSON, 0)
 		transfers     = make([]domain.Transfer, 0)

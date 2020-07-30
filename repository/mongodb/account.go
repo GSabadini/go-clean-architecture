@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -32,7 +33,7 @@ func NewAccountRepository(dbHandler repository.NoSQLHandler) AccountRepository {
 }
 
 //Store insere uma Account no database
-func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
+func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
 	var accountBSON = &accountBSON{
 		ID:        string(account.ID),
 		Name:      account.Name,
@@ -49,7 +50,7 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 }
 
 //UpdateBalance atualiza o Balance de uma Account no database
-func (a AccountRepository) UpdateBalance(ID domain.AccountID, balance float64) error {
+func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance float64) error {
 	var (
 		query  = bson.M{"id": ID}
 		update = bson.M{"$set": bson.M{"balance": balance}}
@@ -63,7 +64,7 @@ func (a AccountRepository) UpdateBalance(ID domain.AccountID, balance float64) e
 }
 
 //FindAll busca todas as Account no database
-func (a AccountRepository) FindAll() ([]domain.Account, error) {
+func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error) {
 	var (
 		accountsBson = make([]accountBSON, 0)
 		accounts     = make([]domain.Account, 0)
@@ -114,7 +115,7 @@ func (a AccountRepository) FindByID(ID domain.AccountID) (domain.Account, error)
 }
 
 //FindBalance busca o Balance de uma Account no database
-func (a AccountRepository) FindBalance(ID domain.AccountID) (domain.Account, error) {
+func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
