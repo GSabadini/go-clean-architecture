@@ -16,8 +16,8 @@ type TransferRepository struct {
 }
 
 //NewTransferRepository constrói um TransferRepository com suas dependências
-func NewTransferRepository(handler repository.SQLHandler) TransferRepository {
-	return TransferRepository{handler: handler}
+func NewTransferRepository(h repository.SQLHandler) TransferRepository {
+	return TransferRepository{handler: h}
 }
 
 //Store insere uma Transfer no database
@@ -29,7 +29,8 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 			($1, $2, $3, $4, $5)
 	`
 
-	if err := t.handler.Execute(
+	if err := t.handler.ExecuteContext(
+		ctx,
 		query,
 		transfer.ID,
 		transfer.AccountOriginID,
@@ -50,7 +51,7 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 		query     = "SELECT * FROM transfers"
 	)
 
-	rows, err := t.handler.Query(query)
+	rows, err := t.handler.QueryContext(ctx, query)
 	if err != nil {
 		return transfers, errors.Wrap(err, "error listing transfers")
 	}

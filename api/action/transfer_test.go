@@ -2,6 +2,7 @@ package action
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -21,7 +22,12 @@ type mockTransferStore struct {
 	err    error
 }
 
-func (m mockTransferStore) Store(_, _ domain.AccountID, _ float64) (usecase.TransferOutput, error) {
+func (m mockTransferStore) Store(
+	_ context.Context,
+	_ domain.AccountID,
+	_ domain.AccountID,
+	_ float64,
+) (usecase.TransferOutput, error) {
 	return m.result, m.err
 }
 
@@ -217,7 +223,7 @@ type mockTransferFindAll struct {
 	err    error
 }
 
-func (m mockTransferFindAll) FindAll() ([]usecase.TransferOutput, error) {
+func (m mockTransferFindAll) FindAll(_ context.Context) ([]usecase.TransferOutput, error) {
 	return m.result, m.err
 }
 

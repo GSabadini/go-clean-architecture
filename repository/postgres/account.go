@@ -16,8 +16,8 @@ type AccountRepository struct {
 }
 
 //NewAccountRepository constrói um AccountRepository com suas dependências
-func NewAccountRepository(handler repository.SQLHandler) AccountRepository {
-	return AccountRepository{handler: handler}
+func NewAccountRepository(h repository.SQLHandler) AccountRepository {
+	return AccountRepository{handler: h}
 }
 
 //Store insere uma Account no database
@@ -29,7 +29,8 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 			($1, $2, $3, $4, $5)
 	`
 
-	if err := a.handler.Execute(
+	if err := a.handler.ExecuteContext(
+		ctx,
 		query,
 		account.ID,
 		account.Name,
@@ -47,7 +48,7 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance float64) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
-	if err := a.handler.Execute(query, balance, ID); err != nil {
+	if err := a.handler.ExecuteContext(ctx, query, balance, ID); err != nil {
 		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
 	}
 
@@ -61,7 +62,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 		query    = "SELECT * FROM accounts"
 	)
 
-	rows, err := a.handler.Query(query)
+	rows, err := a.handler.QueryContext(ctx, query)
 	if err != nil {
 		return accounts, errors.Wrap(err, "error listing accounts")
 	}
@@ -108,7 +109,7 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 		createdAt time.Time
 	)
 
-	row, err := a.handler.Query(query, ID)
+	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
 		return account, errors.Wrap(err, "error fetching account")
 	}
@@ -140,7 +141,7 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 		balance float64
 	)
 
-	row, err := a.handler.Query(query, ID)
+	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
 		return account, errors.Wrap(err, "error fetching account balance")
 	}

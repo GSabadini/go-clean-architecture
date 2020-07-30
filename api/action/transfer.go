@@ -63,6 +63,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 
 	output, err := t.uc.Store(
+		r.Context(),
 		domain.AccountID(input.AccountOriginID),
 		domain.AccountID(input.AccountDestinationID),
 		input.Amount,
@@ -97,10 +98,10 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 }
 
 //Index é um handler para retornar todas as Transfer
-func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
+func (t Transfer) Index(w http.ResponseWriter, r *http.Request) {
 	const logKey = "index_transfer"
 
-	output, err := t.uc.FindAll()
+	output, err := t.uc.FindAll(r.Context())
 	if err != nil {
 		t.logError(
 			logKey,

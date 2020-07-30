@@ -2,6 +2,7 @@ package database
 
 import (
 	"os"
+	"time"
 )
 
 type config struct {
@@ -11,10 +12,17 @@ type config struct {
 	driver   string
 	user     string
 	password string
+
+	connTimeout time.Duration
+	ctxTimeout  time.Duration
 }
 
 func newConfigMongoDB() *config {
-	return &config{host: os.Getenv("MONGODB_HOST"), database: os.Getenv("MONGODB_DATABASE")}
+	return &config{
+		host:        os.Getenv("MONGODB_HOST"),
+		database:    os.Getenv("MONGODB_DATABASE"),
+		connTimeout: 60 * time.Second,
+	}
 }
 
 func newConfigPostgres() *config {

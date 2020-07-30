@@ -354,8 +354,8 @@ func TestTransfer_Store(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewTransfer(tt.transferRepo, tt.accountRepo)
-			got, err := uc.Store(context.TODO(), tt.args.accountOriginID, tt.args.accountDestinationID, tt.args.amount)
+			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, time.Second)
+			got, err := uc.Store(context.Background(), tt.args.accountOriginID, tt.args.accountDestinationID, tt.args.amount)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -452,8 +452,8 @@ func TestTransfer_FindAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewTransfer(tt.transferRepo, tt.accountRepo)
-			result, err := uc.FindAll(context.TODO())
+			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, time.Second)
+			result, err := uc.FindAll(context.Background())
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

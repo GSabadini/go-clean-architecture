@@ -2,6 +2,7 @@ package action
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -22,7 +23,7 @@ type mockAccountStore struct {
 	err    error
 }
 
-func (m mockAccountStore) Store(_, _ string, _ float64) (usecase.AccountOutput, error) {
+func (m mockAccountStore) Store(_ context.Context, _, _ string, _ float64) (usecase.AccountOutput, error) {
 	return m.result, m.err
 }
 
@@ -182,7 +183,7 @@ type mockAccountFindAll struct {
 	err    error
 }
 
-func (m mockAccountFindAll) FindAll() ([]usecase.AccountOutput, error) {
+func (m mockAccountFindAll) FindAll(_ context.Context) ([]usecase.AccountOutput, error) {
 	return m.result, m.err
 }
 
@@ -273,7 +274,7 @@ type mockAccountFindBalance struct {
 	err    error
 }
 
-func (m mockAccountFindBalance) FindBalance(_ domain.AccountID) (usecase.AccountBalanceOutput, error) {
+func (m mockAccountFindBalance) FindBalance(_ context.Context, _ domain.AccountID) (usecase.AccountBalanceOutput, error) {
 	return m.result, m.err
 }
 

@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -24,20 +23,24 @@ type AccountBalanceOutput struct {
 
 //Account armazena as dependências para os casos de uso de Account
 type Account struct {
-	repo domain.AccountRepository
+	repo       domain.AccountRepository
+	ctxTimeout time.Duration
 }
 
 //NewAccount constrói um Account com suas dependências
-func NewAccount(repo domain.AccountRepository) Account {
-	return Account{repo: repo}
+func NewAccount(repo domain.AccountRepository, t time.Duration) Account {
+	return Account{repo: repo, ctxTimeout: t}
 }
 
 //Store cria uma nova Account
 func (a Account) Store(ctx context.Context, name, CPF string, balance float64) (AccountOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
+	defer cancel()
+
 	var account = domain.NewAccount(
 		domain.AccountID(domain.NewUUID()),
 		name,
-		a.cleanCPF(CPF),
+		CPF,
 		balance,
 		time.Now(),
 	)
@@ -58,6 +61,9 @@ func (a Account) Store(ctx context.Context, name, CPF string, balance float64) (
 
 //FindAll retorna uma lista de Accounts
 func (a Account) FindAll(ctx context.Context) ([]AccountOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
+	defer cancel()
+
 	var output = make([]AccountOutput, 0)
 
 	accounts, err := a.repo.FindAll(ctx)
@@ -80,6 +86,9 @@ func (a Account) FindAll(ctx context.Context) ([]AccountOutput, error) {
 
 //FindBalance retorna o saldo de uma Account
 func (a Account) FindBalance(ctx context.Context, ID domain.AccountID) (AccountBalanceOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
+	defer cancel()
+
 	account, err := a.repo.FindBalance(ctx, ID)
 	if err != nil {
 		return AccountBalanceOutput{}, err
@@ -88,8 +97,4 @@ func (a Account) FindBalance(ctx context.Context, ID domain.AccountID) (AccountB
 	return AccountBalanceOutput{
 		Balance: account.Balance,
 	}, nil
-}
-
-func (a Account) cleanCPF(cpf string) string {
-	return strings.Replace(strings.Replace(cpf, ".", "", -1), "-", "", -1)
 }

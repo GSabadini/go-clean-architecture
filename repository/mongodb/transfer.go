@@ -21,13 +21,13 @@ type transferBSON struct {
 
 //TransferRepository armazena a estrutura de dados de um repositório de Transfer
 type TransferRepository struct {
-	handler        repository.NoSQLHandler
 	collectionName string
+	handler        repository.NoSQLHandler
 }
 
 //NewTransferRepository constrói um repository com suas dependências
-func NewTransferRepository(handler repository.NoSQLHandler) TransferRepository {
-	return TransferRepository{handler: handler, collectionName: "transfers"}
+func NewTransferRepository(h repository.NoSQLHandler) TransferRepository {
+	return TransferRepository{handler: h, collectionName: "transfers"}
 }
 
 //Store insere uma Transfer no database
@@ -40,7 +40,7 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 		CreatedAt:            transfer.CreatedAt,
 	}
 
-	if err := t.handler.Store(t.collectionName, transferBson); err != nil {
+	if err := t.handler.Store(ctx, t.collectionName, transferBson); err != nil {
 		return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
 	}
 
@@ -54,7 +54,7 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 		transfers     = make([]domain.Transfer, 0)
 	)
 
-	if err := t.handler.FindAll(t.collectionName, nil, &transfersBson); err != nil {
+	if err := t.handler.FindAll(ctx, t.collectionName, nil, &transfersBson); err != nil {
 		return transfers, errors.Wrap(err, "error listing transfers")
 	}
 

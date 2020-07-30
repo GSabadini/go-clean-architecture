@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
@@ -12,13 +13,18 @@ import (
 
 //config armazena a estrutura de configuração da aplicação
 type config struct {
-	appName       string
+	appName   string
+	logger    logger.Logger
+	validator validator.Validator
+
+	dbSQL           repository.SQLHandler
+	dbSQLCtxTimeout time.Duration
+
+	dbNoSQL           repository.NoSQLHandler
+	dbNoSQLCtxTimeout time.Duration
+
 	webServerPort web.Port
 	webServer     web.Server
-	logger        logger.Logger
-	dbSQL         repository.SQLHandler
-	dbNoSQL       repository.NoSQLHandler
-	validator     validator.Validator
 }
 
 //NewConfig configura a aplicação
@@ -26,23 +32,13 @@ func NewConfig() *config {
 	return &config{}
 }
 
-func (c *config) AppName(n string) *config {
-	c.appName = n
-	return c
-}
-
-func (c *config) WebServerPort(p string) *config {
-	port, err := strconv.ParseInt(p, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-
-	c.webServerPort = web.Port(port)
+func (c *config) Name(name string) *config {
+	c.appName = name
 	return c
 }
 
 func (c *config) Logger(instance int) *config {
-	log, err := logger.NewLoggerFactory(instance, true)
+	log, err := logger.NewLoggerFactory(instance)
 	if err != nil {
 		panic(err)
 	}
@@ -65,8 +61,13 @@ func (c *config) DbSQL(instance int) *config {
 	return c
 }
 
+func (c *config) DbSQLCtxTimeout(t time.Duration) *config {
+	c.dbSQLCtxTimeout = t
+	return c
+}
+
 func (c *config) DbNoSQL(instance int) *config {
-	handler, err := database.NewDatabaseNoSQLFactory(instance)
+	h, err := database.NewDatabaseNoSQLFactory(instance)
 	if err != nil {
 		c.logger.Fatalln("Could not make a connection to the database")
 		panic(err)
@@ -74,7 +75,12 @@ func (c *config) DbNoSQL(instance int) *config {
 
 	c.logger.Infof("Successfully connected to the NoSQL database")
 
-	c.dbNoSQL = handler
+	c.dbNoSQL = h
+	return c
+}
+
+func (c *config) DbNoSQLCtxTimeout(t time.Duration) *config {
+	c.dbSQLCtxTimeout = t
 	return c
 }
 
@@ -91,13 +97,15 @@ func (c *config) Validator(instance int) *config {
 }
 
 func (c *config) WebServer(instance int) *config {
-	server, err := web.NewWebServerFactory(
+	s, err := web.NewWebServerFactory(
 		instance,
 		c.logger,
 		c.dbSQL,
 		c.dbNoSQL,
 		c.validator,
 		c.webServerPort,
+		c.dbSQLCtxTimeout,
+		c.dbNoSQLCtxTimeout,
 	)
 
 	if err != nil {
@@ -106,7 +114,17 @@ func (c *config) WebServer(instance int) *config {
 
 	c.logger.Infof("Successfully configured web server")
 
-	c.webServer = server
+	c.webServer = s
+	return c
+}
+
+func (c *config) WebServerPort(port string) *config {
+	p, err := strconv.ParseInt(port, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	c.webServerPort = web.Port(p)
 	return c
 }
 

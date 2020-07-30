@@ -20,17 +20,20 @@ type TransferOutput struct {
 type Transfer struct {
 	transferRepo domain.TransferRepository
 	accountRepo  domain.AccountRepository
-	//sync.Mutex
+
+	ctxTimeout time.Duration
 }
 
 //NewTransfer constrói um Transfer com suas dependências
 func NewTransfer(
 	transferRepo domain.TransferRepository,
 	accountRepo domain.AccountRepository,
+	t time.Duration,
 ) Transfer {
 	return Transfer{
 		transferRepo: transferRepo,
 		accountRepo:  accountRepo,
+		ctxTimeout:   t,
 	}
 }
 
@@ -41,6 +44,9 @@ func (t Transfer) Store(
 	accountDestinationID domain.AccountID,
 	amount float64,
 ) (TransferOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
+	defer cancel()
+
 	if err := t.process(ctx, accountOriginID, accountDestinationID, amount); err != nil {
 		return TransferOutput{}, err
 	}
@@ -74,9 +80,6 @@ func (t Transfer) process(
 	accountDestinationID domain.AccountID,
 	amount float64,
 ) error {
-	//uc.Lock()
-	//defer uc.Unlock()
-
 	origin, err := t.accountRepo.FindByID(ctx, accountOriginID)
 	if err != nil {
 		return err
@@ -106,6 +109,9 @@ func (t Transfer) process(
 
 //FindAll retorna uma lista de transferências
 func (t Transfer) FindAll(ctx context.Context) ([]TransferOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
+	defer cancel()
+
 	var output = make([]TransferOutput, 0)
 
 	transfers, err := t.transferRepo.FindAll(ctx)

@@ -78,7 +78,7 @@ func TestAccount_Store(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewAccount(tt.repository)
+			var uc = NewAccount(tt.repository, time.Second)
 			result, err := uc.Store(context.TODO(), tt.args.name, tt.args.CPF, tt.args.balance)
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
@@ -171,8 +171,8 @@ func TestAccount_FindAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewAccount(tt.repository)
-			result, err := uc.FindAll(context.TODO())
+			var uc = NewAccount(tt.repository, time.Second)
+			result, err := uc.FindAll(context.Background())
 
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
@@ -240,8 +240,8 @@ func TestAccount_FindBalance(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var uc = NewAccount(tt.repository)
-		result, err := uc.FindBalance(context.TODO(), tt.args.ID)
+		var uc = NewAccount(tt.repository, time.Second)
+		result, err := uc.FindBalance(context.Background(), tt.args.ID)
 
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)

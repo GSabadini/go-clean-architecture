@@ -23,13 +23,13 @@ type accountBSON struct {
 
 //AccountRepository armazena a estrutura de dados de um repositório de Account
 type AccountRepository struct {
-	handler        repository.NoSQLHandler
 	collectionName string
+	handler        repository.NoSQLHandler
 }
 
 //NewAccountRepository constrói um repository com suas dependências
-func NewAccountRepository(dbHandler repository.NoSQLHandler) AccountRepository {
-	return AccountRepository{handler: dbHandler, collectionName: "accounts"}
+func NewAccountRepository(h repository.NoSQLHandler) AccountRepository {
+	return AccountRepository{handler: h, collectionName: "accounts"}
 }
 
 //Store insere uma Account no database
@@ -42,7 +42,7 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 		CreatedAt: account.CreatedAt,
 	}
 
-	if err := a.handler.Store(a.collectionName, accountBSON); err != nil {
+	if err := a.handler.Store(ctx, a.collectionName, accountBSON); err != nil {
 		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
 
@@ -56,7 +56,7 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 		update = bson.M{"$set": bson.M{"balance": balance}}
 	)
 
-	if err := a.handler.Update(a.collectionName, query, update); err != nil {
+	if err := a.handler.Update(ctx, a.collectionName, query, update); err != nil {
 		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
 	}
 
@@ -70,7 +70,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 		accounts     = make([]domain.Account, 0)
 	)
 
-	if err := a.handler.FindAll(a.collectionName, nil, &accountsBson); err != nil {
+	if err := a.handler.FindAll(ctx, a.collectionName, nil, &accountsBson); err != nil {
 		return accounts, errors.Wrap(err, "error listing accounts")
 	}
 
@@ -90,13 +90,13 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 }
 
 //FindByID busca uma Account por ID no database
-func (a AccountRepository) FindByID(ID domain.AccountID) (domain.Account, error) {
+func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
 	)
 
-	if err := a.handler.FindOne(a.collectionName, query, nil, accountBSON); err != nil {
+	if err := a.handler.FindOne(ctx, a.collectionName, query, nil, accountBSON); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
 			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account")
@@ -122,7 +122,7 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 		selector    = bson.M{"balance": 1, "_id": 0}
 	)
 
-	if err := a.handler.FindOne(a.collectionName, query, selector, accountBSON); err != nil {
+	if err := a.handler.FindOne(ctx, a.collectionName, query, selector, accountBSON); err != nil {
 		switch err {
 		case mgo.ErrNotFound:
 			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account balance")

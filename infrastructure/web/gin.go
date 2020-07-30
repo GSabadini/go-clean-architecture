@@ -16,11 +16,12 @@ import (
 )
 
 type ginEngine struct {
-	router    *gin.Engine
-	log       logger.Logger
-	db        repository.NoSQLHandler
-	validator validator.Validator
-	port      Port
+	router     *gin.Engine
+	log        logger.Logger
+	db         repository.NoSQLHandler
+	validator  validator.Validator
+	port       Port
+	ctxTimeout time.Duration
 }
 
 func newGinServer(
@@ -28,13 +29,15 @@ func newGinServer(
 	db repository.NoSQLHandler,
 	validator validator.Validator,
 	port Port,
+	t time.Duration,
 ) *ginEngine {
 	return &ginEngine{
-		router:    gin.New(),
-		log:       log,
-		db:        db,
-		validator: validator,
-		port:      port,
+		router:     gin.New(),
+		log:        log,
+		db:         db,
+		validator:  validator,
+		port:       port,
+		ctxTimeout: t,
 	}
 }
 
@@ -46,7 +49,7 @@ func (g ginEngine) Listen() {
 
 	server := &http.Server{
 		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		WriteTimeout: 15 * time.Second,
 		Addr:         fmt.Sprintf(":%d", g.port),
 		Handler:      g.router,
 	}
@@ -73,7 +76,7 @@ func (g ginEngine) buildActionStoreTransfer() gin.HandlerFunc {
 		var (
 			transferRepository = mongodb.NewTransferRepository(g.db)
 			accountRepository  = mongodb.NewAccountRepository(g.db)
-			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
+			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository, g.ctxTimeout)
 		)
 
 		var transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
@@ -87,7 +90,7 @@ func (g ginEngine) buildActionIndexTransfer() gin.HandlerFunc {
 		var (
 			transferRepository = mongodb.NewTransferRepository(g.db)
 			accountRepository  = mongodb.NewAccountRepository(g.db)
-			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository)
+			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository, g.ctxTimeout)
 			transferAction     = action.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
@@ -99,7 +102,7 @@ func (g ginEngine) buildActionStoreAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
-			accountUseCase    = usecase.NewAccount(accountRepository)
+			accountUseCase    = usecase.NewAccount(accountRepository, g.ctxTimeout)
 			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
@@ -111,7 +114,7 @@ func (g ginEngine) buildActionIndexAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
-			accountUseCase    = usecase.NewAccount(accountRepository)
+			accountUseCase    = usecase.NewAccount(accountRepository, g.ctxTimeout)
 			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
@@ -123,7 +126,7 @@ func (g ginEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			accountRepository = mongodb.NewAccountRepository(g.db)
-			accountUseCase    = usecase.NewAccount(accountRepository)
+			accountUseCase    = usecase.NewAccount(accountRepository, g.ctxTimeout)
 			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
