@@ -62,7 +62,7 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 			ID                   string
 			accountOriginID      string
 			accountDestinationID string
-			amount               float64
+			amount               int64
 			createdAt            time.Time
 		)
 
@@ -74,7 +74,7 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 			ID:                   domain.TransferID(ID),
 			AccountOriginID:      domain.AccountID(accountOriginID),
 			AccountDestinationID: domain.AccountID(accountDestinationID),
-			Amount:               amount,
+			Amount:               domain.Money(amount),
 			CreatedAt:            createdAt,
 		})
 	}

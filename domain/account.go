@@ -21,7 +21,7 @@ var (
 //AccountRepository expõe os métodos disponíveis para as abstrações do repositório de Account
 type AccountRepository interface {
 	Store(context.Context, Account) (Account, error)
-	UpdateBalance(context.Context, AccountID, float64) error
+	UpdateBalance(context.Context, AccountID, Money) error
 	FindAll(context.Context) ([]Account, error)
 	FindByID(context.Context, AccountID) (Account, error)
 	FindBalance(context.Context, AccountID) (Account, error)
@@ -30,17 +30,22 @@ type AccountRepository interface {
 //AccountID define o tipo identificador de uma Account
 type AccountID string
 
+//String converte o tipo AccountID para uma string
+func (a AccountID) String() string {
+	return string(a)
+}
+
 //Account armazena a estrutura de uma conta
 type Account struct {
 	ID        AccountID
 	Name      string
 	CPF       string
-	Balance   float64
+	Balance   Money
 	CreatedAt time.Time
 }
 
 //NewAccount cria um Account
-func NewAccount(ID AccountID, name, CPF string, balance float64, createdAt time.Time) Account {
+func NewAccount(ID AccountID, name, CPF string, balance Money, createdAt time.Time) Account {
 	return Account{
 		ID:        ID,
 		Name:      name,
@@ -51,12 +56,12 @@ func NewAccount(ID AccountID, name, CPF string, balance float64, createdAt time.
 }
 
 //Deposit adiciona um valor no Balance
-func (a *Account) Deposit(amount float64) {
+func (a *Account) Deposit(amount Money) {
 	a.Balance += amount
 }
 
 //Withdraw remove um valor no Balance
-func (a *Account) Withdraw(amount float64) error {
+func (a *Account) Withdraw(amount Money) error {
 	if a.Balance < amount {
 		return ErrInsufficientBalance
 	}

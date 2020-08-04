@@ -37,7 +37,7 @@ type mockAccountRepo struct {
 	invokedFind             *invoked
 }
 
-func (m mockAccountRepo) UpdateBalance(_ context.Context, _ domain.AccountID, _ float64) error {
+func (m mockAccountRepo) UpdateBalance(_ context.Context, _ domain.AccountID, _ domain.Money) error {
 	if m.invokedUpdate != nil && m.invokedUpdate.call {
 		return m.updateBalanceDestinationFake()
 	}
@@ -65,7 +65,7 @@ func TestTransfer_Store(t *testing.T) {
 	type args struct {
 		accountOriginID      domain.AccountID
 		accountDestinationID domain.AccountID
-		amount               float64
+		amount               domain.Money
 	}
 
 	tests := []struct {
@@ -81,14 +81,14 @@ func TestTransfer_Store(t *testing.T) {
 			args: args{
 				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-				amount:               20,
+				amount:               2999,
 			},
 			transferRepo: mockTransferRepoStore{
 				result: domain.Transfer{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-					Amount:               20,
+					Amount:               2999,
 					CreatedAt:            time.Time{},
 				},
 				err: nil,
@@ -105,7 +105,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
-						Balance:   50,
+						Balance:   5000,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -114,7 +114,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Name:      "Test2",
 						CPF:       "13098565491",
-						Balance:   30,
+						Balance:   3000,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -123,7 +123,7 @@ func TestTransfer_Store(t *testing.T) {
 				ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-				Amount:               20,
+				Amount:               29.99,
 				CreatedAt:            time.Time{},
 			},
 		},
@@ -132,7 +132,7 @@ func TestTransfer_Store(t *testing.T) {
 			args: args{
 				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-				amount:               20,
+				amount:               200,
 			},
 			transferRepo: mockTransferRepoStore{
 				result: domain.Transfer{},
@@ -151,7 +151,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
-						Balance:   50,
+						Balance:   1000,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -160,7 +160,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Name:      "Test2",
 						CPF:       "13098565491",
-						Balance:   30,
+						Balance:   3000,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -173,7 +173,7 @@ func TestTransfer_Store(t *testing.T) {
 			args: args{
 				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-				amount:               20,
+				amount:               1999,
 			},
 			transferRepo: mockTransferRepoStore{
 				result: domain.Transfer{},
@@ -198,7 +198,7 @@ func TestTransfer_Store(t *testing.T) {
 			args: args{
 				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-				amount:               20,
+				amount:               100,
 			},
 			transferRepo: mockTransferRepoStore{
 				result: domain.Transfer{},
@@ -216,7 +216,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
-						Balance:   50,
+						Balance:   5000,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -233,7 +233,7 @@ func TestTransfer_Store(t *testing.T) {
 			args: args{
 				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-				amount:               20,
+				amount:               250,
 			},
 			transferRepo: mockTransferRepoStore{
 				result: domain.Transfer{},
@@ -251,7 +251,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
-						Balance:   50,
+						Balance:   5999,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -260,7 +260,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Name:      "Test2",
 						CPF:       "13098565491",
-						Balance:   30,
+						Balance:   2999,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -273,7 +273,7 @@ func TestTransfer_Store(t *testing.T) {
 			args: args{
 				accountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				accountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
-				amount:               20,
+				amount:               100,
 			},
 			transferRepo: mockTransferRepoStore{
 				result: domain.Transfer{},
@@ -292,7 +292,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "08098565895",
-						Balance:   50,
+						Balance:   200,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -301,7 +301,7 @@ func TestTransfer_Store(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Name:      "Test2",
 						CPF:       "13098565491",
-						Balance:   30,
+						Balance:   100,
 						CreatedAt: time.Time{},
 					}, nil
 				},
@@ -355,8 +355,13 @@ func TestTransfer_Store(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, time.Second)
-			got, err := uc.Store(context.Background(), tt.args.accountOriginID, tt.args.accountDestinationID, tt.args.amount)
 
+			got, err := uc.Store(
+				context.Background(),
+				tt.args.accountOriginID,
+				tt.args.accountDestinationID,
+				tt.args.amount,
+			)
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 				return
@@ -417,14 +422,14 @@ func TestTransfer_FindAll(t *testing.T) {
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-					Amount:               100,
+					Amount:               1,
 					CreatedAt:            time.Time{},
 				},
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-					Amount:               500,
+					Amount:               5,
 					CreatedAt:            time.Time{},
 				},
 			},
@@ -453,8 +458,8 @@ func TestTransfer_FindAll(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, time.Second)
-			result, err := uc.FindAll(context.Background())
 
+			result, err := uc.FindAll(context.Background())
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 				return

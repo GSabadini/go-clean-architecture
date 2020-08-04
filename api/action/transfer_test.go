@@ -26,7 +26,7 @@ func (m mockTransferStore) Store(
 	_ context.Context,
 	_ domain.AccountID,
 	_ domain.AccountID,
-	_ float64,
+	_ domain.Money,
 ) (usecase.TransferOutput, error) {
 	return m.result, m.err
 }

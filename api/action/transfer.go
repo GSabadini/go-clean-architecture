@@ -15,9 +15,9 @@ import (
 
 //transferInput armazena a estrutura de dados de entrada da API
 type transferInput struct {
-	AccountOriginID      string  `json:"account_origin_id" validate:"required,uuid4"`
-	AccountDestinationID string  `json:"account_destination_id" validate:"required,uuid4"`
-	Amount               float64 `json:"amount" validate:"gt=0,required"`
+	AccountOriginID      string `json:"account_origin_id" validate:"required,uuid4"`
+	AccountDestinationID string `json:"account_destination_id" validate:"required,uuid4"`
+	Amount               int64  `json:"amount" validate:"gt=0,required"`
 }
 
 //Transfer armazena as dependências para as ações de Transfer
@@ -66,7 +66,7 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		domain.AccountID(input.AccountOriginID),
 		domain.AccountID(input.AccountDestinationID),
-		input.Amount,
+		domain.Money(input.Amount),
 	)
 	if err != nil {
 		switch err {

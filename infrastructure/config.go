@@ -13,16 +13,12 @@ import (
 
 //config armazena a estrutura de configuração da aplicação
 type config struct {
-	appName   string
-	logger    logger.Logger
-	validator validator.Validator
-
-	dbSQL           repository.SQLHandler
-	dbSQLCtxTimeout time.Duration
-
-	dbNoSQL           repository.NoSQLHandler
-	dbNoSQLCtxTimeout time.Duration
-
+	appName       string
+	logger        logger.Logger
+	validator     validator.Validator
+	dbSQL         repository.SQLHandler
+	dbNoSQL       repository.NoSQLHandler
+	ctxTimeout    time.Duration
 	webServerPort web.Port
 	webServer     web.Server
 }
@@ -61,11 +57,6 @@ func (c *config) DbSQL(instance int) *config {
 	return c
 }
 
-func (c *config) DbSQLCtxTimeout(t time.Duration) *config {
-	c.dbSQLCtxTimeout = t
-	return c
-}
-
 func (c *config) DbNoSQL(instance int) *config {
 	h, err := database.NewDatabaseNoSQLFactory(instance)
 	if err != nil {
@@ -79,8 +70,8 @@ func (c *config) DbNoSQL(instance int) *config {
 	return c
 }
 
-func (c *config) DbNoSQLCtxTimeout(t time.Duration) *config {
-	c.dbSQLCtxTimeout = t
+func (c *config) ContextTimeout(t time.Duration) *config {
+	c.ctxTimeout = t
 	return c
 }
 
@@ -104,8 +95,7 @@ func (c *config) WebServer(instance int) *config {
 		c.dbNoSQL,
 		c.validator,
 		c.webServerPort,
-		c.dbSQLCtxTimeout,
-		c.dbNoSQLCtxTimeout,
+		c.ctxTimeout,
 	)
 
 	if err != nil {

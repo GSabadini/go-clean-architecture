@@ -15,9 +15,9 @@ import (
 
 //accountInput armazena a estrutura de dados de entrada da API
 type accountInput struct {
-	Name    string  `json:"name" validate:"required"`
-	CPF     string  `json:"cpf" validate:"required"`
-	Balance float64 `json:"balance" validate:"gt=0,required"`
+	Name    string `json:"name" validate:"required"`
+	CPF     string `json:"cpf" validate:"required"`
+	Balance int64  `json:"balance" validate:"gt=0,required"`
 }
 
 //Account armazena as dependências para as ações de Account
@@ -62,7 +62,12 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := a.uc.Store(r.Context(), input.Name, a.cleanCPF(input.CPF), input.Balance)
+	output, err := a.uc.Store(
+		r.Context(),
+		input.Name,
+		a.cleanCPF(input.CPF),
+		domain.Money(input.Balance),
+	)
 	if err != nil {
 		a.logError(
 			logKey,

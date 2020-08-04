@@ -33,7 +33,7 @@ func NewAccount(repo domain.AccountRepository, t time.Duration) Account {
 }
 
 //Store cria uma nova Account
-func (a Account) Store(ctx context.Context, name, CPF string, balance float64) (AccountOutput, error) {
+func (a Account) Store(ctx context.Context, name, CPF string, balance domain.Money) (AccountOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
 	defer cancel()
 
@@ -51,10 +51,10 @@ func (a Account) Store(ctx context.Context, name, CPF string, balance float64) (
 	}
 
 	return AccountOutput{
-		ID:        string(account.ID),
+		ID:        account.ID.String(),
 		Name:      account.Name,
 		CPF:       account.CPF,
-		Balance:   account.Balance,
+		Balance:   account.Balance.Float64(),
 		CreatedAt: account.CreatedAt,
 	}, nil
 }
@@ -73,10 +73,10 @@ func (a Account) FindAll(ctx context.Context) ([]AccountOutput, error) {
 
 	for _, account := range accounts {
 		output = append(output, AccountOutput{
-			ID:        string(account.ID),
+			ID:        account.ID.String(),
 			Name:      account.Name,
 			CPF:       account.CPF,
-			Balance:   account.Balance,
+			Balance:   account.Balance.Float64(),
 			CreatedAt: account.CreatedAt,
 		})
 	}
@@ -95,6 +95,6 @@ func (a Account) FindBalance(ctx context.Context, ID domain.AccountID) (AccountB
 	}
 
 	return AccountBalanceOutput{
-		Balance: account.Balance,
+		Balance: account.Balance.Float64(),
 	}, nil
 }

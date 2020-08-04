@@ -20,8 +20,7 @@ type TransferOutput struct {
 type Transfer struct {
 	transferRepo domain.TransferRepository
 	accountRepo  domain.AccountRepository
-
-	ctxTimeout time.Duration
+	ctxTimeout   time.Duration
 }
 
 //NewTransfer constrói um Transfer com suas dependências
@@ -42,7 +41,7 @@ func (t Transfer) Store(
 	ctx context.Context,
 	accountOriginID,
 	accountDestinationID domain.AccountID,
-	amount float64,
+	amount domain.Money,
 ) (TransferOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
@@ -65,10 +64,10 @@ func (t Transfer) Store(
 	}
 
 	return TransferOutput{
-		ID:                   string(transfer.ID),
-		AccountOriginID:      string(transfer.AccountOriginID),
-		AccountDestinationID: string(transfer.AccountDestinationID),
-		Amount:               transfer.Amount,
+		ID:                   transfer.ID.String(),
+		AccountOriginID:      transfer.AccountOriginID.String(),
+		AccountDestinationID: transfer.AccountDestinationID.String(),
+		Amount:               transfer.Amount.Float64(),
 		CreatedAt:            transfer.CreatedAt,
 	}, nil
 }
@@ -78,7 +77,7 @@ func (t Transfer) process(
 	ctx context.Context,
 	accountOriginID,
 	accountDestinationID domain.AccountID,
-	amount float64,
+	amount domain.Money,
 ) error {
 	origin, err := t.accountRepo.FindByID(ctx, accountOriginID)
 	if err != nil {
@@ -121,10 +120,10 @@ func (t Transfer) FindAll(ctx context.Context) ([]TransferOutput, error) {
 
 	for _, transfer := range transfers {
 		output = append(output, TransferOutput{
-			ID:                   string(transfer.ID),
-			AccountOriginID:      string(transfer.AccountOriginID),
-			AccountDestinationID: string(transfer.AccountDestinationID),
-			Amount:               transfer.Amount,
+			ID:                   transfer.ID.String(),
+			AccountOriginID:      transfer.AccountOriginID.String(),
+			AccountDestinationID: transfer.AccountDestinationID.String(),
+			Amount:               transfer.Amount.Float64(),
 			CreatedAt:            transfer.CreatedAt,
 		})
 	}

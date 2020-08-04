@@ -15,7 +15,7 @@ type transferBSON struct {
 	ID                   string    `bson:"id"`
 	AccountOriginID      string    `bson:"account_origin_id"`
 	AccountDestinationID string    `bson:"account_destination_id"`
-	Amount               float64   `bson:"amount"`
+	Amount               int64     `bson:"amount"`
 	CreatedAt            time.Time `bson:"created_at"`
 }
 
@@ -33,10 +33,10 @@ func NewTransferRepository(h repository.NoSQLHandler) TransferRepository {
 //Store insere uma Transfer no database
 func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	transferBson := &transferBSON{
-		ID:                   string(transfer.ID),
-		AccountOriginID:      string(transfer.AccountOriginID),
-		AccountDestinationID: string(transfer.AccountDestinationID),
-		Amount:               transfer.Amount,
+		ID:                   transfer.ID.String(),
+		AccountOriginID:      transfer.AccountOriginID.String(),
+		AccountDestinationID: transfer.AccountDestinationID.String(),
+		Amount:               int64(transfer.Amount),
 		CreatedAt:            transfer.CreatedAt,
 	}
 
@@ -63,7 +63,7 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 			ID:                   domain.TransferID(transferBson.ID),
 			AccountOriginID:      domain.AccountID(transferBson.AccountOriginID),
 			AccountDestinationID: domain.AccountID(transferBson.AccountDestinationID),
-			Amount:               transferBson.Amount,
+			Amount:               domain.Money(transferBson.Amount),
 			CreatedAt:            transferBson.CreatedAt,
 		}
 

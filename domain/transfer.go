@@ -14,12 +14,17 @@ type TransferRepository interface {
 //TransferID define o tipo identificador de uma Transfer
 type TransferID string
 
+//String converte o tipo TranferID para uma string
+func (t TransferID) String() string {
+	return string(t)
+}
+
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
 	ID                   TransferID
 	AccountOriginID      AccountID
 	AccountDestinationID AccountID
-	Amount               float64
+	Amount               Money
 	CreatedAt            time.Time
 }
 
@@ -28,7 +33,7 @@ func NewTransfer(
 	ID TransferID,
 	accountOriginID,
 	accountDestinationID AccountID,
-	amount float64,
+	amount Money,
 	createdAt time.Time,
 ) Transfer {
 	return Transfer{

@@ -17,7 +17,7 @@ type accountBSON struct {
 	ID        string    `bson:"id"`
 	Name      string    `bson:"name"`
 	CPF       string    `bson:"cpf"`
-	Balance   float64   `bson:"balance"`
+	Balance   int64     `bson:"balance"`
 	CreatedAt time.Time `bson:"created_at"`
 }
 
@@ -35,10 +35,10 @@ func NewAccountRepository(h repository.NoSQLHandler) AccountRepository {
 //Store insere uma Account no database
 func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
 	var accountBSON = &accountBSON{
-		ID:        string(account.ID),
+		ID:        account.ID.String(),
 		Name:      account.Name,
 		CPF:       account.CPF,
-		Balance:   account.Balance,
+		Balance:   int64(account.Balance),
 		CreatedAt: account.CreatedAt,
 	}
 
@@ -50,7 +50,7 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 }
 
 //UpdateBalance atualiza o Balance de uma Account no database
-func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance float64) error {
+func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance domain.Money) error {
 	var (
 		query  = bson.M{"id": ID}
 		update = bson.M{"$set": bson.M{"balance": balance}}
@@ -79,7 +79,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 			ID:        domain.AccountID(accountBSON.ID),
 			Name:      accountBSON.Name,
 			CPF:       accountBSON.CPF,
-			Balance:   accountBSON.Balance,
+			Balance:   domain.Money(accountBSON.Balance),
 			CreatedAt: accountBSON.CreatedAt,
 		}
 
@@ -109,7 +109,7 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 		ID:        domain.AccountID(accountBSON.ID),
 		Name:      accountBSON.Name,
 		CPF:       accountBSON.CPF,
-		Balance:   accountBSON.Balance,
+		Balance:   domain.Money(accountBSON.Balance),
 		CreatedAt: accountBSON.CreatedAt,
 	}, nil
 }
@@ -135,7 +135,7 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 		ID:        domain.AccountID(accountBSON.ID),
 		Name:      accountBSON.Name,
 		CPF:       accountBSON.CPF,
-		Balance:   accountBSON.Balance,
+		Balance:   domain.Money(accountBSON.Balance),
 		CreatedAt: accountBSON.CreatedAt,
 	}, nil
 }

@@ -23,7 +23,7 @@ type mockAccountStore struct {
 	err    error
 }
 
-func (m mockAccountStore) Store(_ context.Context, _, _ string, _ float64) (usecase.AccountOutput, error) {
+func (m mockAccountStore) Store(_ context.Context, _, _ string, _ domain.Money) (usecase.AccountOutput, error) {
 	return m.result, m.err
 }
 
@@ -50,7 +50,7 @@ func TestAccount_Store(t *testing.T) {
 					`{
 						"name": "test",
 						"cpf": "44451598087", 
-						"balance": 10 
+						"balance": 10050
 					}`,
 				),
 			},
@@ -59,12 +59,36 @@ func TestAccount_Store(t *testing.T) {
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "07094564964",
-					Balance:   10,
+					Balance:   10.5,
 					CreatedAt: time.Time{},
 				},
 				err: nil,
 			},
-			expectedBody:       []byte(`{"id":"3c096a40-ccba-4b58-93ed-57379ab04680","name":"Test","cpf":"07094564964","balance":10,"created_at":"0001-01-01T00:00:00Z"}`),
+			expectedBody:       []byte(`{"id":"3c096a40-ccba-4b58-93ed-57379ab04680","name":"Test","cpf":"07094564964","balance":10.5,"created_at":"0001-01-01T00:00:00Z"}`),
+			expectedStatusCode: http.StatusCreated,
+		},
+		{
+			name: "Store action success",
+			args: args{
+				rawPayload: []byte(
+					`{
+						"name": "test",
+						"cpf": "44451598087", 
+						"balance": 100000
+					}`,
+				),
+			},
+			ucMock: mockAccountStore{
+				result: usecase.AccountOutput{
+					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
+					Name:      "Test",
+					CPF:       "07094564964",
+					Balance:   10000,
+					CreatedAt: time.Time{},
+				},
+				err: nil,
+			},
+			expectedBody:       []byte(`{"id":"3c096a40-ccba-4b58-93ed-57379ab04680","name":"Test","cpf":"07094564964","balance":10000,"created_at":"0001-01-01T00:00:00Z"}`),
 			expectedStatusCode: http.StatusCreated,
 		},
 		{

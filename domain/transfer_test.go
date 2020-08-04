@@ -11,7 +11,7 @@ func TestNewTransfer(t *testing.T) {
 		ID                   TransferID
 		accountOriginID      AccountID
 		accountDestinationID AccountID
-		amount               float64
+		amount               Money
 		createdAt            time.Time
 	}
 

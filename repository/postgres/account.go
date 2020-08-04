@@ -45,7 +45,7 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 }
 
 //UpdateBalance atualiza o Balance de uma Account no database
-func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance float64) error {
+func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance domain.Money) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
 	if err := a.handler.ExecuteContext(ctx, query, balance, ID); err != nil {
@@ -73,7 +73,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 			ID        string
 			name      string
 			CPF       string
-			balance   float64
+			balance   int64
 			createdAt time.Time
 		)
 
@@ -85,7 +85,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 			ID:        domain.AccountID(ID),
 			Name:      name,
 			CPF:       CPF,
-			Balance:   balance,
+			Balance:   domain.Money(balance),
 			CreatedAt: createdAt,
 		})
 	}
@@ -127,7 +127,7 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 	account.ID = domain.AccountID(id)
 	account.Name = name
 	account.CPF = CPF
-	account.Balance = balance
+	account.Balance = domain.Money(balance)
 	account.CreatedAt = createdAt
 
 	return account, nil
@@ -138,7 +138,7 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 	var (
 		account = domain.Account{}
 		query   = "SELECT balance FROM accounts WHERE id = $1"
-		balance float64
+		balance int64
 	)
 
 	row, err := a.handler.QueryContext(ctx, query, ID)
@@ -156,7 +156,7 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 		return domain.Account{}, err
 	}
 
-	account.Balance = balance
+	account.Balance = domain.Money(balance)
 
 	return account, nil
 }
