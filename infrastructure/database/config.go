@@ -14,7 +14,6 @@ type config struct {
 	password string
 
 	connTimeout time.Duration
-	ctxTimeout  time.Duration
 }
 
 func newConfigMongoDB() *config {
