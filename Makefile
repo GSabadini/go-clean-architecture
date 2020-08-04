@@ -37,6 +37,9 @@ logs:
 enter-container:
 	docker-compose exec go-bank-transfer bash
 
+coverage-report:
+	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
 ci:
 	docker run --rm -it -v $(PWD):/app -w /app golangci/golangci-lint:v1.24.0 \
 	golangci-lint run

@@ -2,8 +2,6 @@ package validator
 
 import (
 	"errors"
-
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 )
 
 //Validator é uma abstração para os validator da aplicação
@@ -21,10 +19,10 @@ const (
 )
 
 //NewValidatorFactory retorna a instância de um validator
-func NewValidatorFactory(instance int, log logger.Logger) (Validator, error) {
+func NewValidatorFactory(instance int) (Validator, error) {
 	switch instance {
 	case InstanceGoPlayground:
-		return NewGoPlayground(log), nil
+		return NewGoPlayground()
 	default:
 		return nil, errInvalidValidatorInstance
 	}

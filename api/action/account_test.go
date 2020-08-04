@@ -2,6 +2,7 @@ package action
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -22,14 +23,14 @@ type mockAccountStore struct {
 	err    error
 }
 
-func (m mockAccountStore) Store(_, _ string, _ float64) (usecase.AccountOutput, error) {
+func (m mockAccountStore) Store(_ context.Context, _, _ string, _ domain.Money) (usecase.AccountOutput, error) {
 	return m.result, m.err
 }
 
 func TestAccount_Store(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	type args struct {
 		rawPayload []byte
@@ -38,7 +39,7 @@ func TestAccount_Store(t *testing.T) {
 	tests := []struct {
 		name               string
 		args               args
-		usecaseMock        usecase.AccountUseCase
+		ucMock             usecase.AccountUseCase
 		expectedBody       []byte
 		expectedStatusCode int
 	}{
@@ -49,21 +50,45 @@ func TestAccount_Store(t *testing.T) {
 					`{
 						"name": "test",
 						"cpf": "44451598087", 
-						"balance": 10 
+						"balance": 10050
 					}`,
 				),
 			},
-			usecaseMock: mockAccountStore{
+			ucMock: mockAccountStore{
 				result: usecase.AccountOutput{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "07094564964",
-					Balance:   10,
+					Balance:   10.5,
 					CreatedAt: time.Time{},
 				},
 				err: nil,
 			},
-			expectedBody:       []byte(`{"id":"3c096a40-ccba-4b58-93ed-57379ab04680","name":"Test","cpf":"07094564964","balance":10,"created_at":"0001-01-01T00:00:00Z"}`),
+			expectedBody:       []byte(`{"id":"3c096a40-ccba-4b58-93ed-57379ab04680","name":"Test","cpf":"07094564964","balance":10.5,"created_at":"0001-01-01T00:00:00Z"}`),
+			expectedStatusCode: http.StatusCreated,
+		},
+		{
+			name: "Store action success",
+			args: args{
+				rawPayload: []byte(
+					`{
+						"name": "test",
+						"cpf": "44451598087", 
+						"balance": 100000
+					}`,
+				),
+			},
+			ucMock: mockAccountStore{
+				result: usecase.AccountOutput{
+					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
+					Name:      "Test",
+					CPF:       "07094564964",
+					Balance:   10000,
+					CreatedAt: time.Time{},
+				},
+				err: nil,
+			},
+			expectedBody:       []byte(`{"id":"3c096a40-ccba-4b58-93ed-57379ab04680","name":"Test","cpf":"07094564964","balance":10000,"created_at":"0001-01-01T00:00:00Z"}`),
 			expectedStatusCode: http.StatusCreated,
 		},
 		{
@@ -77,7 +102,7 @@ func TestAccount_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockAccountStore{
+			ucMock: mockAccountStore{
 				result: usecase.AccountOutput{},
 				err:    errors.New("error"),
 			},
@@ -95,7 +120,7 @@ func TestAccount_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockAccountStore{
+			ucMock: mockAccountStore{
 				result: usecase.AccountOutput{},
 				err:    nil,
 			},
@@ -113,7 +138,7 @@ func TestAccount_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockAccountStore{
+			ucMock: mockAccountStore{
 				result: usecase.AccountOutput{},
 				err:    nil,
 			},
@@ -129,7 +154,7 @@ func TestAccount_Store(t *testing.T) {
 					}`,
 				),
 			},
-			usecaseMock: mockAccountStore{
+			ucMock: mockAccountStore{
 				result: usecase.AccountOutput{},
 				err:    nil,
 			},
@@ -148,7 +173,7 @@ func TestAccount_Store(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewAccount(tt.usecaseMock, logger.LoggerMock{}, validator)
+				action = NewAccount(tt.ucMock, logger.LoggerMock{}, validator)
 			)
 
 			action.Store(w, req)
@@ -182,24 +207,24 @@ type mockAccountFindAll struct {
 	err    error
 }
 
-func (m mockAccountFindAll) FindAll() ([]usecase.AccountOutput, error) {
+func (m mockAccountFindAll) FindAll(_ context.Context) ([]usecase.AccountOutput, error) {
 	return m.result, m.err
 }
 
 func TestAccount_Index(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	tests := []struct {
 		name               string
-		usecaseMock        usecase.AccountUseCase
+		ucMock             usecase.AccountUseCase
 		expectedBody       []byte
 		expectedStatusCode int
 	}{
 		{
 			name: "Index handler success one account",
-			usecaseMock: mockAccountFindAll{
+			ucMock: mockAccountFindAll{
 				result: []usecase.AccountOutput{
 					{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -216,7 +241,7 @@ func TestAccount_Index(t *testing.T) {
 		},
 		{
 			name: "Index handler success empty",
-			usecaseMock: mockAccountFindAll{
+			ucMock: mockAccountFindAll{
 				result: []usecase.AccountOutput{},
 				err:    nil,
 			},
@@ -225,7 +250,7 @@ func TestAccount_Index(t *testing.T) {
 		},
 		{
 			name: "Index handler generic error",
-			usecaseMock: mockAccountFindAll{
+			ucMock: mockAccountFindAll{
 				err: errors.New("error"),
 			},
 			expectedBody:       []byte(`{"errors":["error"]}`),
@@ -239,7 +264,7 @@ func TestAccount_Index(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewAccount(tt.usecaseMock, logger.LoggerMock{}, validator)
+				action = NewAccount(tt.ucMock, logger.LoggerMock{}, validator)
 			)
 
 			action.Index(w, req)
@@ -273,14 +298,14 @@ type mockAccountFindBalance struct {
 	err    error
 }
 
-func (m mockAccountFindBalance) FindBalance(_ string) (usecase.AccountBalanceOutput, error) {
+func (m mockAccountFindBalance) FindBalance(_ context.Context, _ domain.AccountID) (usecase.AccountBalanceOutput, error) {
 	return m.result, m.err
 }
 
 func TestAccount_FindBalance(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground, logger.LoggerMock{})
+	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
 
 	type args struct {
 		accountID string
@@ -289,7 +314,7 @@ func TestAccount_FindBalance(t *testing.T) {
 	tests := []struct {
 		name               string
 		args               args
-		usecaseMock        usecase.AccountUseCase
+		ucMock             usecase.AccountUseCase
 		expectedBody       []byte
 		expectedStatusCode int
 	}{
@@ -298,7 +323,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
-			usecaseMock: mockAccountFindBalance{
+			ucMock: mockAccountFindBalance{
 				result: usecase.AccountBalanceOutput{
 					Balance: 10,
 				},
@@ -312,7 +337,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
-			usecaseMock: mockAccountFindBalance{
+			ucMock: mockAccountFindBalance{
 				result: usecase.AccountBalanceOutput{},
 				err:    errors.New("error"),
 			},
@@ -324,7 +349,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			args: args{
 				accountID: "error",
 			},
-			usecaseMock: mockAccountFindBalance{
+			ucMock: mockAccountFindBalance{
 				result: usecase.AccountBalanceOutput{},
 				err:    nil,
 			},
@@ -336,7 +361,7 @@ func TestAccount_FindBalance(t *testing.T) {
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
-			usecaseMock: mockAccountFindBalance{
+			ucMock: mockAccountFindBalance{
 				result: usecase.AccountBalanceOutput{},
 				err:    domain.ErrNotFound,
 			},
@@ -356,7 +381,7 @@ func TestAccount_FindBalance(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewAccount(tt.usecaseMock, logger.LoggerMock{}, validator)
+				action = NewAccount(tt.ucMock, logger.LoggerMock{}, validator)
 			)
 
 			action.FindBalance(w, req)

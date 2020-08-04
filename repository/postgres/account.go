@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -15,12 +16,12 @@ type AccountRepository struct {
 }
 
 //NewAccountRepository constrói um AccountRepository com suas dependências
-func NewAccountRepository(handler repository.SQLHandler) AccountRepository {
-	return AccountRepository{handler: handler}
+func NewAccountRepository(h repository.SQLHandler) AccountRepository {
+	return AccountRepository{handler: h}
 }
 
 //Store insere uma Account no database
-func (a AccountRepository) Store(account domain.Account) (domain.Account, error) {
+func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
 	query := `
 		INSERT INTO 
 			accounts (id, name, cpf, balance, created_at)
@@ -28,7 +29,8 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 			($1, $2, $3, $4, $5)
 	`
 
-	if err := a.handler.Execute(
+	if err := a.handler.ExecuteContext(
+		ctx,
 		query,
 		account.ID,
 		account.Name,
@@ -43,10 +45,10 @@ func (a AccountRepository) Store(account domain.Account) (domain.Account, error)
 }
 
 //UpdateBalance atualiza o Balance de uma Account no database
-func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
+func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance domain.Money) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
-	if err := a.handler.Execute(query, balance, ID); err != nil {
+	if err := a.handler.ExecuteContext(ctx, query, balance, ID); err != nil {
 		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
 	}
 
@@ -54,13 +56,13 @@ func (a AccountRepository) UpdateBalance(ID string, balance float64) error {
 }
 
 //FindAlL busca todas as Account no database
-func (a AccountRepository) FindAll() ([]domain.Account, error) {
+func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error) {
 	var (
 		accounts = make([]domain.Account, 0)
 		query    = "SELECT * FROM accounts"
 	)
 
-	rows, err := a.handler.Query(query)
+	rows, err := a.handler.QueryContext(ctx, query)
 	if err != nil {
 		return accounts, errors.Wrap(err, "error listing accounts")
 	}
@@ -71,7 +73,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 			ID        string
 			name      string
 			CPF       string
-			balance   float64
+			balance   int64
 			createdAt time.Time
 		)
 
@@ -80,10 +82,10 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 		}
 
 		accounts = append(accounts, domain.Account{
-			ID:        ID,
+			ID:        domain.AccountID(ID),
 			Name:      name,
 			CPF:       CPF,
-			Balance:   balance,
+			Balance:   domain.Money(balance),
 			CreatedAt: createdAt,
 		})
 	}
@@ -96,7 +98,7 @@ func (a AccountRepository) FindAll() ([]domain.Account, error) {
 }
 
 //FindByID busca uma Account por ID no database
-func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
+func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		account   = domain.Account{}
 		query     = "SELECT * FROM accounts WHERE id = $1"
@@ -107,7 +109,7 @@ func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 		createdAt time.Time
 	)
 
-	row, err := a.handler.Query(query, ID)
+	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
 		return account, errors.Wrap(err, "error fetching account")
 	}
@@ -122,24 +124,24 @@ func (a AccountRepository) FindByID(ID string) (domain.Account, error) {
 		return domain.Account{}, err
 	}
 
-	account.ID = id
+	account.ID = domain.AccountID(id)
 	account.Name = name
 	account.CPF = CPF
-	account.Balance = balance
+	account.Balance = domain.Money(balance)
 	account.CreatedAt = createdAt
 
 	return account, nil
 }
 
 //FindBalance busca o Balance de uma Account no database
-func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
+func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		account = domain.Account{}
 		query   = "SELECT balance FROM accounts WHERE id = $1"
-		balance float64
+		balance int64
 	)
 
-	row, err := a.handler.Query(query, ID)
+	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
 		return account, errors.Wrap(err, "error fetching account balance")
 	}
@@ -154,7 +156,7 @@ func (a AccountRepository) FindBalance(ID string) (domain.Account, error) {
 		return domain.Account{}, err
 	}
 
-	account.Balance = balance
+	account.Balance = domain.Money(balance)
 
 	return account, nil
 }

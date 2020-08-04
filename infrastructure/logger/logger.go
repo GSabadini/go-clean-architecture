@@ -29,16 +29,16 @@ var (
 )
 
 //NewLoggerFactory retorna a instância de um logger
-func NewLoggerFactory(instance int, isJSON bool) (Logger, error) {
+func NewLoggerFactory(instance int) (Logger, error) {
 	switch instance {
 	case InstanceZapLogger:
-		logger, err := NewZapLogger(isJSON)
+		logger, err := NewZapLogger()
 		if err != nil {
 			return nil, err
 		}
 		return logger, nil
 	case InstanceLogrusLogger:
-		var logger = NewLogrusLogger(isJSON)
+		var logger = NewLogrusLogger()
 		return logger, nil
 	default:
 		return nil, errInvalidLoggerInstance

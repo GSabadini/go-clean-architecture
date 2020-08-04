@@ -1,6 +1,9 @@
 package database
 
-import mongo "gopkg.in/mgo.v2"
+import (
+	"context"
+	mongo "gopkg.in/mgo.v2"
+)
 
 //mongoHandler armazena a estrutura para MongoDB
 type mongoHandler struct {
@@ -10,7 +13,7 @@ type mongoHandler struct {
 
 //NewMongoHandler constrói um novo handler de banco para MongoDB
 func NewMongoHandler(c *config) (*mongoHandler, error) {
-	session, err := mongo.Dial(c.host)
+	session, err := mongo.DialWithTimeout(c.host, c.connTimeout)
 	if err != nil {
 		return &mongoHandler{}, err
 	}
@@ -23,7 +26,7 @@ func NewMongoHandler(c *config) (*mongoHandler, error) {
 }
 
 //Store realiza uma inserção no banco de dados
-func (mgo mongoHandler) Store(collection string, data interface{}) error {
+func (mgo mongoHandler) Store(ctx context.Context, collection string, data interface{}) error {
 	session := mgo.session.Clone()
 	defer session.Close()
 
@@ -31,7 +34,7 @@ func (mgo mongoHandler) Store(collection string, data interface{}) error {
 }
 
 //Update realiza uma atualização no banco de dados
-func (mgo mongoHandler) Update(collection string, query interface{}, update interface{}) error {
+func (mgo mongoHandler) Update(ctx context.Context, collection string, query interface{}, update interface{}) error {
 	session := mgo.session.Clone()
 	defer session.Close()
 
@@ -39,7 +42,7 @@ func (mgo mongoHandler) Update(collection string, query interface{}, update inte
 }
 
 //FindAll realiza uma busca por todos os registros no banco de dados
-func (mgo mongoHandler) FindAll(collection string, query interface{}, result interface{}) error {
+func (mgo mongoHandler) FindAll(ctx context.Context, collection string, query interface{}, result interface{}) error {
 	session := mgo.session.Clone()
 	defer session.Close()
 
@@ -47,7 +50,13 @@ func (mgo mongoHandler) FindAll(collection string, query interface{}, result int
 }
 
 //FindOne realiza a busca de um item específico no banco de dados
-func (mgo mongoHandler) FindOne(collection string, query interface{}, selector interface{}, result interface{}) error {
+func (mgo mongoHandler) FindOne(
+	ctx context.Context,
+	collection string,
+	query interface{},
+	selector interface{},
+	result interface{},
+) error {
 	session := mgo.session.Clone()
 	defer session.Close()
 

@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"strings"
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -23,53 +23,60 @@ type AccountBalanceOutput struct {
 
 //Account armazena as dependências para os casos de uso de Account
 type Account struct {
-	repo domain.AccountRepository
+	repo       domain.AccountRepository
+	ctxTimeout time.Duration
 }
 
 //NewAccount constrói um Account com suas dependências
-func NewAccount(repo domain.AccountRepository) Account {
-	return Account{repo: repo}
+func NewAccount(repo domain.AccountRepository, t time.Duration) Account {
+	return Account{repo: repo, ctxTimeout: t}
 }
 
 //Store cria uma nova Account
-func (a Account) Store(name, CPF string, balance float64) (AccountOutput, error) {
+func (a Account) Store(ctx context.Context, name, CPF string, balance domain.Money) (AccountOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
+	defer cancel()
+
 	var account = domain.NewAccount(
-		domain.NewUUID(),
+		domain.AccountID(domain.NewUUID()),
 		name,
-		a.cleanCPF(CPF),
+		CPF,
 		balance,
 		time.Now(),
 	)
 
-	account, err := a.repo.Store(account)
+	account, err := a.repo.Store(ctx, account)
 	if err != nil {
 		return AccountOutput{}, err
 	}
 
 	return AccountOutput{
-		ID:        account.ID,
+		ID:        account.ID.String(),
 		Name:      account.Name,
 		CPF:       account.CPF,
-		Balance:   account.Balance,
+		Balance:   account.Balance.Float64(),
 		CreatedAt: account.CreatedAt,
 	}, nil
 }
 
 //FindAll retorna uma lista de Accounts
-func (a Account) FindAll() ([]AccountOutput, error) {
+func (a Account) FindAll(ctx context.Context) ([]AccountOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
+	defer cancel()
+
 	var output = make([]AccountOutput, 0)
 
-	accounts, err := a.repo.FindAll()
+	accounts, err := a.repo.FindAll(ctx)
 	if err != nil {
 		return output, err
 	}
 
 	for _, account := range accounts {
 		output = append(output, AccountOutput{
-			ID:        account.ID,
+			ID:        account.ID.String(),
 			Name:      account.Name,
 			CPF:       account.CPF,
-			Balance:   account.Balance,
+			Balance:   account.Balance.Float64(),
 			CreatedAt: account.CreatedAt,
 		})
 	}
@@ -78,17 +85,16 @@ func (a Account) FindAll() ([]AccountOutput, error) {
 }
 
 //FindBalance retorna o saldo de uma Account
-func (a Account) FindBalance(ID string) (AccountBalanceOutput, error) {
-	account, err := a.repo.FindBalance(ID)
+func (a Account) FindBalance(ctx context.Context, ID domain.AccountID) (AccountBalanceOutput, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
+	defer cancel()
+
+	account, err := a.repo.FindBalance(ctx, ID)
 	if err != nil {
 		return AccountBalanceOutput{}, err
 	}
 
 	return AccountBalanceOutput{
-		Balance: account.Balance,
+		Balance: account.Balance.Float64(),
 	}, nil
-}
-
-func (a Account) cleanCPF(cpf string) string {
-	return strings.Replace(strings.Replace(cpf, ".", "", -1), "-", "", -1)
 }

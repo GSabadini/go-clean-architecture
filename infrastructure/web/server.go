@@ -2,6 +2,7 @@ package web
 
 import (
 	"errors"
+	"time"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
@@ -33,12 +34,13 @@ func NewWebServerFactory(
 	dbNoSQL repository.NoSQLHandler,
 	validator validator.Validator,
 	port Port,
+	ctxTimeout time.Duration,
 ) (Server, error) {
 	switch instance {
 	case InstanceGorillaMux:
-		return NewGorillaMux(log, dbSQL, validator, port), nil
+		return newGorillaMux(log, dbSQL, validator, port, ctxTimeout), nil
 	case InstanceGin:
-		return NewGinServer(log, dbNoSQL, validator, port), nil
+		return newGinServer(log, dbNoSQL, validator, port, ctxTimeout), nil
 	default:
 		return nil, errInvalidWebServerInstance
 	}

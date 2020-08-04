@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"github.com/gsabadini/go-bank-transfer/domain"
 	"reflect"
@@ -15,7 +16,7 @@ type mockAccountRepoStore struct {
 	err    error
 }
 
-func (m mockAccountRepoStore) Store(_ domain.Account) (domain.Account, error) {
+func (m mockAccountRepoStore) Store(_ context.Context, _ domain.Account) (domain.Account, error) {
 	return m.result, m.err
 }
 
@@ -24,7 +25,7 @@ func TestAccount_Store(t *testing.T) {
 
 	type args struct {
 		name, CPF string
-		balance   float64
+		balance   domain.Money
 	}
 
 	tests := []struct {
@@ -39,14 +40,14 @@ func TestAccount_Store(t *testing.T) {
 			args: args{
 				name:    "Test",
 				CPF:     "02815517078",
-				balance: 100,
+				balance: 19944,
 			},
 			repository: mockAccountRepoStore{
 				result: domain.Account{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "02815517078",
-					Balance:   100,
+					Balance:   19944,
 					CreatedAt: time.Time{},
 				},
 				err: nil,
@@ -55,7 +56,32 @@ func TestAccount_Store(t *testing.T) {
 				ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:      "Test",
 				CPF:       "02815517078",
-				Balance:   100,
+				Balance:   199.44,
+				CreatedAt: time.Time{},
+			},
+		},
+		{
+			name: "Create account successful",
+			args: args{
+				name:    "Test",
+				CPF:     "02815517078",
+				balance: 2350,
+			},
+			repository: mockAccountRepoStore{
+				result: domain.Account{
+					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
+					Name:      "Test",
+					CPF:       "02815517078",
+					Balance:   2350,
+					CreatedAt: time.Time{},
+				},
+				err: nil,
+			},
+			expected: AccountOutput{
+				ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
+				Name:      "Test",
+				CPF:       "02815517078",
+				Balance:   23.5,
 				CreatedAt: time.Time{},
 			},
 		},
@@ -77,9 +103,9 @@ func TestAccount_Store(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewAccount(tt.repository)
-			result, err := uc.Store(tt.args.name, tt.args.CPF, tt.args.balance)
+			var uc = NewAccount(tt.repository, time.Second)
 
+			result, err := uc.Store(context.TODO(), tt.args.name, tt.args.CPF, tt.args.balance)
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 			}
@@ -98,7 +124,7 @@ type mockAccountRepoFindAll struct {
 	err    error
 }
 
-func (m mockAccountRepoFindAll) FindAll() ([]domain.Account, error) {
+func (m mockAccountRepoFindAll) FindAll(_ context.Context) ([]domain.Account, error) {
 	return m.result, m.err
 }
 
@@ -119,14 +145,14 @@ func TestAccount_FindAll(t *testing.T) {
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 						Name:      "Test",
 						CPF:       "02815517078",
-						Balance:   100,
+						Balance:   125,
 						CreatedAt: time.Time{},
 					},
 					{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "02815517071",
-						Balance:   1000,
+						Balance:   99999,
 						CreatedAt: time.Time{},
 					},
 				},
@@ -137,14 +163,14 @@ func TestAccount_FindAll(t *testing.T) {
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "02815517078",
-					Balance:   100,
+					Balance:   1.25,
 					CreatedAt: time.Time{},
 				},
 				{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 					Name:      "Test",
 					CPF:       "02815517071",
-					Balance:   1000,
+					Balance:   999.99,
 					CreatedAt: time.Time{},
 				},
 			},
@@ -170,9 +196,9 @@ func TestAccount_FindAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewAccount(tt.repository)
-			result, err := uc.FindAll()
+			var uc = NewAccount(tt.repository, time.Second)
 
+			result, err := uc.FindAll(context.Background())
 			if (err != nil) && (err.Error() != tt.expectedError) {
 				t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 			}
@@ -191,7 +217,7 @@ type mockAccountRepoFindBalance struct {
 	err    error
 }
 
-func (m mockAccountRepoFindBalance) FindBalance(_ string) (domain.Account, error) {
+func (m mockAccountRepoFindBalance) FindBalance(_ context.Context, _ domain.AccountID) (domain.Account, error) {
 	return m.result, m.err
 }
 
@@ -199,7 +225,7 @@ func TestAccount_FindBalance(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		ID string
+		ID domain.AccountID
 	}
 
 	tests := []struct {
@@ -221,7 +247,22 @@ func TestAccount_FindBalance(t *testing.T) {
 				err: nil,
 			},
 			expected: AccountBalanceOutput{
-				Balance: 100.00,
+				Balance: 1,
+			},
+		},
+		{
+			name: "Success when returning the account balance",
+			args: args{
+				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
+			},
+			repository: mockAccountRepoFindBalance{
+				result: domain.Account{
+					Balance: 20050,
+				},
+				err: nil,
+			},
+			expected: AccountBalanceOutput{
+				Balance: 200.5,
 			},
 		},
 		{
@@ -239,9 +280,9 @@ func TestAccount_FindBalance(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var uc = NewAccount(tt.repository)
-		result, err := uc.FindBalance(tt.args.ID)
+		var uc = NewAccount(tt.repository, time.Second)
 
+		result, err := uc.FindBalance(context.Background(), tt.args.ID)
 		if (err != nil) && (err.Error() != tt.expectedError) {
 			t.Errorf("[TestCase '%s'] Result: '%v' | ExpectedError: '%v'", tt.name, err, tt.expectedError)
 			return

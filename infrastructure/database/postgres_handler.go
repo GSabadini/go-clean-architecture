@@ -1,13 +1,12 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"os"
-
 	"github.com/gsabadini/go-bank-transfer/repository"
-
 	_ "github.com/lib/pq"
+	"os"
 )
 
 //postgresHandler armazena a estrutura para o Postgres
@@ -39,8 +38,8 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 }
 
 //Execute
-func (p postgresHandler) Execute(query string, args ...interface{}) error {
-	_, err := p.database.Exec(query, args...)
+func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
+	_, err := p.database.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -49,8 +48,8 @@ func (p postgresHandler) Execute(query string, args ...interface{}) error {
 }
 
 //Query
-func (p postgresHandler) Query(query string, args ...interface{}) (repository.Row, error) {
-	rows, err := p.database.Query(query, args...)
+func (p postgresHandler) QueryContext(ctx context.Context, query string, args ...interface{}) (repository.Row, error) {
+	rows, err := p.database.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
