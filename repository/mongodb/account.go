@@ -38,7 +38,7 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 		ID:        account.ID.String(),
 		Name:      account.Name,
 		CPF:       account.CPF,
-		Balance:   int64(account.Balance),
+		Balance:   account.Balance.Int64(),
 		CreatedAt: account.CreatedAt,
 	}
 

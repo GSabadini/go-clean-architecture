@@ -36,7 +36,7 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 		ID:                   transfer.ID.String(),
 		AccountOriginID:      transfer.AccountOriginID.String(),
 		AccountDestinationID: transfer.AccountDestinationID.String(),
-		Amount:               int64(transfer.Amount),
+		Amount:               transfer.Amount.Int64(),
 		CreatedAt:            transfer.CreatedAt,
 	}
 
