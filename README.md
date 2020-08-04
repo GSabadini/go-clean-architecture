@@ -14,6 +14,10 @@
 
 - Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
 
+- Database Plug-in (MongoDB and Postgres)
+- Logger Plug-in (Logrus and Zap)
+- HTTP Router Plug-in (Gorilla Mux and Gin)
+
 ## Architecture
 -  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
@@ -74,7 +78,7 @@ make enter-container
 
 #### Test endpoints API using Postman
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/6f08b3fd0e5eb169f75a)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/8406204152f98cc33eac)
 
 #### Test endpoints API using curl
 
@@ -86,7 +90,7 @@ curl -i --request POST 'http://localhost:3001/v1/accounts' \
 --data-raw '{
     "name": "Test",
     "cpf": "070.910.584-24",
-    "balance": 1.00
+    "balance": 100
 }'
 ```
 
@@ -110,7 +114,7 @@ curl -i --request POST 'http://localhost:3001/v1/transfers' \
 --data-raw '{
 	"account_destination_id": "{{account_id}}",
 	"account_origin_id": "{{account_id}}",
-	"amount": 1.00
+	"amount": 100
 }'
 ```
 
