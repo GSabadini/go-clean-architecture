@@ -7,14 +7,11 @@ type logrusLogger struct {
 }
 
 //NewLogrusLogger constrói uma instância do logger Logrus
-func NewLogrusLogger(isJSON bool) Logger {
+func NewLogrusLogger() Logger {
 	log := logrus.New()
-
-	if isJSON {
-		log.SetFormatter(&logrus.JSONFormatter{
-			TimestampFormat: "2006-01-02 15:04:05",
-		})
-	}
+	log.SetFormatter(&logrus.JSONFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+	})
 
 	return &logrusLogger{logger: log}
 }

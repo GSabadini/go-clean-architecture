@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/gsabadini/go-bank-transfer/api/response"
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -14,9 +15,9 @@ import (
 
 //accountInput armazena a estrutura de dados de entrada da API
 type accountInput struct {
-	Name    string  `json:"name" validate:"required"`
-	CPF     string  `json:"cpf" validate:"required"`
-	Balance float64 `json:"balance" validate:"gt=0,required"`
+	Name    string `json:"name" validate:"required"`
+	CPF     string `json:"cpf" validate:"required"`
+	Balance int64  `json:"balance" validate:"gt=0,required"`
 }
 
 //Account armazena as dependências para as ações de Account
@@ -61,7 +62,12 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := a.uc.Store(input.Name, input.CPF, input.Balance)
+	output, err := a.uc.Store(
+		r.Context(),
+		input.Name,
+		a.cleanCPF(input.CPF),
+		domain.Money(input.Balance),
+	)
 	if err != nil {
 		a.logError(
 			logKey,
@@ -79,10 +85,10 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 }
 
 //Index é um handler para retornar todas as Account
-func (a Account) Index(w http.ResponseWriter, _ *http.Request) {
+func (a Account) Index(w http.ResponseWriter, r *http.Request) {
 	const logKey = "index_account"
 
-	output, err := a.uc.FindAll()
+	output, err := a.uc.FindAll(r.Context())
 	if err != nil {
 		a.logError(
 			logKey,
@@ -117,7 +123,7 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := a.uc.FindBalance(accountID)
+	output, err := a.uc.FindBalance(r.Context(), domain.AccountID(accountID))
 	if err != nil {
 		switch err {
 		case domain.ErrNotFound:
@@ -145,6 +151,10 @@ func (a Account) FindBalance(w http.ResponseWriter, r *http.Request) {
 	a.logSuccess(logKey, "success when returning account balance", http.StatusOK)
 
 	response.NewSuccess(output, http.StatusOK).Send(w)
+}
+
+func (a Account) cleanCPF(cpf string) string {
+	return strings.Replace(strings.Replace(cpf, ".", "", -1), "-", "", -1)
 }
 
 func (a Account) validateInput(input accountInput) []string {

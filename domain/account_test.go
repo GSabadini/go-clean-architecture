@@ -10,14 +10,14 @@ func TestAccount_Deposit(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		amount float64
+		amount Money
 	}
 
 	tests := []struct {
 		name     string
 		account  Account
 		args     args
-		expected float64
+		expected Money
 	}{
 		{
 			name: "Successful depositing balance",
@@ -32,23 +32,23 @@ func TestAccount_Deposit(t *testing.T) {
 		{
 			name: "Successful depositing balance",
 			args: args{
-				amount: 1020.98,
+				amount: 102098,
 			},
 			account: Account{
 				Balance: 0,
 			},
-			expected: 1020.98,
+			expected: 102098,
 		},
-		//{
-		//	name: "Successful depositing balance",
-		//	args: args{
-		//		amount: 44.98,
-		//	},
-		//	account: Account{
-		//		Balance: 0.98,
-		//	},
-		//	expected: 45.96,
-		//},
+		{
+			name: "Successful depositing balance",
+			args: args{
+				amount: 4498,
+			},
+			account: Account{
+				Balance: 98,
+			},
+			expected: 4596,
+		},
 	}
 
 	for _, tt := range tests {
@@ -70,14 +70,14 @@ func TestAccount_Withdraw(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		amount float64
+		amount Money
 	}
 
 	tests := []struct {
 		name        string
 		account     Account
 		args        args
-		expected    float64
+		expected    Money
 		expectedErr error
 	}{
 		{
@@ -93,32 +93,31 @@ func TestAccount_Withdraw(t *testing.T) {
 		{
 			name: "Success in withdrawing balance",
 			args: args{
-				amount: 10.12,
+				amount: 10012,
 			},
 			account: Account{
-				Balance: 101.25,
+				Balance: 10013,
 			},
-			expected: 91.13,
+			expected: 1,
 		},
 		{
 			name: "Success in withdrawing balance",
 			args: args{
-				amount: 0.25,
+				amount: 25,
 			},
 			account: Account{
-				Balance: 10.12,
+				Balance: 125,
 			},
-			expected: 9.87,
+			expected: 100,
 		},
 		{
 			name: "error when withdrawing account balance without sufficient balance",
 			args: args{
-				amount: 5.64,
+				amount: 564,
 			},
 			account: Account{
-				Balance: 0.62,
+				Balance: 62,
 			},
-			expected:    0.62,
 			expectedErr: ErrInsufficientBalance,
 		},
 		{
@@ -129,7 +128,6 @@ func TestAccount_Withdraw(t *testing.T) {
 			account: Account{
 				Balance: 1,
 			},
-			expected:    1,
 			expectedErr: ErrInsufficientBalance,
 		},
 		{
@@ -140,7 +138,6 @@ func TestAccount_Withdraw(t *testing.T) {
 			account: Account{
 				Balance: 0,
 			},
-			expected:    0,
 			expectedErr: ErrInsufficientBalance,
 		},
 	}
@@ -157,7 +154,7 @@ func TestAccount_Withdraw(t *testing.T) {
 				return
 			}
 
-			if tt.account.Balance != tt.expected {
+			if tt.expectedErr == nil && tt.account.Balance != tt.expected {
 				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
 					tt.name,
 					tt.account.Balance,
@@ -172,10 +169,10 @@ func TestNewAccount(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		ID        string
+		ID        AccountID
 		name      string
 		CPF       string
-		balance   float64
+		balance   Money
 		createdAt time.Time
 	}
 

@@ -2,7 +2,6 @@ package logger
 
 import (
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 type zapLogger struct {
@@ -10,19 +9,14 @@ type zapLogger struct {
 }
 
 //NewZapLogger constrói uma instância do logger Zap
-func NewZapLogger(isJSON bool) (Logger, error) {
+func NewZapLogger() (Logger, error) {
 	log, err := zap.NewProduction()
 	if err != nil {
 		return nil, err
 	}
+
 	sugar := log.Sugar()
 	defer log.Sync()
-
-	if isJSON {
-		encoderConfig := zap.NewProductionEncoderConfig()
-		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-		zapcore.NewJSONEncoder(encoderConfig)
-	}
 
 	return &zapLogger{logger: sugar}, nil
 }

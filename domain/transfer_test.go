@@ -8,10 +8,10 @@ import (
 
 func TestNewTransfer(t *testing.T) {
 	type args struct {
-		ID                   string
-		accountOriginID      string
-		accountDestinationID string
-		amount               float64
+		ID                   TransferID
+		accountOriginID      AccountID
+		accountDestinationID AccountID
+		amount               Money
 		createdAt            time.Time
 	}
 

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -15,12 +16,12 @@ type TransferRepository struct {
 }
 
 //NewTransferRepository constrói um TransferRepository com suas dependências
-func NewTransferRepository(handler repository.SQLHandler) TransferRepository {
-	return TransferRepository{handler: handler}
+func NewTransferRepository(h repository.SQLHandler) TransferRepository {
+	return TransferRepository{handler: h}
 }
 
 //Store insere uma Transfer no database
-func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	query := `
 		INSERT INTO 
 			transfers (id, account_origin_id, account_destination_id, amount, created_at)
@@ -28,7 +29,8 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 			($1, $2, $3, $4, $5)
 	`
 
-	if err := t.handler.Execute(
+	if err := t.handler.ExecuteContext(
+		ctx,
 		query,
 		transfer.ID,
 		transfer.AccountOriginID,
@@ -43,13 +45,13 @@ func (t TransferRepository) Store(transfer domain.Transfer) (domain.Transfer, er
 }
 
 //FindAll busca todas as Transfer no database
-func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
+func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	var (
 		transfers = make([]domain.Transfer, 0)
 		query     = "SELECT * FROM transfers"
 	)
 
-	rows, err := t.handler.Query(query)
+	rows, err := t.handler.QueryContext(ctx, query)
 	if err != nil {
 		return transfers, errors.Wrap(err, "error listing transfers")
 	}
@@ -60,7 +62,7 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 			ID                   string
 			accountOriginID      string
 			accountDestinationID string
-			amount               float64
+			amount               int64
 			createdAt            time.Time
 		)
 
@@ -69,10 +71,10 @@ func (t TransferRepository) FindAll() ([]domain.Transfer, error) {
 		}
 
 		transfers = append(transfers, domain.Transfer{
-			ID:                   ID,
-			AccountOriginID:      accountOriginID,
-			AccountDestinationID: accountDestinationID,
-			Amount:               amount,
+			ID:                   domain.TransferID(ID),
+			AccountOriginID:      domain.AccountID(accountOriginID),
+			AccountDestinationID: domain.AccountID(accountDestinationID),
+			Amount:               domain.Money(amount),
 			CreatedAt:            createdAt,
 		})
 	}

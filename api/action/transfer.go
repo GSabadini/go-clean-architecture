@@ -15,9 +15,9 @@ import (
 
 //transferInput armazena a estrutura de dados de entrada da API
 type transferInput struct {
-	AccountOriginID      string  `json:"account_origin_id" validate:"required,uuid4"`
-	AccountDestinationID string  `json:"account_destination_id" validate:"required,uuid4"`
-	Amount               float64 `json:"amount" validate:"gt=0,required"`
+	AccountOriginID      string `json:"account_origin_id" validate:"required,uuid4"`
+	AccountDestinationID string `json:"account_destination_id" validate:"required,uuid4"`
+	Amount               int64  `json:"amount" validate:"gt=0,required"`
 }
 
 //Transfer armazena as dependências para as ações de Transfer
@@ -63,9 +63,10 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	}
 
 	output, err := t.uc.Store(
-		input.AccountOriginID,
-		input.AccountDestinationID,
-		input.Amount,
+		r.Context(),
+		domain.AccountID(input.AccountOriginID),
+		domain.AccountID(input.AccountDestinationID),
+		domain.Money(input.Amount),
 	)
 	if err != nil {
 		switch err {
@@ -97,10 +98,10 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 }
 
 //Index é um handler para retornar todas as Transfer
-func (t Transfer) Index(w http.ResponseWriter, _ *http.Request) {
+func (t Transfer) Index(w http.ResponseWriter, r *http.Request) {
 	const logKey = "index_transfer"
 
-	output, err := t.uc.FindAll()
+	output, err := t.uc.FindAll(r.Context())
 	if err != nil {
 		t.logError(
 			logKey,

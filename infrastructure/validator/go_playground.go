@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"errors"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -12,27 +12,28 @@ import (
 type goPlayground struct {
 	validator *validator.Validate
 	translate ut.Translator
-	log       logger.Logger
 	err       error
 	msg       []string
 }
 
 //NewGoPlayground constrói uma instância do validator GoPlayground
-func NewGoPlayground(log logger.Logger) Validator {
-	language := en.New()
-	uni := ut.New(language, language)
-	translate, found := uni.GetTranslator("en")
+func NewGoPlayground() (Validator, error) {
+	var (
+		language         = en.New()
+		uni              = ut.New(language, language)
+		translate, found = uni.GetTranslator("en")
+	)
+
 	if !found {
-		log.Fatalln("translator not found")
+		return nil, errors.New("translator not found")
 	}
 
 	v := validator.New()
-
 	if err := en_translations.RegisterDefaultTranslations(v, translate); err != nil {
-		log.Fatalln("translator not found")
+		return nil, errors.New("translator not found")
 	}
 
-	return &goPlayground{validator: v, translate: translate, log: log}
+	return &goPlayground{validator: v, translate: translate}, nil
 }
 
 func (g *goPlayground) Validate(i interface{}) error {
