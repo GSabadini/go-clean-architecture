@@ -94,7 +94,7 @@ func (g ginEngine) buildActionIndexTransfer() gin.HandlerFunc {
 			transferAction     = action.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
-		transferAction.Index(c.Writer, c.Request)
+		transferAction.FindAll(c.Writer, c.Request)
 	}
 }
 
@@ -118,7 +118,7 @@ func (g ginEngine) buildActionIndexAccount() gin.HandlerFunc {
 			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
-		accountAction.Index(c.Writer, c.Request)
+		accountAction.FindAll(c.Writer, c.Request)
 	}
 }
 

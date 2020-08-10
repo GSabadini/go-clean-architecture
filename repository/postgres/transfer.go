@@ -56,7 +56,6 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 		return transfers, errors.Wrap(err, "error listing transfers")
 	}
 
-	defer rows.Close()
 	for rows.Next() {
 		var (
 			ID                   string
@@ -78,6 +77,7 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 			CreatedAt:            createdAt,
 		})
 	}
+	defer rows.Close()
 
 	if err = rows.Err(); err != nil {
 		return []domain.Transfer{}, err

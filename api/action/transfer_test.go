@@ -239,7 +239,7 @@ func TestTransfer_Index(t *testing.T) {
 		expectedStatusCode int
 	}{
 		{
-			name: "Index handler success one transfer",
+			name: "FindAll handler success one transfer",
 			ucMock: mockTransferFindAll{
 				result: []usecase.TransferOutput{
 					{
@@ -256,7 +256,7 @@ func TestTransfer_Index(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
-			name: "Index handler success empty",
+			name: "FindAll handler success empty",
 			ucMock: mockTransferFindAll{
 				result: []usecase.TransferOutput{},
 				err:    nil,
@@ -265,7 +265,7 @@ func TestTransfer_Index(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
-			name: "Index handler generic error",
+			name: "FindAll handler generic error",
 			ucMock: mockTransferFindAll{
 				err: errors.New("error"),
 			},
@@ -283,7 +283,7 @@ func TestTransfer_Index(t *testing.T) {
 				action = NewTransfer(tt.ucMock, logger.LoggerMock{}, validator)
 			)
 
-			action.Index(w, req)
+			action.FindAll(w, req)
 
 			if w.Code != tt.expectedStatusCode {
 				t.Errorf(

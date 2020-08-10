@@ -97,9 +97,9 @@ func (t Transfer) Store(w http.ResponseWriter, r *http.Request) {
 	response.NewSuccess(output, http.StatusCreated).Send(w)
 }
 
-//Index é um handler para retornar todas as Transfer
-func (t Transfer) Index(w http.ResponseWriter, r *http.Request) {
-	const logKey = "index_transfer"
+//FindAll é um handler para retornar todas as Transfer
+func (t Transfer) FindAll(w http.ResponseWriter, r *http.Request) {
+	const logKey = "find_all_transfer"
 
 	output, err := t.uc.FindAll(r.Context())
 	if err != nil {
@@ -107,7 +107,8 @@ func (t Transfer) Index(w http.ResponseWriter, r *http.Request) {
 			logKey,
 			"error when returning the transfer list",
 			http.StatusInternalServerError,
-			err)
+			err,
+		)
 
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return

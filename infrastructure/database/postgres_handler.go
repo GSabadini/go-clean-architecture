@@ -38,6 +38,27 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 }
 
 //Execute
+func (p postgresHandler) BeginTx(ctx context.Context) (repository.Tx, error) {
+	return p.database.BeginTx(ctx, nil)
+}
+//postgresRow
+type postgresTx struct {
+	tx *sql.Tx
+}
+
+func (p postgresTx) Commit() error {
+	return p.tx.Commit()
+}
+func (p postgresTx) Rollback() error {
+	return p.tx.Rollback()
+}
+
+//newPostgresTx
+func newPostgresTx(tx *sql.Tx) postgresTx {
+	return postgresTx{tx: tx}
+}
+
+//ExecuteContext
 func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
 	_, err := p.database.ExecContext(ctx, query, args...)
 	if err != nil {

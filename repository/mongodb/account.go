@@ -65,16 +65,15 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 
 //FindAll busca todas as Account no database
 func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error) {
-	var (
-		accountsBson = make([]accountBSON, 0)
-		accounts     = make([]domain.Account, 0)
-	)
+	var accountsBSON = make([]accountBSON, 0)
 
-	if err := a.handler.FindAll(ctx, a.collectionName, nil, &accountsBson); err != nil {
-		return accounts, errors.Wrap(err, "error listing accounts")
+	if err := a.handler.FindAll(ctx, a.collectionName, nil, &accountsBSON); err != nil {
+		return []domain.Account{}, errors.Wrap(err, "error listing accounts")
 	}
 
-	for _, accountBSON := range accountsBson {
+	var accounts = make([]domain.Account, 0)
+
+	for _, accountBSON := range accountsBSON {
 		var account = domain.Account{
 			ID:        domain.AccountID(accountBSON.ID),
 			Name:      accountBSON.Name,

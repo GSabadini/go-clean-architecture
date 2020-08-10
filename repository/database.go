@@ -23,3 +23,8 @@ type Row interface {
 	Err() error
 	Close() error
 }
+
+type Tx interface {
+	Commit() error
+	Rollback() error
+}

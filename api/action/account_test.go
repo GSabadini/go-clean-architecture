@@ -223,7 +223,7 @@ func TestAccount_Index(t *testing.T) {
 		expectedStatusCode int
 	}{
 		{
-			name: "Index handler success one account",
+			name: "FindAll handler success one account",
 			ucMock: mockAccountFindAll{
 				result: []usecase.AccountOutput{
 					{
@@ -240,7 +240,7 @@ func TestAccount_Index(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
-			name: "Index handler success empty",
+			name: "FindAll handler success empty",
 			ucMock: mockAccountFindAll{
 				result: []usecase.AccountOutput{},
 				err:    nil,
@@ -249,7 +249,7 @@ func TestAccount_Index(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
-			name: "Index handler generic error",
+			name: "FindAll handler generic error",
 			ucMock: mockAccountFindAll{
 				err: errors.New("error"),
 			},
@@ -267,7 +267,7 @@ func TestAccount_Index(t *testing.T) {
 				action = NewAccount(tt.ucMock, logger.LoggerMock{}, validator)
 			)
 
-			action.Index(w, req)
+			action.FindAll(w, req)
 
 			if w.Code != tt.expectedStatusCode {
 				t.Errorf(

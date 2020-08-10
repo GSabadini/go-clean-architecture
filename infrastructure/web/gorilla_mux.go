@@ -105,7 +105,7 @@ func (g gorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 			transferAction     = action.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
-		transferAction.Index(res, req)
+		transferAction.FindAll(res, req)
 	}
 
 	return negroni.New(
@@ -141,7 +141,7 @@ func (g gorillaMux) buildActionIndexAccount() *negroni.Negroni {
 			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
-		accountAction.Index(res, req)
+		accountAction.FindAll(res, req)
 	}
 
 	return negroni.New(

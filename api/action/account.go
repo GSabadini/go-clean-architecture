@@ -84,9 +84,9 @@ func (a Account) Store(w http.ResponseWriter, r *http.Request) {
 	response.NewSuccess(output, http.StatusCreated).Send(w)
 }
 
-//Index é um handler para retornar todas as Account
-func (a Account) Index(w http.ResponseWriter, r *http.Request) {
-	const logKey = "index_account"
+//FindAll é um handler para retornar todas as Account
+func (a Account) FindAll(w http.ResponseWriter, r *http.Request) {
+	const logKey = "find_all_account"
 
 	output, err := a.uc.FindAll(r.Context())
 	if err != nil {

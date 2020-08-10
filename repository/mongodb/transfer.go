@@ -32,7 +32,7 @@ func NewTransferRepository(h repository.NoSQLHandler) TransferRepository {
 
 //Store insere uma Transfer no database
 func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
-	transferBson := &transferBSON{
+	transferBSON := &transferBSON{
 		ID:                   transfer.ID.String(),
 		AccountOriginID:      transfer.AccountOriginID.String(),
 		AccountDestinationID: transfer.AccountDestinationID.String(),
@@ -40,7 +40,7 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 		CreatedAt:            transfer.CreatedAt,
 	}
 
-	if err := t.handler.Store(ctx, t.collectionName, transferBson); err != nil {
+	if err := t.handler.Store(ctx, t.collectionName, transferBSON); err != nil {
 		return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
 	}
 
@@ -49,22 +49,21 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 
 //FindAll busca todas as Transfer no database
 func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
-	var (
-		transfersBson = make([]transferBSON, 0)
-		transfers     = make([]domain.Transfer, 0)
-	)
+	var transfersBSON = make([]transferBSON, 0)
 
-	if err := t.handler.FindAll(ctx, t.collectionName, nil, &transfersBson); err != nil {
-		return transfers, errors.Wrap(err, "error listing transfers")
+	if err := t.handler.FindAll(ctx, t.collectionName, nil, &transfersBSON); err != nil {
+		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 	}
 
-	for _, transferBson := range transfersBson {
+	var transfers = make([]domain.Transfer, 0)
+
+	for _, transferBSON := range transfersBSON {
 		var transfer = domain.Transfer{
-			ID:                   domain.TransferID(transferBson.ID),
-			AccountOriginID:      domain.AccountID(transferBson.AccountOriginID),
-			AccountDestinationID: domain.AccountID(transferBson.AccountDestinationID),
-			Amount:               domain.Money(transferBson.Amount),
-			CreatedAt:            transferBson.CreatedAt,
+			ID:                   domain.TransferID(transferBSON.ID),
+			AccountOriginID:      domain.AccountID(transferBSON.AccountOriginID),
+			AccountDestinationID: domain.AccountID(transferBSON.AccountDestinationID),
+			Amount:               domain.Money(transferBSON.Amount),
+			CreatedAt:            transferBSON.CreatedAt,
 		}
 
 		transfers = append(transfers, transfer)

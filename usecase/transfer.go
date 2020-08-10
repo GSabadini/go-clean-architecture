@@ -39,7 +39,7 @@ func NewTransfer(
 //Store cria uma nova Transfer
 func (t Transfer) Store(
 	ctx context.Context,
-	accountOriginID,
+	accountOriginID domain.AccountID,
 	accountDestinationID domain.AccountID,
 	amount domain.Money,
 ) (TransferOutput, error) {
@@ -75,7 +75,7 @@ func (t Transfer) Store(
 /* TODO melhorar processsamento de transação */
 func (t Transfer) process(
 	ctx context.Context,
-	accountOriginID,
+	accountOriginID domain.AccountID,
 	accountDestinationID domain.AccountID,
 	amount domain.Money,
 ) error {
