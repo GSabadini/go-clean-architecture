@@ -24,6 +24,7 @@ type Row interface {
 	Close() error
 }
 
+//Tx expõe os métodos disponíveis para as abstrações de transações
 type Tx interface {
 	Commit() error
 	Rollback() error

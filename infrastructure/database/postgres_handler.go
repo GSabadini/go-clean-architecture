@@ -4,19 +4,21 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
+
 	"github.com/gsabadini/go-bank-transfer/repository"
 	_ "github.com/lib/pq"
-	"os"
 )
 
 //postgresHandler armazena a estrutura para o Postgres
 type postgresHandler struct {
-	database *sql.DB
+	db *sql.DB
 }
 
 //NewPostgresHandler constrói um novo handler de banco para Postgres
 func NewPostgresHandler(c *config) (*postgresHandler, error) {
-	var ds = fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
+	var ds = fmt.Sprintf(
+		"host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 		c.host,
 		c.port,
 		c.user,
@@ -34,13 +36,14 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 		panic(err)
 	}
 
-	return &postgresHandler{database: db}, nil
+	return &postgresHandler{db: db}, nil
 }
 
 //Execute
 func (p postgresHandler) BeginTx(ctx context.Context) (repository.Tx, error) {
-	return p.database.BeginTx(ctx, nil)
+	return p.db.BeginTx(ctx, nil)
 }
+
 //postgresRow
 type postgresTx struct {
 	tx *sql.Tx
@@ -60,7 +63,7 @@ func newPostgresTx(tx *sql.Tx) postgresTx {
 
 //ExecuteContext
 func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
-	_, err := p.database.ExecContext(ctx, query, args...)
+	_, err := p.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -70,7 +73,7 @@ func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args 
 
 //Query
 func (p postgresHandler) QueryContext(ctx context.Context, query string, args ...interface{}) (repository.Row, error) {
-	rows, err := p.database.QueryContext(ctx, query, args...)
+	rows, err := p.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

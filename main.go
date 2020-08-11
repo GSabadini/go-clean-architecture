@@ -16,7 +16,7 @@ func main() {
 
 	app.Name(os.Getenv("APP_NAME"))
 
-	app.ContextTimeout(5 * time.Second)
+	app.ContextTimeout(10 * time.Second)
 
 	app.Logger(logger.InstanceLogrusLogger)
 
@@ -26,5 +26,5 @@ func main() {
 
 	app.DbNoSQL(database.InstanceMongoDB)
 
-	app.WebServerPort(os.Getenv("APP_PORT")).WebServer(web.InstanceGorillaMux).Start()
+	app.WebServerPort(os.Getenv("APP_PORT")).WebServer(web.InstanceGin).Start()
 }

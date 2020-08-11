@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	errInvalidDatabaseInstance = errors.New("invalid database instance")
+	errInvalidDatabaseInstance = errors.New("invalid db instance")
 )
 
 const (

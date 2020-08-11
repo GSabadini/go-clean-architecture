@@ -8,6 +8,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 
 	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 //transferBSON armazena a estrutura de dados do MongoDB
@@ -51,12 +52,11 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	var transfersBSON = make([]transferBSON, 0)
 
-	if err := t.handler.FindAll(ctx, t.collectionName, nil, &transfersBSON); err != nil {
+	if err := t.handler.FindAll(ctx, t.collectionName, bson.M{}, &transfersBSON); err != nil {
 		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 	}
 
 	var transfers = make([]domain.Transfer, 0)
-
 	for _, transferBSON := range transfersBSON {
 		var transfer = domain.Transfer{
 			ID:                   domain.TransferID(transferBSON.ID),
