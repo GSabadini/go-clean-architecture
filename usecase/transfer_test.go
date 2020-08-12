@@ -84,13 +84,13 @@ func TestTransfer_Store(t *testing.T) {
 				amount:               2999,
 			},
 			transferRepo: mockTransferRepoStore{
-				result: domain.Transfer{
-					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
-					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
-					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-					Amount:               2999,
-					CreatedAt:            time.Time{},
-				},
+				result: domain.NewTransfer(
+					"3c096a40-ccba-4b58-93ed-57379ab04680",
+					"3c096a40-ccba-4b58-93ed-57379ab04681",
+					"3c096a40-ccba-4b58-93ed-57379ab04682",
+					2999,
+					time.Time{},
+				),
 				err: nil,
 			},
 			accountRepo: mockAccountRepo{
@@ -101,22 +101,22 @@ func TestTransfer_Store(t *testing.T) {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
-						Name:      "Test",
-						CPF:       "08098565895",
-						Balance:   5000,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"08098565895",
+						5000,
+						time.Time{},
+					), nil
 				},
 				findByIDDestinationFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
-						Name:      "Test2",
-						CPF:       "13098565491",
-						Balance:   3000,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04682",
+						"Test2",
+						"13098565491",
+						3000,
+						time.Time{},
+					), nil
 				},
 			},
 			expected: TransferOutput{
@@ -147,22 +147,22 @@ func TestTransfer_Store(t *testing.T) {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
-						Name:      "Test",
-						CPF:       "08098565895",
-						Balance:   1000,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"08098565895",
+						1000,
+						time.Time{},
+					), nil
 				},
 				findByIDDestinationFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
-						Name:      "Test2",
-						CPF:       "13098565491",
-						Balance:   3000,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04682",
+						"Test2",
+						"13098565491",
+						3000,
+						time.Time{},
+					), nil
 				},
 			},
 			expectedError: "error",
@@ -212,13 +212,13 @@ func TestTransfer_Store(t *testing.T) {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
-						Name:      "Test",
-						CPF:       "08098565895",
-						Balance:   5000,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"08098565895",
+						5000,
+						time.Time{},
+					), nil
 				},
 				findByIDDestinationFake: func() (domain.Account, error) {
 					return domain.Account{}, errors.New("error")
@@ -247,22 +247,22 @@ func TestTransfer_Store(t *testing.T) {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
-						Name:      "Test",
-						CPF:       "08098565895",
-						Balance:   5999,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"08098565895",
+						5999,
+						time.Time{},
+					), nil
 				},
 				findByIDDestinationFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
-						Name:      "Test2",
-						CPF:       "13098565491",
-						Balance:   2999,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04682",
+						"Test2",
+						"13098565491",
+						2999,
+						time.Time{},
+					), nil
 				},
 			},
 			expectedError: "error",
@@ -288,22 +288,22 @@ func TestTransfer_Store(t *testing.T) {
 				},
 				invokedUpdate: &invoked{call: false},
 				findByIDOriginFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
-						Name:      "Test",
-						CPF:       "08098565895",
-						Balance:   200,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"08098565895",
+						200,
+						time.Time{},
+					), nil
 				},
 				findByIDDestinationFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
-						Name:      "Test2",
-						CPF:       "13098565491",
-						Balance:   100,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04682",
+						"Test2",
+						"13098565491",
+						100,
+						time.Time{},
+					), nil
 				},
 			},
 			expectedError: "error",
@@ -329,22 +329,22 @@ func TestTransfer_Store(t *testing.T) {
 					return nil
 				},
 				findByIDOriginFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
-						Name:      "Test",
-						CPF:       "08098565895",
-						Balance:   0,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"08098565895",
+						0,
+						time.Time{},
+					), nil
 				},
 				findByIDDestinationFake: func() (domain.Account, error) {
-					return domain.Account{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04682",
-						Name:      "Test2",
-						CPF:       "13098565491",
-						Balance:   0,
-						CreatedAt: time.Time{},
-					}, nil
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04682",
+						"Test2",
+						"13098565491",
+						0,
+						time.Time{},
+					), nil
 				},
 			},
 			expectedError: "origin account does not have sufficient balance",
@@ -399,20 +399,20 @@ func TestTransfer_FindAll(t *testing.T) {
 			name: "Success when returning the transfer list",
 			transferRepo: mockTransferRepoFindAll{
 				result: []domain.Transfer{
-					{
-						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
-						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
-						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-						Amount:               100,
-						CreatedAt:            time.Time{},
-					},
-					{
-						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
-						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
-						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
-						Amount:               500,
-						CreatedAt:            time.Time{},
-					},
+					domain.NewTransfer(
+						"3c096a40-ccba-4b58-93ed-57379ab04680",
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"3c096a40-ccba-4b58-93ed-57379ab04682",
+						100,
+						time.Time{},
+					),
+					domain.NewTransfer(
+						"3c096a40-ccba-4b58-93ed-57379ab04680",
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"3c096a40-ccba-4b58-93ed-57379ab04682",
+						500,
+						time.Time{},
+					),
 				},
 				err: nil,
 			},

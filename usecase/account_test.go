@@ -43,13 +43,13 @@ func TestAccount_Store(t *testing.T) {
 				balance: 19944,
 			},
 			repository: mockAccountRepoStore{
-				result: domain.Account{
-					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
-					Name:      "Test",
-					CPF:       "02815517078",
-					Balance:   19944,
-					CreatedAt: time.Time{},
-				},
+				result: domain.NewAccount(
+					"3c096a40-ccba-4b58-93ed-57379ab04680",
+					"Test",
+					"02815517078",
+					19944,
+					time.Time{},
+				),
 				err: nil,
 			},
 			expected: AccountOutput{
@@ -68,13 +68,13 @@ func TestAccount_Store(t *testing.T) {
 				balance: 2350,
 			},
 			repository: mockAccountRepoStore{
-				result: domain.Account{
-					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
-					Name:      "Test",
-					CPF:       "02815517078",
-					Balance:   2350,
-					CreatedAt: time.Time{},
-				},
+				result: domain.NewAccount(
+					"3c096a40-ccba-4b58-93ed-57379ab04680",
+					"Test",
+					"02815517078",
+					2350,
+					time.Time{},
+				),
 				err: nil,
 			},
 			expected: AccountOutput{
@@ -141,20 +141,20 @@ func TestAccount_FindAll(t *testing.T) {
 			name: "Success when returning the account list",
 			repository: mockAccountRepoFindAll{
 				result: []domain.Account{
-					{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
-						Name:      "Test",
-						CPF:       "02815517078",
-						Balance:   125,
-						CreatedAt: time.Time{},
-					},
-					{
-						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
-						Name:      "Test",
-						CPF:       "02815517071",
-						Balance:   99999,
-						CreatedAt: time.Time{},
-					},
+					domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04680",
+						"Test",
+						"02815517078",
+						125,
+						time.Time{},
+					),
+					domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"02815517071",
+						99999,
+						time.Time{},
+					),
 				},
 				err: nil,
 			},
@@ -241,10 +241,8 @@ func TestAccount_FindBalance(t *testing.T) {
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			repository: mockAccountRepoFindBalance{
-				result: domain.Account{
-					Balance: 100,
-				},
-				err: nil,
+				result: domain.NewAccountBalance(100),
+				err:    nil,
 			},
 			expected: AccountBalanceOutput{
 				Balance: 1,
@@ -256,10 +254,8 @@ func TestAccount_FindBalance(t *testing.T) {
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			repository: mockAccountRepoFindBalance{
-				result: domain.Account{
-					Balance: 20050,
-				},
-				err: nil,
+				result: domain.NewAccountBalance(20050),
+				err:    nil,
 			},
 			expected: AccountBalanceOutput{
 				Balance: 200.5,

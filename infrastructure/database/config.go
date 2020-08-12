@@ -20,8 +20,6 @@ func newConfigMongoDB() *config {
 	return &config{
 		host:       os.Getenv("MONGODB_HOST"),
 		database:   os.Getenv("MONGODB_DATABASE"),
-		user:       "dev",
-		password:   "dev",
 		ctxTimeout: 60 * time.Second,
 	}
 }

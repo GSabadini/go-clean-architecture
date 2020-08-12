@@ -35,18 +35,15 @@ func NewAccountRepository(h repository.NoSQLHandler) AccountRepository {
 //Store insere uma Account no database
 func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
 	var accountBSON = accountBSON{
-		ID:        account.ID.String(),
-		Name:      account.Name,
-		CPF:       account.CPF,
-		Balance:   account.Balance.Int64(),
-		CreatedAt: account.CreatedAt,
+		ID:        account.ID().String(),
+		Name:      account.Name(),
+		CPF:       account.CPF(),
+		Balance:   account.Balance().Int64(),
+		CreatedAt: account.CreatedAt(),
 	}
 
 	if err := a.handler.Store(ctx, a.collectionName, accountBSON); err != nil {
-		switch err {
-		default:
-			return domain.Account{}, errors.Wrap(err, "error creating account")
-		}
+		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
 
 	return account, nil
@@ -60,7 +57,12 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 	)
 
 	if err := a.handler.Update(ctx, a.collectionName, query, update); err != nil {
-		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
+		switch err {
+		case mongo.ErrNilDocument:
+			return errors.Wrap(domain.ErrNotFound, "error updating account balance")
+		default:
+			return errors.Wrap(err, "error updating account balance")
+		}
 	}
 
 	return nil
@@ -80,14 +82,15 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 	}
 
 	var accounts = make([]domain.Account, 0)
+
 	for _, accountBSON := range accountsBSON {
-		var account = domain.Account{
-			ID:        domain.AccountID(accountBSON.ID),
-			Name:      accountBSON.Name,
-			CPF:       accountBSON.CPF,
-			Balance:   domain.Money(accountBSON.Balance),
-			CreatedAt: accountBSON.CreatedAt,
-		}
+		var account = domain.NewAccount(
+			domain.AccountID(accountBSON.ID),
+			accountBSON.Name,
+			accountBSON.CPF,
+			domain.Money(accountBSON.Balance),
+			accountBSON.CreatedAt,
+		)
 
 		accounts = append(accounts, account)
 	}
@@ -95,7 +98,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 	return accounts, nil
 }
 
-//FindByID busca uma Account por ID no database
+//FindByID busca uma Account por id no database
 func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		accountBSON = &accountBSON{}
@@ -111,13 +114,13 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 		}
 	}
 
-	return domain.Account{
-		ID:        domain.AccountID(accountBSON.ID),
-		Name:      accountBSON.Name,
-		CPF:       accountBSON.CPF,
-		Balance:   domain.Money(accountBSON.Balance),
-		CreatedAt: accountBSON.CreatedAt,
-	}, nil
+	return domain.NewAccount(
+		domain.AccountID(accountBSON.ID),
+		accountBSON.Name,
+		accountBSON.CPF,
+		domain.Money(accountBSON.Balance),
+		accountBSON.CreatedAt,
+	), nil
 }
 
 //FindBalance busca o Balance de uma Account no database
@@ -137,7 +140,5 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 		}
 	}
 
-	return domain.Account{
-		Balance: domain.Money(accountBSON.Balance),
-	}, nil
+	return domain.NewAccountBalance(domain.Money(accountBSON.Balance)), nil
 }

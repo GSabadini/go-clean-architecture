@@ -51,11 +51,11 @@ func (a Account) Store(ctx context.Context, name, CPF string, balance domain.Mon
 	}
 
 	return AccountOutput{
-		ID:        account.ID.String(),
-		Name:      account.Name,
-		CPF:       account.CPF,
-		Balance:   account.Balance.Float64(),
-		CreatedAt: account.CreatedAt,
+		ID:        account.ID().String(),
+		Name:      account.Name(),
+		CPF:       account.CPF(),
+		Balance:   account.Balance().Float64(),
+		CreatedAt: account.CreatedAt(),
 	}, nil
 }
 
@@ -73,11 +73,11 @@ func (a Account) FindAll(ctx context.Context) ([]AccountOutput, error) {
 
 	for _, account := range accounts {
 		output = append(output, AccountOutput{
-			ID:        account.ID.String(),
-			Name:      account.Name,
-			CPF:       account.CPF,
-			Balance:   account.Balance.Float64(),
-			CreatedAt: account.CreatedAt,
+			ID:        account.ID().String(),
+			Name:      account.Name(),
+			CPF:       account.CPF(),
+			Balance:   account.Balance().Float64(),
+			CreatedAt: account.CreatedAt(),
 		})
 	}
 
@@ -95,6 +95,6 @@ func (a Account) FindBalance(ctx context.Context, ID domain.AccountID) (AccountB
 	}
 
 	return AccountBalanceOutput{
-		Balance: account.Balance.Float64(),
+		Balance: account.Balance().Float64(),
 	}, nil
 }

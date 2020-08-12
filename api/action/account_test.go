@@ -187,6 +187,7 @@ func TestAccount_Store(t *testing.T) {
 				)
 			}
 
+			fmt.Println(w.Body.String())
 			var result = bytes.TrimSpace(w.Body.Bytes())
 			if !bytes.Equal(result, tt.expectedBody) {
 				t.Errorf(

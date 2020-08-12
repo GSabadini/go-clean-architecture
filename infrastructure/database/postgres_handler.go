@@ -39,7 +39,6 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 	return &postgresHandler{db: db}, nil
 }
 
-//Execute
 func (p postgresHandler) BeginTx(ctx context.Context) (repository.Tx, error) {
 	return p.db.BeginTx(ctx, nil)
 }

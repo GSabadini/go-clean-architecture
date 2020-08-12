@@ -46,7 +46,10 @@ func (t Transfer) Store(
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 
+	//t.accountRepo.StartTransaction()
+
 	if err := t.process(ctx, accountOriginID, accountDestinationID, amount); err != nil {
+		//t.accountRepo.Rollback()
 		return TransferOutput{}, err
 	}
 
@@ -58,21 +61,27 @@ func (t Transfer) Store(
 		time.Now(),
 	)
 
+	//t.transferRepo.StartTransaction()
+
 	transfer, err := t.transferRepo.Store(ctx, transfer)
 	if err != nil {
+		//t.transferRepo.Rollback()
+		//t.accountRepo.Rollback()
 		return TransferOutput{}, err
 	}
 
+	//t.accountRepo.Commit()
+	//t.transferRepo.Commit()
+
 	return TransferOutput{
-		ID:                   transfer.ID.String(),
-		AccountOriginID:      transfer.AccountOriginID.String(),
-		AccountDestinationID: transfer.AccountDestinationID.String(),
-		Amount:               transfer.Amount.Float64(),
-		CreatedAt:            transfer.CreatedAt,
+		ID:                   transfer.ID().String(),
+		AccountOriginID:      transfer.AccountOriginID().String(),
+		AccountDestinationID: transfer.AccountDestinationID().String(),
+		Amount:               transfer.Amount().Float64(),
+		CreatedAt:            transfer.CreatedAt(),
 	}, nil
 }
 
-/* TODO melhorar processsamento de transação */
 func (t Transfer) process(
 	ctx context.Context,
 	accountOriginID domain.AccountID,
@@ -95,11 +104,11 @@ func (t Transfer) process(
 
 	destination.Deposit(amount)
 
-	if err = t.accountRepo.UpdateBalance(ctx, origin.ID, origin.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(ctx, origin.ID(), origin.Balance()); err != nil {
 		return err
 	}
 
-	if err = t.accountRepo.UpdateBalance(ctx, destination.ID, destination.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(ctx, destination.ID(), destination.Balance()); err != nil {
 		return err
 	}
 
@@ -120,11 +129,11 @@ func (t Transfer) FindAll(ctx context.Context) ([]TransferOutput, error) {
 
 	for _, transfer := range transfers {
 		output = append(output, TransferOutput{
-			ID:                   transfer.ID.String(),
-			AccountOriginID:      transfer.AccountOriginID.String(),
-			AccountDestinationID: transfer.AccountDestinationID.String(),
-			Amount:               transfer.Amount.Float64(),
-			CreatedAt:            transfer.CreatedAt,
+			ID:                   transfer.ID().String(),
+			AccountOriginID:      transfer.AccountOriginID().String(),
+			AccountDestinationID: transfer.AccountDestinationID().String(),
+			Amount:               transfer.Amount().Float64(),
+			CreatedAt:            transfer.CreatedAt(),
 		})
 	}
 

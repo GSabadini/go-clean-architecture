@@ -101,10 +101,9 @@ func (mgo mongoHandler) FindOne(
 			ctx,
 			query,
 			options.FindOne().SetProjection(projection),
-		).
-		Decode(result)
+		).Decode(result)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return nil

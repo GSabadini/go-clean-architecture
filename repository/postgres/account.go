@@ -32,11 +32,11 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 	if err := a.handler.ExecuteContext(
 		ctx,
 		query,
-		account.ID,
-		account.Name,
-		account.CPF,
-		account.Balance,
-		account.CreatedAt,
+		account.ID(),
+		account.Name(),
+		account.CPF(),
+		account.Balance(),
+		account.CreatedAt(),
 	); err != nil {
 		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
@@ -80,13 +80,13 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 			return []domain.Account{}, errors.Wrap(err, "error listing accounts")
 		}
 
-		accounts = append(accounts, domain.Account{
-			ID:        domain.AccountID(ID),
-			Name:      name,
-			CPF:       CPF,
-			Balance:   domain.Money(balance),
-			CreatedAt: createdAt,
-		})
+		accounts = append(accounts, domain.NewAccount(
+			domain.AccountID(ID),
+			name,
+			CPF,
+			domain.Money(balance),
+			createdAt,
+		))
 	}
 	defer rows.Close()
 
@@ -97,7 +97,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 	return accounts, nil
 }
 
-//FindByID busca uma Account por ID no database
+//FindByID busca uma Account por id no database
 func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		query     = "SELECT * FROM accounts WHERE id = $1"
@@ -123,13 +123,13 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 		return domain.Account{}, err
 	}
 
-	return domain.Account{
-		ID:        domain.AccountID(id),
-		Name:      name,
-		CPF:       CPF,
-		Balance:   domain.Money(balance),
-		CreatedAt: createdAt,
-	}, nil
+	return domain.NewAccount(
+		domain.AccountID(id),
+		name,
+		CPF,
+		domain.Money(balance),
+		createdAt,
+	), nil
 }
 
 //FindBalance busca o Balance de uma Account no database
@@ -154,5 +154,5 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 		return domain.Account{}, err
 	}
 
-	return domain.Account{Balance: domain.Money(balance)}, nil
+	return domain.NewAccountBalance(domain.Money(balance)), nil
 }

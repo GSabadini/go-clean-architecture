@@ -34,11 +34,11 @@ func NewTransferRepository(h repository.NoSQLHandler) TransferRepository {
 //Store insere uma Transfer no database
 func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	transferBSON := &transferBSON{
-		ID:                   transfer.ID.String(),
-		AccountOriginID:      transfer.AccountOriginID.String(),
-		AccountDestinationID: transfer.AccountDestinationID.String(),
-		Amount:               transfer.Amount.Int64(),
-		CreatedAt:            transfer.CreatedAt,
+		ID:                   transfer.ID().String(),
+		AccountOriginID:      transfer.AccountOriginID().String(),
+		AccountDestinationID: transfer.AccountDestinationID().String(),
+		Amount:               transfer.Amount().Int64(),
+		CreatedAt:            transfer.CreatedAt(),
 	}
 
 	if err := t.handler.Store(ctx, t.collectionName, transferBSON); err != nil {
@@ -57,14 +57,15 @@ func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, err
 	}
 
 	var transfers = make([]domain.Transfer, 0)
+
 	for _, transferBSON := range transfersBSON {
-		var transfer = domain.Transfer{
-			ID:                   domain.TransferID(transferBSON.ID),
-			AccountOriginID:      domain.AccountID(transferBSON.AccountOriginID),
-			AccountDestinationID: domain.AccountID(transferBSON.AccountDestinationID),
-			Amount:               domain.Money(transferBSON.Amount),
-			CreatedAt:            transferBSON.CreatedAt,
-		}
+		var transfer = domain.NewTransfer(
+			domain.TransferID(transferBSON.ID),
+			domain.AccountID(transferBSON.AccountOriginID),
+			domain.AccountID(transferBSON.AccountDestinationID),
+			domain.Money(transferBSON.Amount),
+			transferBSON.CreatedAt,
+		)
 
 		transfers = append(transfers, transfer)
 	}
