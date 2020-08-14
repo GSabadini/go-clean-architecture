@@ -32,11 +32,11 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 	if err := a.handler.ExecuteContext(
 		ctx,
 		query,
-		account.ID,
-		account.Name,
-		account.CPF,
-		account.Balance,
-		account.CreatedAt,
+		account.ID(),
+		account.Name(),
+		account.CPF(),
+		account.Balance(),
+		account.CreatedAt(),
 	); err != nil {
 		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
@@ -49,7 +49,7 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
 	if err := a.handler.ExecuteContext(ctx, query, balance, ID); err != nil {
-		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
+		return errors.Wrap(err, "error updating account balance")
 	}
 
 	return nil
@@ -64,10 +64,9 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 
 	rows, err := a.handler.QueryContext(ctx, query)
 	if err != nil {
-		return accounts, errors.Wrap(err, "error listing accounts")
+		return []domain.Account{}, errors.Wrap(err, "error listing accounts")
 	}
 
-	defer rows.Close()
 	for rows.Next() {
 		var (
 			ID        string
@@ -78,17 +77,18 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 		)
 
 		if err = rows.Scan(&ID, &name, &CPF, &balance, &createdAt); err != nil {
-			return accounts, errors.Wrap(err, "error listing accounts")
+			return []domain.Account{}, errors.Wrap(err, "error listing accounts")
 		}
 
-		accounts = append(accounts, domain.Account{
-			ID:        domain.AccountID(ID),
-			Name:      name,
-			CPF:       CPF,
-			Balance:   domain.Money(balance),
-			CreatedAt: createdAt,
-		})
+		accounts = append(accounts, domain.NewAccount(
+			domain.AccountID(ID),
+			name,
+			CPF,
+			domain.Money(balance),
+			createdAt,
+		))
 	}
+	defer rows.Close()
 
 	if err = rows.Err(); err != nil {
 		return []domain.Account{}, err
@@ -97,66 +97,62 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 	return accounts, nil
 }
 
-//FindByID busca uma Account por ID no database
+//FindByID busca uma Account por id no database
 func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
-		account   = domain.Account{}
 		query     = "SELECT * FROM accounts WHERE id = $1"
 		id        string
 		name      string
 		CPF       string
-		balance   float64
+		balance   int64
 		createdAt time.Time
 	)
 
 	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
-		return account, errors.Wrap(err, "error fetching account")
+		return domain.Account{}, errors.Wrap(err, "error fetching account")
 	}
 
-	defer row.Close()
 	row.Next()
 	if err = row.Scan(&id, &name, &CPF, &balance, &createdAt); err != nil {
-		return account, errors.Wrap(err, "error fetching account")
+		return domain.Account{}, errors.Wrap(err, "error fetching account")
 	}
+	defer row.Close()
 
 	if err = row.Err(); err != nil {
 		return domain.Account{}, err
 	}
 
-	account.ID = domain.AccountID(id)
-	account.Name = name
-	account.CPF = CPF
-	account.Balance = domain.Money(balance)
-	account.CreatedAt = createdAt
-
-	return account, nil
+	return domain.NewAccount(
+		domain.AccountID(id),
+		name,
+		CPF,
+		domain.Money(balance),
+		createdAt,
+	), nil
 }
 
 //FindBalance busca o Balance de uma Account no database
 func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
-		account = domain.Account{}
 		query   = "SELECT balance FROM accounts WHERE id = $1"
 		balance int64
 	)
 
 	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
-		return account, errors.Wrap(err, "error fetching account balance")
+		return domain.Account{}, errors.Wrap(err, "error fetching account balance")
 	}
 
-	defer row.Close()
 	row.Next()
 	if err := row.Scan(&balance); err != nil {
-		return account, errors.Wrap(err, "error fetching account balance")
+		return domain.Account{}, errors.Wrap(err, "error fetching account balance")
 	}
+	defer row.Close()
 
 	if err = row.Err(); err != nil {
 		return domain.Account{}, err
 	}
 
-	account.Balance = domain.Money(balance)
-
-	return account, nil
+	return domain.NewAccountBalance(domain.Money(balance)), nil
 }

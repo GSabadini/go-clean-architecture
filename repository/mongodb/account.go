@@ -8,8 +8,8 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 
 	"github.com/pkg/errors"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 //accountBSON armazena a estrutura de dados do MongoDB
@@ -34,12 +34,12 @@ func NewAccountRepository(h repository.NoSQLHandler) AccountRepository {
 
 //Store insere uma Account no database
 func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
-	var accountBSON = &accountBSON{
-		ID:        account.ID.String(),
-		Name:      account.Name,
-		CPF:       account.CPF,
-		Balance:   account.Balance.Int64(),
-		CreatedAt: account.CreatedAt,
+	var accountBSON = accountBSON{
+		ID:        account.ID().String(),
+		Name:      account.Name(),
+		CPF:       account.CPF(),
+		Balance:   account.Balance().Int64(),
+		CreatedAt: account.CreatedAt(),
 	}
 
 	if err := a.handler.Store(ctx, a.collectionName, accountBSON); err != nil {
@@ -57,7 +57,12 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 	)
 
 	if err := a.handler.Update(ctx, a.collectionName, query, update); err != nil {
-		return errors.Wrap(domain.ErrNotFound, "error updating account balance")
+		switch err {
+		case mongo.ErrNilDocument:
+			return errors.Wrap(domain.ErrNotFound, "error updating account balance")
+		default:
+			return errors.Wrap(err, "error updating account balance")
+		}
 	}
 
 	return nil
@@ -65,23 +70,27 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 
 //FindAll busca todas as Account no database
 func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error) {
-	var (
-		accountsBson = make([]accountBSON, 0)
-		accounts     = make([]domain.Account, 0)
-	)
+	var accountsBSON = make([]accountBSON, 0)
 
-	if err := a.handler.FindAll(ctx, a.collectionName, nil, &accountsBson); err != nil {
-		return accounts, errors.Wrap(err, "error listing accounts")
+	if err := a.handler.FindAll(ctx, a.collectionName, bson.M{}, &accountsBSON); err != nil {
+		switch err {
+		case mongo.ErrNilDocument:
+			return []domain.Account{}, errors.Wrap(domain.ErrNotFound, "error listing accounts")
+		default:
+			return []domain.Account{}, errors.Wrap(err, "error listing accounts")
+		}
 	}
 
-	for _, accountBSON := range accountsBson {
-		var account = domain.Account{
-			ID:        domain.AccountID(accountBSON.ID),
-			Name:      accountBSON.Name,
-			CPF:       accountBSON.CPF,
-			Balance:   domain.Money(accountBSON.Balance),
-			CreatedAt: accountBSON.CreatedAt,
-		}
+	var accounts = make([]domain.Account, 0)
+
+	for _, accountBSON := range accountsBSON {
+		var account = domain.NewAccount(
+			domain.AccountID(accountBSON.ID),
+			accountBSON.Name,
+			accountBSON.CPF,
+			domain.Money(accountBSON.Balance),
+			accountBSON.CreatedAt,
+		)
 
 		accounts = append(accounts, account)
 	}
@@ -89,7 +98,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 	return accounts, nil
 }
 
-//FindByID busca uma Account por ID no database
+//FindByID busca uma Account por id no database
 func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		accountBSON = &accountBSON{}
@@ -98,20 +107,20 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 
 	if err := a.handler.FindOne(ctx, a.collectionName, query, nil, accountBSON); err != nil {
 		switch err {
-		case mgo.ErrNotFound:
+		case mongo.ErrNoDocuments:
 			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account")
 		default:
 			return domain.Account{}, errors.Wrap(err, "error fetching account")
 		}
 	}
 
-	return domain.Account{
-		ID:        domain.AccountID(accountBSON.ID),
-		Name:      accountBSON.Name,
-		CPF:       accountBSON.CPF,
-		Balance:   domain.Money(accountBSON.Balance),
-		CreatedAt: accountBSON.CreatedAt,
-	}, nil
+	return domain.NewAccount(
+		domain.AccountID(accountBSON.ID),
+		accountBSON.Name,
+		accountBSON.CPF,
+		domain.Money(accountBSON.Balance),
+		accountBSON.CreatedAt,
+	), nil
 }
 
 //FindBalance busca o Balance de uma Account no database
@@ -119,23 +128,17 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 	var (
 		accountBSON = &accountBSON{}
 		query       = bson.M{"id": ID}
-		selector    = bson.M{"balance": 1, "_id": 0}
+		projection  = bson.M{"balance": 1, "_id": 0}
 	)
 
-	if err := a.handler.FindOne(ctx, a.collectionName, query, selector, accountBSON); err != nil {
+	if err := a.handler.FindOne(ctx, a.collectionName, query, projection, accountBSON); err != nil {
 		switch err {
-		case mgo.ErrNotFound:
+		case mongo.ErrNoDocuments:
 			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
 		default:
 			return domain.Account{}, errors.Wrap(err, "error fetching account balance")
 		}
 	}
 
-	return domain.Account{
-		ID:        domain.AccountID(accountBSON.ID),
-		Name:      accountBSON.Name,
-		CPF:       accountBSON.CPF,
-		Balance:   domain.Money(accountBSON.Balance),
-		CreatedAt: accountBSON.CreatedAt,
-	}, nil
+	return domain.NewAccountBalance(domain.Money(accountBSON.Balance)), nil
 }

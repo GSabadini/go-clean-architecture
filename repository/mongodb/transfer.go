@@ -8,6 +8,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/repository"
 
 	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 //transferBSON armazena a estrutura de dados do MongoDB
@@ -32,15 +33,15 @@ func NewTransferRepository(h repository.NoSQLHandler) TransferRepository {
 
 //Store insere uma Transfer no database
 func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
-	transferBson := &transferBSON{
-		ID:                   transfer.ID.String(),
-		AccountOriginID:      transfer.AccountOriginID.String(),
-		AccountDestinationID: transfer.AccountDestinationID.String(),
-		Amount:               transfer.Amount.Int64(),
-		CreatedAt:            transfer.CreatedAt,
+	transferBSON := &transferBSON{
+		ID:                   transfer.ID().String(),
+		AccountOriginID:      transfer.AccountOriginID().String(),
+		AccountDestinationID: transfer.AccountDestinationID().String(),
+		Amount:               transfer.Amount().Int64(),
+		CreatedAt:            transfer.CreatedAt(),
 	}
 
-	if err := t.handler.Store(ctx, t.collectionName, transferBson); err != nil {
+	if err := t.handler.Store(ctx, t.collectionName, transferBSON); err != nil {
 		return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
 	}
 
@@ -49,23 +50,22 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 
 //FindAll busca todas as Transfer no database
 func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
-	var (
-		transfersBson = make([]transferBSON, 0)
-		transfers     = make([]domain.Transfer, 0)
-	)
+	var transfersBSON = make([]transferBSON, 0)
 
-	if err := t.handler.FindAll(ctx, t.collectionName, nil, &transfersBson); err != nil {
-		return transfers, errors.Wrap(err, "error listing transfers")
+	if err := t.handler.FindAll(ctx, t.collectionName, bson.M{}, &transfersBSON); err != nil {
+		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 	}
 
-	for _, transferBson := range transfersBson {
-		var transfer = domain.Transfer{
-			ID:                   domain.TransferID(transferBson.ID),
-			AccountOriginID:      domain.AccountID(transferBson.AccountOriginID),
-			AccountDestinationID: domain.AccountID(transferBson.AccountDestinationID),
-			Amount:               domain.Money(transferBson.Amount),
-			CreatedAt:            transferBson.CreatedAt,
-		}
+	var transfers = make([]domain.Transfer, 0)
+
+	for _, transferBSON := range transfersBSON {
+		var transfer = domain.NewTransfer(
+			domain.TransferID(transferBSON.ID),
+			domain.AccountID(transferBSON.AccountOriginID),
+			domain.AccountID(transferBSON.AccountDestinationID),
+			domain.Money(transferBSON.Amount),
+			transferBSON.CreatedAt,
+		)
 
 		transfers = append(transfers, transfer)
 	}

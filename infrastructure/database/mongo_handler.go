@@ -2,51 +2,81 @@ package database
 
 import (
 	"context"
-	mongo "gopkg.in/mgo.v2"
+	"fmt"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 //mongoHandler armazena a estrutura para MongoDB
 type mongoHandler struct {
-	database *mongo.Database
-	session  *mongo.Session
+	db      *mongo.Database
+	session mongo.Session
 }
 
 //NewMongoHandler constrói um novo handler de banco para MongoDB
 func NewMongoHandler(c *config) (*mongoHandler, error) {
-	session, err := mongo.DialWithTimeout(c.host, c.connTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.ctxTimeout)
+	defer cancel()
+
+	uri := fmt.Sprintf(
+		"%s://@%s",
+		c.host,
+		c.host,
+	)
+
+	clientOpts := options.Client().ApplyURI(uri).SetDirect(true)
+	client, err := mongo.Connect(ctx, clientOpts)
 	if err != nil {
-		return &mongoHandler{}, err
+		panic(err)
 	}
 
-	handler := new(mongoHandler)
-	handler.session = session
-	handler.database = handler.session.DB(c.database)
+	session, err := client.StartSession()
+	if err != nil {
+		panic(err)
+	}
 
-	return handler, nil
+	return &mongoHandler{
+		db:      client.Database(c.database),
+		session: session,
+	}, nil
 }
 
 //Store realiza uma inserção no banco de dados
 func (mgo mongoHandler) Store(ctx context.Context, collection string, data interface{}) error {
-	session := mgo.session.Clone()
-	defer session.Close()
+	if _, err := mgo.db.Collection(collection).InsertOne(ctx, data); err != nil {
+		return err
+	}
 
-	return mgo.database.C(collection).With(session).Insert(data)
+	return nil
 }
 
 //Update realiza uma atualização no banco de dados
 func (mgo mongoHandler) Update(ctx context.Context, collection string, query interface{}, update interface{}) error {
-	session := mgo.session.Clone()
-	defer session.Close()
+	if _, err := mgo.db.Collection(collection).UpdateOne(ctx, query, update); err != nil {
+		return err
+	}
 
-	return mgo.database.C(collection).With(session).Update(query, update)
+	return nil
 }
 
 //FindAll realiza uma busca por todos os registros no banco de dados
 func (mgo mongoHandler) FindAll(ctx context.Context, collection string, query interface{}, result interface{}) error {
-	session := mgo.session.Clone()
-	defer session.Close()
+	cur, err := mgo.db.Collection(collection).Find(ctx, query)
+	if err != nil {
+		return err
+	}
 
-	return mgo.database.C(collection).With(session).Find(query).All(result)
+	defer cur.Close(ctx)
+	if err = cur.All(ctx, result); err != nil {
+		return err
+	}
+
+	if err := cur.Err(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //FindOne realiza a busca de um item específico no banco de dados
@@ -54,11 +84,18 @@ func (mgo mongoHandler) FindOne(
 	ctx context.Context,
 	collection string,
 	query interface{},
-	selector interface{},
+	projection interface{},
 	result interface{},
 ) error {
-	session := mgo.session.Clone()
-	defer session.Close()
+	var err = mgo.db.Collection(collection).
+		FindOne(
+			ctx,
+			query,
+			options.FindOne().SetProjection(projection),
+		).Decode(result)
+	if err != nil {
+		return err
+	}
 
-	return mgo.database.C(collection).With(session).Find(query).Select(selector).One(result)
+	return nil
 }

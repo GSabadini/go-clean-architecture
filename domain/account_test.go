@@ -24,9 +24,7 @@ func TestAccount_Deposit(t *testing.T) {
 			args: args{
 				amount: 10,
 			},
-			account: Account{
-				Balance: 0,
-			},
+			account:  NewAccountBalance(0),
 			expected: 10,
 		},
 		{
@@ -34,9 +32,7 @@ func TestAccount_Deposit(t *testing.T) {
 			args: args{
 				amount: 102098,
 			},
-			account: Account{
-				Balance: 0,
-			},
+			account:  NewAccountBalance(0),
 			expected: 102098,
 		},
 		{
@@ -44,9 +40,7 @@ func TestAccount_Deposit(t *testing.T) {
 			args: args{
 				amount: 4498,
 			},
-			account: Account{
-				Balance: 98,
-			},
+			account:  NewAccountBalance(98),
 			expected: 4596,
 		},
 	}
@@ -55,10 +49,10 @@ func TestAccount_Deposit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.account.Deposit(tt.args.amount)
 
-			if tt.account.Balance != tt.expected {
+			if tt.account.Balance() != tt.expected {
 				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
 					tt.name,
-					tt.account.Balance,
+					tt.account.Balance(),
 					tt.expected,
 				)
 			}
@@ -85,9 +79,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			args: args{
 				amount: 10,
 			},
-			account: Account{
-				Balance: 10,
-			},
+			account:  NewAccountBalance(10),
 			expected: 0,
 		},
 		{
@@ -95,9 +87,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			args: args{
 				amount: 10012,
 			},
-			account: Account{
-				Balance: 10013,
-			},
+			account:  NewAccountBalance(10013),
 			expected: 1,
 		},
 		{
@@ -105,9 +95,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			args: args{
 				amount: 25,
 			},
-			account: Account{
-				Balance: 125,
-			},
+			account:  NewAccountBalance(125),
 			expected: 100,
 		},
 		{
@@ -115,9 +103,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			args: args{
 				amount: 564,
 			},
-			account: Account{
-				Balance: 62,
-			},
+			account:     NewAccountBalance(62),
 			expectedErr: ErrInsufficientBalance,
 		},
 		{
@@ -125,9 +111,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			args: args{
 				amount: 5,
 			},
-			account: Account{
-				Balance: 1,
-			},
+			account:     NewAccountBalance(1),
 			expectedErr: ErrInsufficientBalance,
 		},
 		{
@@ -135,9 +119,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			args: args{
 				amount: 10,
 			},
-			account: Account{
-				Balance: 0,
-			},
+			account:     NewAccountBalance(0),
 			expectedErr: ErrInsufficientBalance,
 		},
 	}
@@ -154,10 +136,10 @@ func TestAccount_Withdraw(t *testing.T) {
 				return
 			}
 
-			if tt.expectedErr == nil && tt.account.Balance != tt.expected {
+			if tt.expectedErr == nil && tt.account.Balance() != tt.expected {
 				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'",
 					tt.name,
-					tt.account.Balance,
+					tt.account.Balance(),
 					tt.expected,
 				)
 			}

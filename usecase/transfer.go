@@ -7,19 +7,11 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//TransferOutput armazena a estrutura de dados de retorno do caso de uso
-type TransferOutput struct {
-	ID                   string    `json:"id"`
-	AccountOriginID      string    `json:"account_origin_id"`
-	AccountDestinationID string    `json:"account_destination_id"`
-	Amount               float64   `json:"amount"`
-	CreatedAt            time.Time `json:"created_at"`
-}
-
 //Transfer armazena as dependências para os casos de uso de Transfer
 type Transfer struct {
 	transferRepo domain.TransferRepository
 	accountRepo  domain.AccountRepository
+	presenter    TransferPresenter
 	ctxTimeout   time.Duration
 }
 
@@ -27,11 +19,13 @@ type Transfer struct {
 func NewTransfer(
 	transferRepo domain.TransferRepository,
 	accountRepo domain.AccountRepository,
+	presenter TransferPresenter,
 	t time.Duration,
 ) Transfer {
 	return Transfer{
 		transferRepo: transferRepo,
 		accountRepo:  accountRepo,
+		presenter:    presenter,
 		ctxTimeout:   t,
 	}
 }
@@ -39,7 +33,7 @@ func NewTransfer(
 //Store cria uma nova Transfer
 func (t Transfer) Store(
 	ctx context.Context,
-	accountOriginID,
+	accountOriginID domain.AccountID,
 	accountDestinationID domain.AccountID,
 	amount domain.Money,
 ) (TransferOutput, error) {
@@ -47,7 +41,7 @@ func (t Transfer) Store(
 	defer cancel()
 
 	if err := t.process(ctx, accountOriginID, accountDestinationID, amount); err != nil {
-		return TransferOutput{}, err
+		return t.presenter.Output(domain.Transfer{}), err
 	}
 
 	var transfer = domain.NewTransfer(
@@ -60,22 +54,15 @@ func (t Transfer) Store(
 
 	transfer, err := t.transferRepo.Store(ctx, transfer)
 	if err != nil {
-		return TransferOutput{}, err
+		return t.presenter.Output(domain.Transfer{}), err
 	}
 
-	return TransferOutput{
-		ID:                   transfer.ID.String(),
-		AccountOriginID:      transfer.AccountOriginID.String(),
-		AccountDestinationID: transfer.AccountDestinationID.String(),
-		Amount:               transfer.Amount.Float64(),
-		CreatedAt:            transfer.CreatedAt,
-	}, nil
+	return t.presenter.Output(transfer), nil
 }
 
-/* TODO melhorar processsamento de transação */
 func (t Transfer) process(
 	ctx context.Context,
-	accountOriginID,
+	accountOriginID domain.AccountID,
 	accountDestinationID domain.AccountID,
 	amount domain.Money,
 ) error {
@@ -84,22 +71,22 @@ func (t Transfer) process(
 		return err
 	}
 
+	if err := origin.Withdraw(amount); err != nil {
+		return err
+	}
+
 	destination, err := t.accountRepo.FindByID(ctx, accountDestinationID)
 	if err != nil {
 		return err
 	}
 
-	if err := origin.Withdraw(amount); err != nil {
-		return err
-	}
-
 	destination.Deposit(amount)
 
-	if err = t.accountRepo.UpdateBalance(ctx, origin.ID, origin.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(ctx, origin.ID(), origin.Balance()); err != nil {
 		return err
 	}
 
-	if err = t.accountRepo.UpdateBalance(ctx, destination.ID, destination.Balance); err != nil {
+	if err = t.accountRepo.UpdateBalance(ctx, destination.ID(), destination.Balance()); err != nil {
 		return err
 	}
 
@@ -111,22 +98,10 @@ func (t Transfer) FindAll(ctx context.Context) ([]TransferOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 
-	var output = make([]TransferOutput, 0)
-
 	transfers, err := t.transferRepo.FindAll(ctx)
 	if err != nil {
-		return output, err
+		return t.presenter.OutputList([]domain.Transfer{}), err
 	}
 
-	for _, transfer := range transfers {
-		output = append(output, TransferOutput{
-			ID:                   transfer.ID.String(),
-			AccountOriginID:      transfer.AccountOriginID.String(),
-			AccountDestinationID: transfer.AccountDestinationID.String(),
-			Amount:               transfer.Amount.Float64(),
-			CreatedAt:            transfer.CreatedAt,
-		})
-	}
-
-	return output, nil
+	return t.presenter.OutputList(transfers), nil
 }

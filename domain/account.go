@@ -37,36 +37,66 @@ func (a AccountID) String() string {
 
 //Account armazena a estrutura de uma conta
 type Account struct {
-	ID        AccountID
-	Name      string
-	CPF       string
-	Balance   Money
-	CreatedAt time.Time
+	id        AccountID
+	name      string
+	cpf       string
+	balance   Money
+	createdAt time.Time
+}
+
+//NewAccount cria um Account somento com o Balance
+func NewAccountBalance(balance Money) Account {
+	return Account{balance: balance}
 }
 
 //NewAccount cria um Account
 func NewAccount(ID AccountID, name, CPF string, balance Money, createdAt time.Time) Account {
 	return Account{
-		ID:        ID,
-		Name:      name,
-		CPF:       CPF,
-		Balance:   balance,
-		CreatedAt: createdAt,
+		id:        ID,
+		name:      name,
+		cpf:       CPF,
+		balance:   balance,
+		createdAt: createdAt,
 	}
 }
 
 //Deposit adiciona um valor no Balance
 func (a *Account) Deposit(amount Money) {
-	a.Balance += amount
+	a.balance += amount
 }
 
 //Withdraw remove um valor no Balance
 func (a *Account) Withdraw(amount Money) error {
-	if a.Balance < amount {
+	if a.balance < amount {
 		return ErrInsufficientBalance
 	}
 
-	a.Balance -= amount
+	a.balance -= amount
 
 	return nil
+}
+
+//ID
+func (a Account) ID() AccountID {
+	return a.id
+}
+
+//Name
+func (a Account) Name() string {
+	return a.name
+}
+
+//CPF
+func (a Account) CPF() string {
+	return a.cpf
+}
+
+//Balance
+func (a Account) Balance() Money {
+	return a.balance
+}
+
+//CreatedAt
+func (a Account) CreatedAt() time.Time {
+	return a.createdAt
 }
