@@ -14,6 +14,7 @@ type NoSQLHandler interface {
 type SQLHandler interface {
 	ExecuteContext(context.Context, string, ...interface{}) error
 	QueryContext(context.Context, string, ...interface{}) (Row, error)
+	//BeginTx(ctx context.Context) (Tx, error)
 }
 
 //Row expõe os métodos disponíveis para as abstrações de linhas de banco SQL

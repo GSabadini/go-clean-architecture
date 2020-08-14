@@ -7,19 +7,11 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//TransferOutput armazena a estrutura de dados de retorno do caso de uso
-type TransferOutput struct {
-	ID                   string    `json:"id"`
-	AccountOriginID      string    `json:"account_origin_id"`
-	AccountDestinationID string    `json:"account_destination_id"`
-	Amount               float64   `json:"amount"`
-	CreatedAt            time.Time `json:"created_at"`
-}
-
 //Transfer armazena as dependências para os casos de uso de Transfer
 type Transfer struct {
 	transferRepo domain.TransferRepository
 	accountRepo  domain.AccountRepository
+	presenter    TransferPresenter
 	ctxTimeout   time.Duration
 }
 
@@ -27,11 +19,13 @@ type Transfer struct {
 func NewTransfer(
 	transferRepo domain.TransferRepository,
 	accountRepo domain.AccountRepository,
+	presenter TransferPresenter,
 	t time.Duration,
 ) Transfer {
 	return Transfer{
 		transferRepo: transferRepo,
 		accountRepo:  accountRepo,
+		presenter:    presenter,
 		ctxTimeout:   t,
 	}
 }
@@ -46,11 +40,8 @@ func (t Transfer) Store(
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 
-	//t.accountRepo.StartTransaction()
-
 	if err := t.process(ctx, accountOriginID, accountDestinationID, amount); err != nil {
-		//t.accountRepo.Rollback()
-		return TransferOutput{}, err
+		return t.presenter.Output(domain.Transfer{}), err
 	}
 
 	var transfer = domain.NewTransfer(
@@ -61,25 +52,12 @@ func (t Transfer) Store(
 		time.Now(),
 	)
 
-	//t.transferRepo.StartTransaction()
-
 	transfer, err := t.transferRepo.Store(ctx, transfer)
 	if err != nil {
-		//t.transferRepo.Rollback()
-		//t.accountRepo.Rollback()
-		return TransferOutput{}, err
+		return t.presenter.Output(domain.Transfer{}), err
 	}
 
-	//t.accountRepo.Commit()
-	//t.transferRepo.Commit()
-
-	return TransferOutput{
-		ID:                   transfer.ID().String(),
-		AccountOriginID:      transfer.AccountOriginID().String(),
-		AccountDestinationID: transfer.AccountDestinationID().String(),
-		Amount:               transfer.Amount().Float64(),
-		CreatedAt:            transfer.CreatedAt(),
-	}, nil
+	return t.presenter.Output(transfer), nil
 }
 
 func (t Transfer) process(
@@ -93,12 +71,12 @@ func (t Transfer) process(
 		return err
 	}
 
-	destination, err := t.accountRepo.FindByID(ctx, accountDestinationID)
-	if err != nil {
+	if err := origin.Withdraw(amount); err != nil {
 		return err
 	}
 
-	if err := origin.Withdraw(amount); err != nil {
+	destination, err := t.accountRepo.FindByID(ctx, accountDestinationID)
+	if err != nil {
 		return err
 	}
 
@@ -120,22 +98,10 @@ func (t Transfer) FindAll(ctx context.Context) ([]TransferOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 
-	var output = make([]TransferOutput, 0)
-
 	transfers, err := t.transferRepo.FindAll(ctx)
 	if err != nil {
-		return output, err
+		return t.presenter.OutputList([]domain.Transfer{}), err
 	}
 
-	for _, transfer := range transfers {
-		output = append(output, TransferOutput{
-			ID:                   transfer.ID().String(),
-			AccountOriginID:      transfer.AccountOriginID().String(),
-			AccountDestinationID: transfer.AccountDestinationID().String(),
-			Amount:               transfer.Amount().Float64(),
-			CreatedAt:            transfer.CreatedAt(),
-		})
-	}
-
-	return output, nil
+	return t.presenter.OutputList(transfers), nil
 }

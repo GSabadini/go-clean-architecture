@@ -42,15 +42,6 @@ func NewMongoHandler(c *config) (*mongoHandler, error) {
 	}, nil
 }
 
-//
-//func (mgo mongoHandler) StartTransaction() error {
-//	return mgo.session.StartTransaction()
-//}
-//
-//func (mgo mongoHandler) CommitTransaction() error {
-//	return mgo.session.CommitTransaction()
-//}
-
 //Store realiza uma inserção no banco de dados
 func (mgo mongoHandler) Store(ctx context.Context, collection string, data interface{}) error {
 	if _, err := mgo.db.Collection(collection).InsertOne(ctx, data); err != nil {

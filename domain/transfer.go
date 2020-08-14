@@ -31,7 +31,7 @@ type Transfer struct {
 //NewTransfer cria um Transfer
 func NewTransfer(
 	ID TransferID,
-	accountOriginID,
+	accountOriginID AccountID,
 	accountDestinationID AccountID,
 	amount Money,
 	createdAt time.Time,

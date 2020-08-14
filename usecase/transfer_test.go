@@ -59,6 +59,16 @@ func (m mockAccountRepo) FindByID(_ context.Context, _ domain.AccountID) (domain
 	return m.findByIDOriginFake()
 }
 
+type mockTransferPresenterStore struct {
+	TransferPresenter
+
+	result TransferOutput
+}
+
+func (m mockTransferPresenterStore) Output(_ domain.Transfer) TransferOutput {
+	return m.result
+}
+
 func TestTransfer_Store(t *testing.T) {
 	t.Parallel()
 
@@ -73,6 +83,7 @@ func TestTransfer_Store(t *testing.T) {
 		args          args
 		transferRepo  domain.TransferRepository
 		accountRepo   domain.AccountRepository
+		presenter     TransferPresenter
 		expected      TransferOutput
 		expectedError string
 	}{
@@ -117,6 +128,15 @@ func TestTransfer_Store(t *testing.T) {
 						3000,
 						time.Time{},
 					), nil
+				},
+			},
+			presenter: mockTransferPresenterStore{
+				result: TransferOutput{
+					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
+					Amount:               29.99,
+					CreatedAt:            time.Time{},
 				},
 			},
 			expected: TransferOutput{
@@ -165,6 +185,9 @@ func TestTransfer_Store(t *testing.T) {
 					), nil
 				},
 			},
+			presenter: mockTransferPresenterStore{
+				result: TransferOutput{},
+			},
 			expectedError: "error",
 			expected:      TransferOutput{},
 		},
@@ -189,6 +212,9 @@ func TestTransfer_Store(t *testing.T) {
 				findByIDOriginFake: func() (domain.Account, error) {
 					return domain.Account{}, errors.New("error")
 				},
+			},
+			presenter: mockTransferPresenterStore{
+				result: TransferOutput{},
 			},
 			expectedError: "error",
 			expected:      TransferOutput{},
@@ -224,6 +250,9 @@ func TestTransfer_Store(t *testing.T) {
 					return domain.Account{}, errors.New("error")
 				},
 				invokedFind: &invoked{call: false},
+			},
+			presenter: mockTransferPresenterStore{
+				result: TransferOutput{},
 			},
 			expectedError: "error",
 			expected:      TransferOutput{},
@@ -264,6 +293,9 @@ func TestTransfer_Store(t *testing.T) {
 						time.Time{},
 					), nil
 				},
+			},
+			presenter: mockTransferPresenterStore{
+				result: TransferOutput{},
 			},
 			expectedError: "error",
 			expected:      TransferOutput{},
@@ -306,6 +338,9 @@ func TestTransfer_Store(t *testing.T) {
 					), nil
 				},
 			},
+			presenter: mockTransferPresenterStore{
+				result: TransferOutput{},
+			},
 			expectedError: "error",
 			expected:      TransferOutput{},
 		},
@@ -347,6 +382,9 @@ func TestTransfer_Store(t *testing.T) {
 					), nil
 				},
 			},
+			presenter: mockTransferPresenterStore{
+				result: TransferOutput{},
+			},
 			expectedError: "origin account does not have sufficient balance",
 			expected:      TransferOutput{},
 		},
@@ -354,7 +392,7 @@ func TestTransfer_Store(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, time.Second)
+			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, tt.presenter, time.Second)
 
 			got, err := uc.Store(
 				context.Background(),
@@ -385,6 +423,20 @@ func (m mockTransferRepoFindAll) FindAll(_ context.Context) ([]domain.Transfer, 
 	return m.result, m.err
 }
 
+type mockTransferPresenterFindAll struct {
+	TransferPresenter
+
+	result []TransferOutput
+}
+
+func (m mockTransferPresenterFindAll) OutputList(_ []domain.Transfer) []TransferOutput {
+	return m.result
+}
+
+func (m mockTransferPresenterFindAll) OutputListEmpty() []TransferOutput {
+	return make([]TransferOutput, 0)
+}
+
 func TestTransfer_FindAll(t *testing.T) {
 	t.Parallel()
 
@@ -393,6 +445,7 @@ func TestTransfer_FindAll(t *testing.T) {
 		expected      []TransferOutput
 		transferRepo  domain.TransferRepository
 		accountRepo   domain.AccountRepository
+		presenter     TransferPresenter
 		expectedError string
 	}{
 		{
@@ -417,6 +470,24 @@ func TestTransfer_FindAll(t *testing.T) {
 				err: nil,
 			},
 			accountRepo: mockAccountRepo{},
+			presenter: mockTransferPresenterFindAll{
+				result: []TransferOutput{
+					{
+						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Amount:               1,
+						CreatedAt:            time.Time{},
+					},
+					{
+						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
+						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
+						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
+						Amount:               5,
+						CreatedAt:            time.Time{},
+					},
+				},
+			},
 			expected: []TransferOutput{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -441,7 +512,10 @@ func TestTransfer_FindAll(t *testing.T) {
 				err:    nil,
 			},
 			accountRepo: mockAccountRepo{},
-			expected:    []TransferOutput{},
+			presenter: mockTransferPresenterFindAll{
+				result: []TransferOutput{},
+			},
+			expected: []TransferOutput{},
 		},
 		{
 			name: "Error when returning the transfer list",
@@ -449,7 +523,10 @@ func TestTransfer_FindAll(t *testing.T) {
 				result: []domain.Transfer{},
 				err:    errors.New("error"),
 			},
-			accountRepo:   mockAccountRepo{},
+			accountRepo: mockAccountRepo{},
+			presenter: mockTransferPresenterFindAll{
+				result: []TransferOutput{},
+			},
 			expected:      []TransferOutput{},
 			expectedError: "error",
 		},
@@ -457,7 +534,7 @@ func TestTransfer_FindAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, time.Second)
+			var uc = NewTransfer(tt.transferRepo, tt.accountRepo, tt.presenter, time.Second)
 
 			result, err := uc.FindAll(context.Background())
 			if (err != nil) && (err.Error() != tt.expectedError) {

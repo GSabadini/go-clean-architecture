@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/api/action"
+	"github.com/gsabadini/go-bank-transfer/api/presenter"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/repository"
@@ -62,11 +63,11 @@ func (g ginEngine) Listen() {
 
 func (g ginEngine) setAppHandlers(router *gin.Engine) {
 	router.POST("/v1/transfers", g.buildActionStoreTransfer())
-	router.GET("/v1/transfers", g.buildActionIndexTransfer())
+	router.GET("/v1/transfers", g.buildActionFindAllTransfer())
 
 	router.GET("/v1/accounts/:account_id/balance", g.buildActionFindBalanceAccount())
 	router.POST("/v1/accounts", g.buildActionStoreAccount())
-	router.GET("/v1/accounts", g.buildActionIndexAccount())
+	router.GET("/v1/accounts", g.buildActionFindAllAccount())
 
 	router.GET("/v1/healthcheck", g.healthcheck())
 }
@@ -74,24 +75,30 @@ func (g ginEngine) setAppHandlers(router *gin.Engine) {
 func (g ginEngine) buildActionStoreTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			transferRepository = mongodb.NewTransferRepository(g.db)
-			accountRepository  = mongodb.NewAccountRepository(g.db)
-			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository, g.ctxTimeout)
-		)
+			transferUseCase = usecase.NewTransfer(
+				mongodb.NewTransferRepository(g.db),
+				mongodb.NewAccountRepository(g.db),
+				presenter.NewTransferPresenter(),
+				g.ctxTimeout,
+			)
 
-		var transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+		)
 
 		transferAction.Store(c.Writer, c.Request)
 	}
 }
 
-func (g ginEngine) buildActionIndexTransfer() gin.HandlerFunc {
+func (g ginEngine) buildActionFindAllTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			transferRepository = mongodb.NewTransferRepository(g.db)
-			accountRepository  = mongodb.NewAccountRepository(g.db)
-			transferUseCase    = usecase.NewTransfer(transferRepository, accountRepository, g.ctxTimeout)
-			transferAction     = action.NewTransfer(transferUseCase, g.log, g.validator)
+			transferUseCase = usecase.NewTransfer(
+				mongodb.NewTransferRepository(g.db),
+				mongodb.NewAccountRepository(g.db),
+				presenter.NewTransferPresenter(),
+				g.ctxTimeout,
+			)
+			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
 		transferAction.FindAll(c.Writer, c.Request)
@@ -101,21 +108,27 @@ func (g ginEngine) buildActionIndexTransfer() gin.HandlerFunc {
 func (g ginEngine) buildActionStoreAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountRepository = mongodb.NewAccountRepository(g.db)
-			accountUseCase    = usecase.NewAccount(accountRepository, g.ctxTimeout)
-			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountUseCase = usecase.NewAccount(
+				mongodb.NewAccountRepository(g.db),
+				presenter.NewAccountPresenter(),
+				g.ctxTimeout,
+			)
+			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.Store(c.Writer, c.Request)
 	}
 }
 
-func (g ginEngine) buildActionIndexAccount() gin.HandlerFunc {
+func (g ginEngine) buildActionFindAllAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountRepository = mongodb.NewAccountRepository(g.db)
-			accountUseCase    = usecase.NewAccount(accountRepository, g.ctxTimeout)
-			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountUseCase = usecase.NewAccount(
+				mongodb.NewAccountRepository(g.db),
+				presenter.NewAccountPresenter(),
+				g.ctxTimeout,
+			)
+			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.FindAll(c.Writer, c.Request)
@@ -125,9 +138,12 @@ func (g ginEngine) buildActionIndexAccount() gin.HandlerFunc {
 func (g ginEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountRepository = mongodb.NewAccountRepository(g.db)
-			accountUseCase    = usecase.NewAccount(accountRepository, g.ctxTimeout)
-			accountAction     = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountUseCase = usecase.NewAccount(
+				mongodb.NewAccountRepository(g.db),
+				presenter.NewAccountPresenter(),
+				g.ctxTimeout,
+			)
+			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		q := c.Request.URL.Query()

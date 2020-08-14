@@ -39,8 +39,14 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 	return &postgresHandler{db: db}, nil
 }
 
-func (p postgresHandler) BeginTx(ctx context.Context) (repository.Tx, error) {
-	return p.db.BeginTx(ctx, nil)
+//BeginTx
+func (p postgresHandler) BeginTx(ctx context.Context) (postgresTx, error) {
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return postgresTx{}, err
+	}
+
+	return postgresTx{tx: tx}, nil
 }
 
 //postgresRow
@@ -48,9 +54,12 @@ type postgresTx struct {
 	tx *sql.Tx
 }
 
+//Commit
 func (p postgresTx) Commit() error {
 	return p.tx.Commit()
 }
+
+//Rollback
 func (p postgresTx) Rollback() error {
 	return p.tx.Rollback()
 }
