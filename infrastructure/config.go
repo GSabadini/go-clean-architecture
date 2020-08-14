@@ -45,7 +45,7 @@ func (c *config) Logger(instance int) *config {
 }
 
 func (c *config) DbSQL(instance int) *config {
-	handler, err := database.NewDatabaseSQLFactory(instance)
+	db, err := database.NewDatabaseSQLFactory(instance)
 	if err != nil {
 		c.logger.Fatalln("Could not make a connection to the database")
 		panic(err)
@@ -53,12 +53,12 @@ func (c *config) DbSQL(instance int) *config {
 
 	c.logger.Infof("Successfully connected to the SQL database")
 
-	c.dbSQL = handler
+	c.dbSQL = db
 	return c
 }
 
 func (c *config) DbNoSQL(instance int) *config {
-	h, err := database.NewDatabaseNoSQLFactory(instance)
+	db, err := database.NewDatabaseNoSQLFactory(instance)
 	if err != nil {
 		c.logger.Fatalln("Could not make a connection to the database")
 		panic(err)
@@ -66,7 +66,7 @@ func (c *config) DbNoSQL(instance int) *config {
 
 	c.logger.Infof("Successfully connected to the NoSQL database")
 
-	c.dbNoSQL = h
+	c.dbNoSQL = db
 	return c
 }
 

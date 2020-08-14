@@ -21,26 +21,51 @@ func (t TransferID) String() string {
 
 //Transfer armazena a estrutura de transferência
 type Transfer struct {
-	ID                   TransferID
-	AccountOriginID      AccountID
-	AccountDestinationID AccountID
-	Amount               Money
-	CreatedAt            time.Time
+	id                   TransferID
+	accountOriginID      AccountID
+	accountDestinationID AccountID
+	amount               Money
+	createdAt            time.Time
 }
 
 //NewTransfer cria um Transfer
 func NewTransfer(
 	ID TransferID,
-	accountOriginID,
+	accountOriginID AccountID,
 	accountDestinationID AccountID,
 	amount Money,
 	createdAt time.Time,
 ) Transfer {
 	return Transfer{
-		ID:                   ID,
-		AccountOriginID:      accountOriginID,
-		AccountDestinationID: accountDestinationID,
-		Amount:               amount,
-		CreatedAt:            createdAt,
+		id:                   ID,
+		accountOriginID:      accountOriginID,
+		accountDestinationID: accountDestinationID,
+		amount:               amount,
+		createdAt:            createdAt,
 	}
+}
+
+//CreatedAt
+func (t Transfer) ID() TransferID {
+	return t.id
+}
+
+//AccountOriginID
+func (t Transfer) AccountOriginID() AccountID {
+	return t.accountOriginID
+}
+
+//AccountDestinationID
+func (t Transfer) AccountDestinationID() AccountID {
+	return t.accountDestinationID
+}
+
+//Amount
+func (t Transfer) Amount() Money {
+	return t.amount
+}
+
+//CreatedAt
+func (t Transfer) CreatedAt() time.Time {
+	return t.createdAt
 }

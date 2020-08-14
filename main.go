@@ -12,19 +12,15 @@ import (
 )
 
 func main() {
-	var app = infrastructure.NewConfig()
+	var app = infrastructure.NewConfig().
+		Name(os.Getenv("APP_NAME")).
+		ContextTimeout(10 * time.Second).
+		Logger(logger.InstanceLogrusLogger).
+		Validator(validator.InstanceGoPlayground).
+		DbSQL(database.InstancePostgres).
+		DbNoSQL(database.InstanceMongoDB)
 
-	app.Name(os.Getenv("APP_NAME"))
-
-	app.ContextTimeout(5 * time.Second)
-
-	app.Logger(logger.InstanceLogrusLogger)
-
-	app.Validator(validator.InstanceGoPlayground)
-
-	app.DbSQL(database.InstancePostgres)
-
-	app.DbNoSQL(database.InstanceMongoDB)
-
-	app.WebServerPort(os.Getenv("APP_PORT")).WebServer(web.InstanceGorillaMux).Start()
+	app.WebServerPort(os.Getenv("APP_PORT")).
+		WebServer(web.InstanceGorillaMux).
+		Start()
 }

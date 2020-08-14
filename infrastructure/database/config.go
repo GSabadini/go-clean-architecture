@@ -13,14 +13,14 @@ type config struct {
 	user     string
 	password string
 
-	connTimeout time.Duration
+	ctxTimeout time.Duration
 }
 
 func newConfigMongoDB() *config {
 	return &config{
-		host:        os.Getenv("MONGODB_HOST"),
-		database:    os.Getenv("MONGODB_DATABASE"),
-		connTimeout: 60 * time.Second,
+		host:       os.Getenv("MONGODB_HOST"),
+		database:   os.Getenv("MONGODB_DATABASE"),
+		ctxTimeout: 60 * time.Second,
 	}
 }
 
