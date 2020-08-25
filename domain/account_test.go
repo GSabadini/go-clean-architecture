@@ -99,7 +99,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			expected: 100,
 		},
 		{
-			name: "error when withdrawing account balance without sufficient balance",
+			name: "error when withdrawing validator balance without sufficient balance",
 			args: args{
 				amount: 564,
 			},
@@ -107,7 +107,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			expectedErr: ErrInsufficientBalance,
 		},
 		{
-			name: "error when withdrawing account balance without sufficient balance",
+			name: "error when withdrawing validator balance without sufficient balance",
 			args: args{
 				amount: 5,
 			},
@@ -115,7 +115,7 @@ func TestAccount_Withdraw(t *testing.T) {
 			expectedErr: ErrInsufficientBalance,
 		},
 		{
-			name: "error when withdrawing account balance without sufficient balance",
+			name: "error when withdrawing validator balance without sufficient balance",
 			args: args{
 				amount: 10,
 			},

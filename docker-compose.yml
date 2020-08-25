@@ -23,7 +23,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./scripts/mongodb:/docker-entrypoint-initdb.d
+      - ./script/mongodb:/docker-entrypoint-initdb.d
 
   postgres:
     container_name: "postgres"
@@ -35,7 +35,7 @@ services:
       POSTGRES_PASSWORD: dev
       POSTGRES_DB: bank
     volumes:
-      - ./scripts/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./script/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 #  go-bank-transfer-debug:
 #    container_name: "go-bank-transfer-debug"

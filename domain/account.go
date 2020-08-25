@@ -12,10 +12,10 @@ var (
 	ErrNotFound = errors.New("not found")
 
 	//ErrInsufficientBalance é um erro de saldo insuficiente
-	ErrInsufficientBalance = errors.New("origin account does not have sufficient balance")
+	ErrInsufficientBalance = errors.New("origin validator does not have sufficient balance")
 
 	//ErrUpdateBalance é um erro ao atualizar o saldo de uma conta
-	ErrUpdateBalance = errors.New("error update account balance")
+	ErrUpdateBalance = errors.New("error update validator balance")
 )
 
 //AccountRepository expõe os métodos disponíveis para as abstrações do repositório de Account

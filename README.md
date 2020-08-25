@@ -78,6 +78,7 @@ make enter-container
 | `/v1/accounts/{{account_id}}/balance`   | `GET`                |    `Find balance account` |
 | `/v1/transfers`| `POST`                | `Create transfer` |
 | `/v1/transfers`| `GET`                 | `List transfers`  |
+| `/v1/health`| `GET`                 | `Health check`  |
 
 #### Test endpoints API using Postman
 
