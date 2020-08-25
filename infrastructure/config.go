@@ -8,7 +8,7 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/web"
-	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository"
 )
 
 //config armazena a estrutura de configuração da aplicação

@@ -10,6 +10,9 @@
   <a href="https://travis-ci.org/github/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://travis-ci.org/GSabadini/go-bank-transfer.svg?branch=master" />
   </a>
+  <a href="https://codecov.io/gh/GSabadini/go-bank-transfer">
+    <img src="https://codecov.io/gh/GSabadini/go-bank-transfer/branch/master/graph/badge.svg" />
+  </a>
 </p>
 
 - Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.

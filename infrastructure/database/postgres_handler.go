@@ -4,9 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
-	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository"
 	_ "github.com/lib/pq"
 )
 
@@ -26,7 +25,7 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 		c.password,
 	)
 
-	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), ds)
+	db, err := sql.Open(c.driver, ds)
 	if err != nil {
 		return &postgresHandler{}, err
 	}
@@ -37,36 +36,6 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 	}
 
 	return &postgresHandler{db: db}, nil
-}
-
-//BeginTx
-func (p postgresHandler) BeginTx(ctx context.Context) (postgresTx, error) {
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return postgresTx{}, err
-	}
-
-	return postgresTx{tx: tx}, nil
-}
-
-//postgresRow
-type postgresTx struct {
-	tx *sql.Tx
-}
-
-//Commit
-func (p postgresTx) Commit() error {
-	return p.tx.Commit()
-}
-
-//Rollback
-func (p postgresTx) Rollback() error {
-	return p.tx.Rollback()
-}
-
-//newPostgresTx
-func newPostgresTx(tx *sql.Tx) postgresTx {
-	return postgresTx{tx: tx}
 }
 
 //ExecuteContext
@@ -123,4 +92,34 @@ func (pr postgresRow) Err() error {
 //Close retorna o método close
 func (pr postgresRow) Close() error {
 	return pr.rows.Close()
+}
+
+//BeginTx
+func (p postgresHandler) BeginTx(ctx context.Context) (postgresTx, error) {
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return postgresTx{}, err
+	}
+
+	return newPostgresTx(tx), nil
+}
+
+//postgresRow
+type postgresTx struct {
+	tx *sql.Tx
+}
+
+//newPostgresTx
+func newPostgresTx(tx *sql.Tx) postgresTx {
+	return postgresTx{tx: tx}
+}
+
+//Commit
+func (p postgresTx) Commit() error {
+	return p.tx.Commit()
+}
+
+//Rollback
+func (p postgresTx) Rollback() error {
+	return p.tx.Rollback()
 }

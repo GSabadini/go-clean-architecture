@@ -2,19 +2,17 @@ package web
 
 import (
 	"fmt"
+	postgres2 "github.com/gsabadini/go-bank-transfer/interface/repository/account/postgres"
 	"net/http"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/api/action"
-	"github.com/gsabadini/go-bank-transfer/api/middleware"
-	"github.com/gsabadini/go-bank-transfer/api/presenter"
+	"github.com/gorilla/mux"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
-	"github.com/gsabadini/go-bank-transfer/repository"
-	"github.com/gsabadini/go-bank-transfer/repository/postgres"
-	"github.com/gsabadini/go-bank-transfer/usecase"
-
-	"github.com/gorilla/mux"
+	"github.com/gsabadini/go-bank-transfer/interface/api/middleware"
+	"github.com/gsabadini/go-bank-transfer/interface/presenter"
+	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository/transfer/postgres"
 	"github.com/urfave/negroni"
 )
 
@@ -74,20 +72,20 @@ func (g gorillaMux) setAppHandlers(router *mux.Router) {
 	api.Handle("/accounts", g.buildActionStoreAccount()).Methods(http.MethodPost)
 	api.Handle("/accounts", g.buildActionFindAllAccount()).Methods(http.MethodGet)
 
-	api.HandleFunc("/healthcheck", action.HealthCheck).Methods(http.MethodGet)
+	api.HandleFunc("/healthcheck", healtcheck.HealthCheck).Methods(http.MethodGet)
 }
 
 func (g gorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferUseCase = usecase.NewTransfer(
+			transferUseCase = transfer.NewTransfer(
 				postgres.NewTransferRepository(g.db),
-				postgres.NewAccountRepository(g.db),
+				postgres2.NewAccountRepository(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
 
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			transferAction = transfer.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
 		transferAction.Store(res, req)
@@ -103,13 +101,13 @@ func (g gorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 func (g gorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferUseCase = usecase.NewTransfer(
+			transferUseCase = transfer.NewTransfer(
 				postgres.NewTransferRepository(g.db),
-				postgres.NewAccountRepository(g.db),
+				postgres2.NewAccountRepository(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			transferAction = transfer.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
 		transferAction.FindAll(res, req)
@@ -125,12 +123,12 @@ func (g gorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 func (g gorillaMux) buildActionStoreAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				postgres.NewAccountRepository(g.db),
+			accountUseCase = account.NewAccount(
+				postgres2.NewAccountRepository(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountAction = account.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.Store(res, req)
@@ -146,12 +144,12 @@ func (g gorillaMux) buildActionStoreAccount() *negroni.Negroni {
 func (g gorillaMux) buildActionFindAllAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				postgres.NewAccountRepository(g.db),
+			accountUseCase = account.NewAccount(
+				postgres2.NewAccountRepository(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountAction = account.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.FindAll(res, req)
@@ -167,12 +165,12 @@ func (g gorillaMux) buildActionFindAllAccount() *negroni.Negroni {
 func (g gorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				postgres.NewAccountRepository(g.db),
+			accountUseCase = account.NewAccount(
+				postgres2.NewAccountRepository(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountAction = account.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		var (

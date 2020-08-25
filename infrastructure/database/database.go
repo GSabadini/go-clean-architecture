@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 
-	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository"
 )
 
 var (

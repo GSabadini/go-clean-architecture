@@ -6,7 +6,7 @@ import (
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
-	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository"
 )
 
 //Server é uma abstração para o server da aplicação

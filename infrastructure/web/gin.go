@@ -2,18 +2,16 @@ package web
 
 import (
 	"fmt"
+	mongodb2 "github.com/gsabadini/go-bank-transfer/interface/repository/account/mongodb"
 	"net/http"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/api/action"
-	"github.com/gsabadini/go-bank-transfer/api/presenter"
+	"github.com/gin-gonic/gin"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
-	"github.com/gsabadini/go-bank-transfer/repository"
-	"github.com/gsabadini/go-bank-transfer/repository/mongodb"
-	"github.com/gsabadini/go-bank-transfer/usecase"
-
-	"github.com/gin-gonic/gin"
+	"github.com/gsabadini/go-bank-transfer/interface/presenter"
+	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository/transfer/mongodb"
 )
 
 type ginEngine struct {
@@ -75,14 +73,14 @@ func (g ginEngine) setAppHandlers(router *gin.Engine) {
 func (g ginEngine) buildActionStoreTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			transferUseCase = usecase.NewTransfer(
+			transferUseCase = transfer.NewTransfer(
 				mongodb.NewTransferRepository(g.db),
-				mongodb.NewAccountRepository(g.db),
+				mongodb2.NewAccountRepository(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
 
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			transferAction = transfer.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
 		transferAction.Store(c.Writer, c.Request)
@@ -92,13 +90,13 @@ func (g ginEngine) buildActionStoreTransfer() gin.HandlerFunc {
 func (g ginEngine) buildActionFindAllTransfer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			transferUseCase = usecase.NewTransfer(
+			transferUseCase = transfer.NewTransfer(
 				mongodb.NewTransferRepository(g.db),
-				mongodb.NewAccountRepository(g.db),
+				mongodb2.NewAccountRepository(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			transferAction = transfer.NewTransfer(transferUseCase, g.log, g.validator)
 		)
 
 		transferAction.FindAll(c.Writer, c.Request)
@@ -108,12 +106,12 @@ func (g ginEngine) buildActionFindAllTransfer() gin.HandlerFunc {
 func (g ginEngine) buildActionStoreAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				mongodb.NewAccountRepository(g.db),
+			accountUseCase = account.NewAccount(
+				mongodb2.NewAccountRepository(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountAction = account.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.Store(c.Writer, c.Request)
@@ -123,12 +121,12 @@ func (g ginEngine) buildActionStoreAccount() gin.HandlerFunc {
 func (g ginEngine) buildActionFindAllAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				mongodb.NewAccountRepository(g.db),
+			accountUseCase = account.NewAccount(
+				mongodb2.NewAccountRepository(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountAction = account.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		accountAction.FindAll(c.Writer, c.Request)
@@ -138,12 +136,12 @@ func (g ginEngine) buildActionFindAllAccount() gin.HandlerFunc {
 func (g ginEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				mongodb.NewAccountRepository(g.db),
+			accountUseCase = account.NewAccount(
+				mongodb2.NewAccountRepository(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			accountAction = account.NewAccount(accountUseCase, g.log, g.validator)
 		)
 
 		q := c.Request.URL.Query()
@@ -156,6 +154,6 @@ func (g ginEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
 
 func (g ginEngine) healthcheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		action.HealthCheck(c.Writer, c.Request)
+		healtcheck.HealthCheck(c.Writer, c.Request)
 	}
 }
