@@ -10,17 +10,17 @@ import (
 	"testing"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockFindBalanceAccount struct {
-	result output.AccountBalanceOutput
+	result output.AccountBalance
 	err    error
 }
 
-func (m mockFindBalanceAccount) Execute(_ context.Context, _ domain.AccountID) (output.AccountBalanceOutput, error) {
+func (m mockFindBalanceAccount) Execute(_ context.Context, _ domain.AccountID) (output.AccountBalance, error) {
 	return m.result, m.err
 }
 
@@ -44,7 +44,7 @@ func TestFindBalanceAccountAction_Execute(t *testing.T) {
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			ucMock: mockFindBalanceAccount{
-				result: output.AccountBalanceOutput{
+				result: output.AccountBalance{
 					Balance: 10,
 				},
 				err: nil,
@@ -58,7 +58,7 @@ func TestFindBalanceAccountAction_Execute(t *testing.T) {
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			ucMock: mockFindBalanceAccount{
-				result: output.AccountBalanceOutput{},
+				result: output.AccountBalance{},
 				err:    errors.New("error"),
 			},
 			expectedBody:       []byte(`{"errors":["error"]}`),
@@ -70,19 +70,19 @@ func TestFindBalanceAccountAction_Execute(t *testing.T) {
 				accountID: "error",
 			},
 			ucMock: mockFindBalanceAccount{
-				result: output.AccountBalanceOutput{},
+				result: output.AccountBalance{},
 				err:    nil,
 			},
 			expectedBody:       []byte(`{"errors":["parameter invalid"]}`),
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
-			name: "FindBalanceAccountAction error fetching validator",
+			name: "FindBalanceAccountAction error fetching account",
 			args: args{
 				accountID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
 			ucMock: mockFindBalanceAccount{
-				result: output.AccountBalanceOutput{},
+				result: output.AccountBalance{},
 				err:    domain.ErrNotFound,
 			},
 			expectedBody:       []byte(`{"errors":["not found"]}`),
@@ -101,7 +101,7 @@ func TestFindBalanceAccountAction_Execute(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewFindBalanceAccountAction(tt.ucMock, logger.LoggerMock{})
+				action = NewFindBalanceAccountAction(tt.ucMock, log.LoggerMock{})
 			)
 
 			action.Execute(w, req)

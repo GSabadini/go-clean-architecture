@@ -1,8 +1,9 @@
 package logging
 
-import "github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+import (
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+)
 
-//Info
 type Info struct {
 	log        logger.Logger
 	key        string
@@ -10,7 +11,6 @@ type Info struct {
 	httpStatus int
 }
 
-//NewInfo
 func NewInfo(log logger.Logger, key string, msg string, httpStatus int) Info {
 	return Info{
 		log:        log,
@@ -20,7 +20,6 @@ func NewInfo(log logger.Logger, key string, msg string, httpStatus int) Info {
 	}
 }
 
-//Log
 func (i Info) Log() {
 	i.log.WithFields(logger.Fields{
 		"key":         i.key,

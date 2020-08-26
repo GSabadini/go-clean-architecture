@@ -3,30 +3,27 @@ package action
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/api/logging"
 	"github.com/gsabadini/go-bank-transfer/interface/api/response"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 	"github.com/gsabadini/go-bank-transfer/usecase/input"
 )
 
-//CreateTransferAction armazena as dependências para as ações de Transfer
 type CreateTransferAction struct {
 	log       logger.Logger
 	uc        usecase.CreateTransfer
 	validator validator.Validator
 }
 
-//NewCreateTransferAction constrói um Transfer com suas dependências
-func NewCreateTransferAction(uc usecase.CreateTransfer, l logger.Logger, v validator.Validator) CreateTransferAction {
-	return CreateTransferAction{uc: uc, log: l, validator: v}
+func NewCreateTransferAction(uc usecase.CreateTransfer, log logger.Logger, v validator.Validator) CreateTransferAction {
+	return CreateTransferAction{uc: uc, log: log, validator: v}
 }
 
-//Execute é um handler para criação de Transfer
 func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_transfer"
 
@@ -49,9 +46,9 @@ func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 		logging.NewError(
 			t.log,
 			logKey,
-			"invalid validator",
+			"invalid input",
 			http.StatusBadRequest,
-			errors.New("invalid validator"),
+			errors.New("invalid input"),
 		).Log()
 
 		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)

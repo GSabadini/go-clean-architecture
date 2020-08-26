@@ -10,17 +10,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-//AccountRepository armazena a estrutura de dados de um repositório de Account
 type AccountRepository struct {
 	handler repository.SQLHandler
 }
 
-//NewAccountRepository constrói um AccountRepository com suas dependências
 func NewAccountRepository(h repository.SQLHandler) AccountRepository {
 	return AccountRepository{handler: h}
 }
 
-//Store insere uma Account no database
 func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
 	query := `
 		INSERT INTO 
@@ -38,24 +35,22 @@ func (a AccountRepository) Store(ctx context.Context, account domain.Account) (d
 		account.Balance(),
 		account.CreatedAt(),
 	); err != nil {
-		return domain.Account{}, errors.Wrap(err, "error creating validator")
+		return domain.Account{}, errors.Wrap(err, "error creating account")
 	}
 
 	return account, nil
 }
 
-//UpdateBalance atualiza o Balance de uma Account no database
 func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountID, balance domain.Money) error {
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
 	if err := a.handler.ExecuteContext(ctx, query, balance, ID); err != nil {
-		return errors.Wrap(err, "error updating validator balance")
+		return errors.Wrap(err, "error updating account balance")
 	}
 
 	return nil
 }
 
-//FindAlL busca todas as Account no database
 func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error) {
 	var (
 		accounts = make([]domain.Account, 0)
@@ -97,7 +92,6 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 	return accounts, nil
 }
 
-//FindByID busca uma Account por id no database
 func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		query     = "SELECT * FROM accounts WHERE id = $1"
@@ -110,12 +104,12 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 
 	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
-		return domain.Account{}, errors.Wrap(err, "error fetching validator")
+		return domain.Account{}, errors.Wrap(err, "error fetching account")
 	}
 
 	row.Next()
 	if err = row.Scan(&id, &name, &CPF, &balance, &createdAt); err != nil {
-		return domain.Account{}, errors.Wrap(err, "error fetching validator")
+		return domain.Account{}, errors.Wrap(err, "error fetching account")
 	}
 	defer row.Close()
 
@@ -132,7 +126,6 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 	), nil
 }
 
-//FindBalance busca o Balance de uma Account no database
 func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
 	var (
 		query   = "SELECT balance FROM accounts WHERE id = $1"
@@ -141,12 +134,12 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 
 	row, err := a.handler.QueryContext(ctx, query, ID)
 	if err != nil {
-		return domain.Account{}, errors.Wrap(err, "error fetching validator balance")
+		return domain.Account{}, errors.Wrap(err, "error fetching account balance")
 	}
 
 	row.Next()
 	if err := row.Scan(&balance); err != nil {
-		return domain.Account{}, errors.Wrap(err, "error fetching validator balance")
+		return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
 	}
 	defer row.Close()
 

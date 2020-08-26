@@ -8,19 +8,16 @@ import (
 	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
-//FindBalanceAccount é uma abstração de caso de uso de Account
 type FindBalanceAccount interface {
-	Execute(context.Context, domain.AccountID) (output.AccountBalanceOutput, error)
+	Execute(context.Context, domain.AccountID) (output.AccountBalance, error)
 }
 
-//FindBalanceAccountInteractor armazena as dependências para os casos de uso de Account
 type FindBalanceAccountInteractor struct {
 	repo       domain.AccountRepository
 	presenter  output.AccountPresenter
 	ctxTimeout time.Duration
 }
 
-//NewFindBalanceAccountInteractor constrói um FindBalanceAccountInteractor com suas dependências
 func NewFindBalanceAccountInteractor(
 	repo domain.AccountRepository,
 	presenter output.AccountPresenter,
@@ -33,8 +30,7 @@ func NewFindBalanceAccountInteractor(
 	}
 }
 
-//Execute retorna o saldo de uma Account
-func (a FindBalanceAccountInteractor) Execute(ctx context.Context, ID domain.AccountID) (output.AccountBalanceOutput, error) {
+func (a FindBalanceAccountInteractor) Execute(ctx context.Context, ID domain.AccountID) (output.AccountBalance, error) {
 	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
 	defer cancel()
 

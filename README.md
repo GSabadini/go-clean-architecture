@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to Go Bank Transfer :bank:</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.6.0-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.7.0-blue.svg?cacheSeconds=2592000" />
   <a href="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" />
   </a>
@@ -25,6 +25,15 @@
 -  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
 ![Clean Architecture](cleanarch.png)
+
+###Domain
+    -
+###Use Cases
+    -
+###Interfaces
+    -
+###Infrastructure
+    -
 
 ## Requirements/dependencies
 - Golang (not obligatory)

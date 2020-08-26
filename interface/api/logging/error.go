@@ -1,6 +1,8 @@
 package logging
 
-import "github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+import (
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+)
 
 //Error
 type Error struct {

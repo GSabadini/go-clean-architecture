@@ -6,14 +6,12 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//TransferPresenter é uma abstração para a apresentação de Account
 type TransferPresenter interface {
-	Output(domain.Transfer) TransferOutput
-	OutputList([]domain.Transfer) []TransferOutput
+	Output(domain.Transfer) Transfer
+	OutputList([]domain.Transfer) []Transfer
 }
 
-//TransferOutput armazena a estrutura de dados de retorno do caso de uso
-type TransferOutput struct {
+type Transfer struct {
 	ID                   string    `json:"id"`
 	AccountOriginID      string    `json:"account_origin_id"`
 	AccountDestinationID string    `json:"account_destination_id"`

@@ -3,24 +3,21 @@ package action
 import (
 	"net/http"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/api/logging"
 	"github.com/gsabadini/go-bank-transfer/interface/api/response"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
-//FindAllAccountAction armazena as dependências para as ações de Account
 type FindAllAccountAction struct {
 	uc  usecase.FindAllAccount
 	log logger.Logger
 }
 
-//NewFindAllAccountAction constrói um FindAllAccountAction com suas dependências
-func NewFindAllAccountAction(uc usecase.FindAllAccount, l logger.Logger) FindAllAccountAction {
-	return FindAllAccountAction{uc: uc, log: l}
+func NewFindAllAccountAction(uc usecase.FindAllAccount, log logger.Logger) FindAllAccountAction {
+	return FindAllAccountAction{uc: uc, log: log}
 }
 
-//Execute é um handler para retornar todas as Account
 func (a FindAllAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_all_account"
 
@@ -29,7 +26,7 @@ func (a FindAllAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 		logging.NewError(
 			a.log,
 			logKey,
-			"error when returning validator list",
+			"error when returning account list",
 			http.StatusInternalServerError,
 			err,
 		).Log()
@@ -37,7 +34,7 @@ func (a FindAllAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-	logging.NewInfo(a.log, logKey, "success when returning validator list", http.StatusOK).Log()
+	logging.NewInfo(a.log, logKey, "success when returning account list", http.StatusOK).Log()
 
 	response.NewSuccess(output, http.StatusOK).Send(w)
 }

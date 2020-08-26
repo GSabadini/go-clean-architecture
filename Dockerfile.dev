@@ -7,8 +7,8 @@ COPY . .
 RUN go mod download
 RUN go get github.com/cespare/reflex
 
-COPY reflex.conf /
+COPY script/reflex/reflex.conf /
 
 EXPOSE 3001
 
-ENTRYPOINT ["reflex", "-c", "/reflex.conf"]
+ENTRYPOINT ["reflex", "-c", "./script/reflex/reflex.conf"]

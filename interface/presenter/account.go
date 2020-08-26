@@ -7,14 +7,12 @@ import (
 
 type accountPresenter struct{}
 
-//NewAccountPresenter
 func NewAccountPresenter() accountPresenter {
 	return accountPresenter{}
 }
 
-//Output
-func (a accountPresenter) Output(account domain.Account) output.AccountOutput {
-	return output.AccountOutput{
+func (a accountPresenter) Output(account domain.Account) output.Account {
+	return output.Account{
 		ID:        account.ID().String(),
 		Name:      account.Name(),
 		CPF:       account.CPF(),
@@ -23,12 +21,11 @@ func (a accountPresenter) Output(account domain.Account) output.AccountOutput {
 	}
 }
 
-//OutputList
-func (a accountPresenter) OutputList(accounts []domain.Account) []output.AccountOutput {
-	var o = make([]output.AccountOutput, 0)
+func (a accountPresenter) OutputList(accounts []domain.Account) []output.Account {
+	var o = make([]output.Account, 0)
 
 	for _, account := range accounts {
-		o = append(o, output.AccountOutput{
+		o = append(o, output.Account{
 			ID:        account.ID().String(),
 			Name:      account.Name(),
 			CPF:       account.CPF(),
@@ -40,7 +37,6 @@ func (a accountPresenter) OutputList(accounts []domain.Account) []output.Account
 	return o
 }
 
-//OutputBalance
-func (a accountPresenter) OutputBalance(balance domain.Money) output.AccountBalanceOutput {
-	return output.AccountBalanceOutput{Balance: balance.Float64()}
+func (a accountPresenter) OutputBalance(balance domain.Money) output.AccountBalance {
+	return output.AccountBalance{Balance: balance.Float64()}
 }

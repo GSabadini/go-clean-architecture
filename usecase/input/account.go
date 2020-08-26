@@ -1,6 +1,5 @@
 package input
 
-//Account armazena a estrutura de dados de entrada da API
 type Account struct {
 	Name    string `json:"name" validate:"required"`
 	CPF     string `json:"cpf" validate:"required"`

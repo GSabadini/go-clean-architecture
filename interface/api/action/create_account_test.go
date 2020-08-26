@@ -4,31 +4,31 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validation"
 	"github.com/gsabadini/go-bank-transfer/usecase"
+	"github.com/gsabadini/go-bank-transfer/usecase/input"
 	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockAccountCreateAccount struct {
-	result output.AccountOutput
+	result output.Account
 	err    error
 }
 
-func (m mockAccountCreateAccount) Execute(_ context.Context, _ input.Account) (output.AccountOutput, error) {
+func (m mockAccountCreateAccount) Execute(_ context.Context, _ input.Account) (output.Account, error) {
 	return m.result, m.err
 }
 
 func TestCreateAccountAction_Execute(t *testing.T) {
 	t.Parallel()
 
-	validator, _ := validator.NewValidatorFactory(validator.InstanceGoPlayground)
+	validator, _ := validation.NewValidatorFactory(validation.InstanceGoPlayground)
 
 	type args struct {
 		rawPayload []byte
@@ -53,7 +53,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 				),
 			},
 			ucMock: mockAccountCreateAccount{
-				result: output.AccountOutput{
+				result: output.Account{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "07094564964",
@@ -77,7 +77,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 				),
 			},
 			ucMock: mockAccountCreateAccount{
-				result: output.AccountOutput{
+				result: output.Account{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "07094564964",
@@ -101,7 +101,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 				),
 			},
 			ucMock: mockAccountCreateAccount{
-				result: output.AccountOutput{},
+				result: output.Account{},
 				err:    errors.New("error"),
 			},
 			expectedBody:       []byte(`{"errors":["error"]}`),
@@ -119,7 +119,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 				),
 			},
 			ucMock: mockAccountCreateAccount{
-				result: output.AccountOutput{},
+				result: output.Account{},
 				err:    nil,
 			},
 			expectedBody:       []byte(`{"errors":["Balance must be greater than 0"]}`),
@@ -137,7 +137,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 				),
 			},
 			ucMock: mockAccountCreateAccount{
-				result: output.AccountOutput{},
+				result: output.Account{},
 				err:    nil,
 			},
 			expectedBody:       []byte(`{"errors":["Name is a required field","CPF is a required field","Balance must be greater than 0"]}`),
@@ -153,7 +153,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 				),
 			},
 			ucMock: mockAccountCreateAccount{
-				result: output.AccountOutput{},
+				result: output.Account{},
 				err:    nil,
 			},
 			expectedBody:       []byte(`{"errors":["invalid character '}' looking for beginning of value"]}`),
@@ -171,7 +171,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewCreateAccountAction(tt.ucMock, logger.LoggerMock{}, validator)
+				action = NewCreateAccountAction(tt.ucMock, log.LoggerMock{}, validator)
 			)
 
 			action.Execute(w, req)

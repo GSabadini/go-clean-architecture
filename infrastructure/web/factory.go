@@ -4,17 +4,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
 )
 
-//Server é uma abstração para o server da aplicação
 type Server interface {
 	Listen()
 }
 
-//Port define uma porta para o servidor
 type Port int64
 
 var (
@@ -26,7 +24,6 @@ const (
 	InstanceGin
 )
 
-//NewWebServerFactory retorna a instância de um web server
 func NewWebServerFactory(
 	instance int,
 	log logger.Logger,

@@ -3,13 +3,13 @@ package usecase
 import (
 	"context"
 	"errors"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/usecase/input"
+	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockTransferRepoStore struct {
@@ -64,10 +64,10 @@ func (m mockAccountRepo) FindByID(_ context.Context, _ domain.AccountID) (domain
 type mockTransferPresenterStore struct {
 	output.TransferPresenter
 
-	result output.TransferOutput
+	result output.Transfer
 }
 
-func (m mockTransferPresenterStore) Output(_ domain.Transfer) output.TransferOutput {
+func (m mockTransferPresenterStore) Output(_ domain.Transfer) output.Transfer {
 	return m.result
 }
 
@@ -84,7 +84,7 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 		transferRepo  domain.TransferRepository
 		accountRepo   domain.AccountRepository
 		presenter     output.TransferPresenter
-		expected      output.TransferOutput
+		expected      output.Transfer
 		expectedError string
 	}{
 		{
@@ -131,7 +131,7 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 			},
 			presenter: mockTransferPresenterStore{
-				result: output.TransferOutput{
+				result: output.Transfer{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
@@ -139,7 +139,7 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					CreatedAt:            time.Time{},
 				},
 			},
-			expected: output.TransferOutput{
+			expected: output.Transfer{
 				ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
@@ -186,13 +186,13 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 			},
 			presenter: mockTransferPresenterStore{
-				result: output.TransferOutput{},
+				result: output.Transfer{},
 			},
 			expectedError: "error",
-			expected:      output.TransferOutput{},
+			expected:      output.Transfer{},
 		},
 		{
-			name: "Create transfer error find origin validator",
+			name: "Create transfer error find origin account",
 			args: args{input: input.Transfer{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -214,13 +214,13 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 			},
 			presenter: mockTransferPresenterStore{
-				result: output.TransferOutput{},
+				result: output.Transfer{},
 			},
 			expectedError: "error",
-			expected:      output.TransferOutput{},
+			expected:      output.Transfer{},
 		},
 		{
-			name: "Create transfer error find destination validator",
+			name: "Create transfer error find destination account",
 			args: args{input: input.Transfer{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -252,13 +252,13 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				invokedFind: &invoked{call: false},
 			},
 			presenter: mockTransferPresenterStore{
-				result: output.TransferOutput{},
+				result: output.Transfer{},
 			},
 			expectedError: "error",
-			expected:      output.TransferOutput{},
+			expected:      output.Transfer{},
 		},
 		{
-			name: "Create transfer error update origin validator",
+			name: "Create transfer error update origin account",
 			args: args{input: input.Transfer{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -295,13 +295,13 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 			},
 			presenter: mockTransferPresenterStore{
-				result: output.TransferOutput{},
+				result: output.Transfer{},
 			},
 			expectedError: "error",
-			expected:      output.TransferOutput{},
+			expected:      output.Transfer{},
 		},
 		{
-			name: "Create transfer error update destination validator",
+			name: "Create transfer error update destination account",
 			args: args{input: input.Transfer{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -339,10 +339,10 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 			},
 			presenter: mockTransferPresenterStore{
-				result: output.TransferOutput{},
+				result: output.Transfer{},
 			},
 			expectedError: "error",
-			expected:      output.TransferOutput{},
+			expected:      output.Transfer{},
 		},
 		{
 			name: "Create transfer amount not have sufficient",
@@ -383,10 +383,10 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 			},
 			presenter: mockTransferPresenterStore{
-				result: output.TransferOutput{},
+				result: output.Transfer{},
 			},
-			expectedError: "origin validator does not have sufficient balance",
-			expected:      output.TransferOutput{},
+			expectedError: "origin account does not have sufficient balance",
+			expected:      output.Transfer{},
 		},
 	}
 

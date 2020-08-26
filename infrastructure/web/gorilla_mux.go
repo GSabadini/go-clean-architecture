@@ -2,18 +2,18 @@ package web
 
 import (
 	"fmt"
-	"github.com/gsabadini/go-bank-transfer/interface/api/action"
-	"github.com/gsabadini/go-bank-transfer/interface/repository/postgres"
-	"github.com/gsabadini/go-bank-transfer/usecase"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/interface/api/action"
 	"github.com/gsabadini/go-bank-transfer/interface/api/middleware"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/presenter"
 	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository/postgres"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
+	"github.com/gsabadini/go-bank-transfer/usecase"
 	"github.com/urfave/negroni"
 )
 
@@ -45,7 +45,6 @@ func newGorillaMux(
 	}
 }
 
-//Listen inicia o servidor HTTP
 func (g gorillaMux) Listen() {
 	g.setAppHandlers(g.router)
 	g.middleware.UseHandler(g.router)

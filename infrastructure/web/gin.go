@@ -2,17 +2,17 @@ package web
 
 import (
 	"fmt"
-	"github.com/gsabadini/go-bank-transfer/interface/api/action"
-	"github.com/gsabadini/go-bank-transfer/interface/presenter"
-	"github.com/gsabadini/go-bank-transfer/interface/repository/mongodb"
-	"github.com/gsabadini/go-bank-transfer/usecase"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/interface/api/action"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/interface/presenter"
 	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/repository/mongodb"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
+	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
 type ginEngine struct {

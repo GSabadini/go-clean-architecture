@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-//transferBSON armazena a estrutura de dados do MongoDB
 type transferBSON struct {
 	ID                   string    `bson:"id"`
 	AccountOriginID      string    `bson:"account_origin_id"`
@@ -20,18 +19,15 @@ type transferBSON struct {
 	CreatedAt            time.Time `bson:"created_at"`
 }
 
-//TransferRepository armazena a estrutura de dados de um repositório de Transfer
 type TransferRepository struct {
 	collectionName string
 	handler        repository.NoSQLHandler
 }
 
-//NewTransferRepository constrói um repository com suas dependências
 func NewTransferRepository(h repository.NoSQLHandler) TransferRepository {
 	return TransferRepository{handler: h, collectionName: "transfers"}
 }
 
-//Store insere uma Transfer no database
 func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	transferBSON := &transferBSON{
 		ID:                   transfer.ID().String(),
@@ -48,7 +44,6 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 	return transfer, nil
 }
 
-//FindAll busca todas as Transfer no database
 func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	var transfersBSON = make([]transferBSON, 0)
 

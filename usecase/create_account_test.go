@@ -3,12 +3,12 @@ package usecase
 import (
 	"context"
 	"errors"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/usecase/input"
 	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
@@ -26,10 +26,10 @@ func (m mockAccountRepoStore) Store(_ context.Context, _ domain.Account) (domain
 type mockAccountPresenterStore struct {
 	output.AccountPresenter
 
-	result output.AccountOutput
+	result output.Account
 }
 
-func (m mockAccountPresenterStore) Output(_ domain.Account) output.AccountOutput {
+func (m mockAccountPresenterStore) Output(_ domain.Account) output.Account {
 	return m.result
 }
 
@@ -45,11 +45,11 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 		args          args
 		repository    domain.AccountRepository
 		presenter     output.AccountPresenter
-		expected      output.AccountOutput
+		expected      output.Account
 		expectedError interface{}
 	}{
 		{
-			name: "Create validator successful",
+			name: "Create account successful",
 			args: args{
 				input: input.Account{
 					Name:    "Test",
@@ -68,7 +68,7 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 				err: nil,
 			},
 			presenter: mockAccountPresenterStore{
-				result: output.AccountOutput{
+				result: output.Account{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "02815517078",
@@ -76,7 +76,7 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 					CreatedAt: time.Time{},
 				},
 			},
-			expected: output.AccountOutput{
+			expected: output.Account{
 				ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:      "Test",
 				CPF:       "02815517078",
@@ -85,7 +85,7 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Create validator successful",
+			name: "Create account successful",
 			args: args{
 				input: input.Account{
 					Name:    "Test",
@@ -104,7 +104,7 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 				err: nil,
 			},
 			presenter: mockAccountPresenterStore{
-				result: output.AccountOutput{
+				result: output.Account{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "02815517078",
@@ -112,7 +112,7 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 					CreatedAt: time.Time{},
 				},
 			},
-			expected: output.AccountOutput{
+			expected: output.Account{
 				ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:      "Test",
 				CPF:       "02815517078",
@@ -121,7 +121,7 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Create validator generic error",
+			name: "Create account generic error",
 			args: args{
 				input: input.Account{
 					Name:    "",
@@ -134,10 +134,10 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 				err:    errors.New("error"),
 			},
 			presenter: mockAccountPresenterStore{
-				result: output.AccountOutput{},
+				result: output.Account{},
 			},
 			expectedError: "error",
-			expected:      output.AccountOutput{},
+			expected:      output.Account{},
 		},
 	}
 

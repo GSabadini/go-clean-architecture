@@ -9,12 +9,10 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//CreateTransfer é uma abstração de caso de uso de Transfer
 type CreateTransfer interface {
-	Execute(context.Context, input.Transfer) (output.TransferOutput, error)
+	Execute(context.Context, input.Transfer) (output.Transfer, error)
 }
 
-//CreateTransferInteractor armazena as dependências para o caso de uso Create de Transfer
 type CreateTransferInteractor struct {
 	transferRepo domain.TransferRepository
 	accountRepo  domain.AccountRepository
@@ -22,7 +20,6 @@ type CreateTransferInteractor struct {
 	ctxTimeout   time.Duration
 }
 
-//NewCreateTransferInteractor constrói um CreateTransferInteractor com suas dependências
 func NewCreateTransferInteractor(
 	transferRepo domain.TransferRepository,
 	accountRepo domain.AccountRepository,
@@ -37,8 +34,7 @@ func NewCreateTransferInteractor(
 	}
 }
 
-//Execute cria uma nova Transfer
-func (t CreateTransferInteractor) Execute(ctx context.Context, input input.Transfer) (output.TransferOutput, error) {
+func (t CreateTransferInteractor) Execute(ctx context.Context, input input.Transfer) (output.Transfer, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 

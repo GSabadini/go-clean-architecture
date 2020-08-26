@@ -10,17 +10,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-//TransferRepository armazena a estrutura de dados de um repositório de Transfer
 type TransferRepository struct {
 	handler repository.SQLHandler
 }
 
-//NewTransferRepository constrói um TransferRepository com suas dependências
 func NewTransferRepository(h repository.SQLHandler) TransferRepository {
 	return TransferRepository{handler: h}
 }
 
-//Store insere uma Transfer no database
 func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	query := `
 		INSERT INTO 
@@ -44,7 +41,6 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 	return transfer, nil
 }
 
-//FindAll busca todas as Transfer no database
 func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	var (
 		transfers = make([]domain.Transfer, 0)

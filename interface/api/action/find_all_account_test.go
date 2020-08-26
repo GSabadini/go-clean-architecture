@@ -9,17 +9,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockFindAllAccount struct {
-	result []output.AccountOutput
+	result []output.Account
 	err    error
 }
 
-func (m mockFindAllAccount) Execute(_ context.Context) ([]output.AccountOutput, error) {
+func (m mockFindAllAccount) Execute(_ context.Context) ([]output.Account, error) {
 	return m.result, m.err
 }
 
@@ -33,9 +33,9 @@ func TestFindAllAccountAction_Execute(t *testing.T) {
 		expectedStatusCode int
 	}{
 		{
-			name: "FindAllAccountAction success one validator",
+			name: "FindAllAccountAction success one account",
 			ucMock: mockFindAllAccount{
-				result: []output.AccountOutput{
+				result: []output.Account{
 					{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 						Name:      "Test",
@@ -52,7 +52,7 @@ func TestFindAllAccountAction_Execute(t *testing.T) {
 		{
 			name: "FindAllAccountAction success empty",
 			ucMock: mockFindAllAccount{
-				result: []output.AccountOutput{},
+				result: []output.Account{},
 				err:    nil,
 			},
 			expectedBody:       []byte(`[]`),
@@ -74,7 +74,7 @@ func TestFindAllAccountAction_Execute(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewFindAllAccountAction(tt.ucMock, logger.LoggerMock{})
+				action = NewFindAllAccountAction(tt.ucMock, log.LoggerMock{})
 			)
 
 			action.Execute(w, req)

@@ -6,15 +6,13 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//AccountPresenter é uma abstração para os apresentação de Account
 type AccountPresenter interface {
-	Output(domain.Account) AccountOutput
-	OutputList([]domain.Account) []AccountOutput
-	OutputBalance(domain.Money) AccountBalanceOutput
+	Output(domain.Account) Account
+	OutputList([]domain.Account) []Account
+	OutputBalance(domain.Money) AccountBalance
 }
 
-//AccountOutput armazena a estrutura de dados de retorno do caso de uso
-type AccountOutput struct {
+type Account struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
 	CPF       string    `json:"cpf"`
@@ -22,7 +20,6 @@ type AccountOutput struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-//AccountBalanceOutput armazena a estrutura de dados de retorno do caso de uso
-type AccountBalanceOutput struct {
+type AccountBalance struct {
 	Balance float64 `json:"balance"`
 }

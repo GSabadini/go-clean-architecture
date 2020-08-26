@@ -8,19 +8,16 @@ import (
 	"github.com/gsabadini/go-bank-transfer/domain"
 )
 
-//FindAllTransfer é uma abstração de caso de uso de Transfer
 type FindAllTransfer interface {
-	Execute(context.Context) ([]output.TransferOutput, error)
+	Execute(context.Context) ([]output.Transfer, error)
 }
 
-//FindAllTransferInteractor armazena as dependências para o casos de uso FindAll de Transfer
 type FindAllTransferInteractor struct {
 	repo       domain.TransferRepository
 	presenter  output.TransferPresenter
 	ctxTimeout time.Duration
 }
 
-//NewFindAllTransferInteractor constrói um Transfer com suas dependências
 func NewFindAllTransferInteractor(
 	repo domain.TransferRepository,
 	presenter output.TransferPresenter,
@@ -33,8 +30,7 @@ func NewFindAllTransferInteractor(
 	}
 }
 
-//Execute retorna uma lista de transferências
-func (t FindAllTransferInteractor) Execute(ctx context.Context) ([]output.TransferOutput, error) {
+func (t FindAllTransferInteractor) Execute(ctx context.Context) ([]output.Transfer, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 

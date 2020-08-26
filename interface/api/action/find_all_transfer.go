@@ -1,23 +1,21 @@
 package action
 
 import (
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"net/http"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/api/logging"
 	"github.com/gsabadini/go-bank-transfer/interface/api/response"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
-//FindAllTransferAction armazena as dependências para as ações de Transfer
 type FindAllTransferAction struct {
 	uc  usecase.FindAllTransfer
 	log logger.Logger
 }
 
-//NewFindAllTransferAction constrói um Transfer com suas dependências
-func NewFindAllTransferAction(uc usecase.FindAllTransfer, l logger.Logger) FindAllTransferAction {
-	return FindAllTransferAction{uc: uc, log: l}
+func NewFindAllTransferAction(uc usecase.FindAllTransfer, log logger.Logger) FindAllTransferAction {
+	return FindAllTransferAction{uc: uc, log: log}
 }
 
 //Execute é um handler para retornar todas as Transfer

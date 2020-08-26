@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/api/logging"
 	"github.com/gsabadini/go-bank-transfer/interface/api/response"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
@@ -17,8 +17,8 @@ type FindBalanceAccountAction struct {
 }
 
 //NewFindBalanceAccountAction constrói um FindBalanceAccountAction com suas dependências
-func NewFindBalanceAccountAction(uc usecase.FindBalanceAccount, l logger.Logger) FindBalanceAccountAction {
-	return FindBalanceAccountAction{uc: uc, log: l}
+func NewFindBalanceAccountAction(uc usecase.FindBalanceAccount, log logger.Logger) FindBalanceAccountAction {
+	return FindBalanceAccountAction{uc: uc, log: log}
 }
 
 //Execute é um handler para retornar o Balance de uma Account
@@ -47,7 +47,7 @@ func (a FindBalanceAccountAction) Execute(w http.ResponseWriter, r *http.Request
 			logging.NewError(
 				a.log,
 				logKey,
-				"error fetching validator",
+				"error fetching account balance",
 				http.StatusBadRequest,
 				err,
 			).Log()
@@ -58,7 +58,7 @@ func (a FindBalanceAccountAction) Execute(w http.ResponseWriter, r *http.Request
 			logging.NewError(
 				a.log,
 				logKey,
-				"error when returning validator balance",
+				"error when returning account balance",
 				http.StatusInternalServerError,
 				err,
 			).Log()
@@ -67,7 +67,7 @@ func (a FindBalanceAccountAction) Execute(w http.ResponseWriter, r *http.Request
 			return
 		}
 	}
-	logging.NewInfo(a.log, logKey, "success when returning validator balance", http.StatusOK).Log()
+	logging.NewInfo(a.log, logKey, "success when returning account balance", http.StatusOK).Log()
 
 	response.NewSuccess(output, http.StatusOK).Send(w)
 }

@@ -7,14 +7,12 @@ import (
 
 type transferPresenter struct{}
 
-//NewTransferPresenter
 func NewTransferPresenter() transferPresenter {
 	return transferPresenter{}
 }
 
-//Output
-func (tp transferPresenter) Output(transfer domain.Transfer) output.TransferOutput {
-	return output.TransferOutput{
+func (tp transferPresenter) Output(transfer domain.Transfer) output.Transfer {
+	return output.Transfer{
 		ID:                   transfer.ID().String(),
 		AccountOriginID:      transfer.AccountOriginID().String(),
 		AccountDestinationID: transfer.AccountDestinationID().String(),
@@ -23,12 +21,11 @@ func (tp transferPresenter) Output(transfer domain.Transfer) output.TransferOutp
 	}
 }
 
-//OutputList
-func (tp transferPresenter) OutputList(transfers []domain.Transfer) []output.TransferOutput {
-	var o = make([]output.TransferOutput, 0)
+func (tp transferPresenter) OutputList(transfers []domain.Transfer) []output.Transfer {
+	var o = make([]output.Transfer, 0)
 
 	for _, transfer := range transfers {
-		o = append(o, output.TransferOutput{
+		o = append(o, output.Transfer{
 			ID:                   transfer.ID().String(),
 			AccountOriginID:      transfer.AccountOriginID().String(),
 			AccountDestinationID: transfer.AccountDestinationID().String(),

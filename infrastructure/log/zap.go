@@ -1,6 +1,7 @@
-package logger
+package log
 
 import (
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"go.uber.org/zap"
 )
 
@@ -8,8 +9,8 @@ type zapLogger struct {
 	logger *zap.SugaredLogger
 }
 
-//NewZapLogger constrói uma instância do logger Zap
-func NewZapLogger() (Logger, error) {
+//NewZapLogger constrói uma instância do log Zap
+func NewZapLogger() (logger.Logger, error) {
 	log, err := zap.NewProduction()
 	if err != nil {
 		return nil, err
@@ -42,11 +43,11 @@ func (l *zapLogger) Fatalln(args ...interface{}) {
 }
 
 //WithFields
-func (l *zapLogger) WithFields(fields Fields) Logger {
+func (l *zapLogger) WithFields(fields logger.Fields) logger.Logger {
 	var f = make([]interface{}, 0)
-	for k, v := range fields {
-		f = append(f, k)
-		f = append(f, v)
+	for index, field := range fields {
+		f = append(f, index)
+		f = append(f, field)
 	}
 
 	log := l.logger.With(f...)
@@ -54,7 +55,7 @@ func (l *zapLogger) WithFields(fields Fields) Logger {
 }
 
 //WithError
-func (l *zapLogger) WithError(err error) Logger {
+func (l *zapLogger) WithError(err error) logger.Logger {
 	var log = l.logger.With(err.Error())
 	return &zapLogger{logger: log}
 }

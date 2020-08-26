@@ -7,20 +7,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/interface/api/logging"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/negroni"
 )
 
-//Logger armazena a estrutura de logger para entrada e saídas da API
+//Logger armazena a estrutura de log para entrada e saídas da API
 type Logger struct {
-	logger logger.Logger
+	log logger.Logger
 }
 
 //NewLoggerFactory constrói um Logger com suas dependências
 func NewLogger(log logger.Logger) Logger {
-	return Logger{logger: log}
+	return Logger{log: log}
 }
 
 //Execute cria logs de entrada e saída da API
@@ -35,16 +36,18 @@ func (l Logger) Execute(w http.ResponseWriter, r *http.Request, next http.Handle
 
 	body, err := getRequestPayload(r)
 	if err != nil {
-		l.logger.WithFields(logger.Fields{
-			"key":         logKey,
-			"http_status": http.StatusBadRequest,
-			"error":       err.Error(),
-		}).Errorf("error when getting payload")
+		logging.NewError(
+			l.log,
+			logKey,
+			"error when getting payload",
+			http.StatusBadRequest,
+			err,
+		).Log()
 
 		return
 	}
 
-	l.logger.WithFields(logger.Fields{
+	l.log.WithFields(logger.Fields{
 		"key":         requestKey,
 		"payload":     body,
 		"url":         r.URL.Path,
@@ -55,7 +58,7 @@ func (l Logger) Execute(w http.ResponseWriter, r *http.Request, next http.Handle
 
 	end := time.Since(start).Seconds()
 	res := w.(negroni.ResponseWriter)
-	l.logger.WithFields(logger.Fields{
+	l.log.WithFields(logger.Fields{
 		"key":           responseKey,
 		"url":           r.URL.Path,
 		"http_method":   r.Method,

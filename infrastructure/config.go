@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validation"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/web"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
 )
 
-//config armazena a estrutura de configuração da aplicação
 type config struct {
 	appName       string
 	logger        logger.Logger
@@ -23,7 +24,6 @@ type config struct {
 	webServer     web.Server
 }
 
-//NewConfig configura a aplicação
 func NewConfig() *config {
 	return &config{}
 }
@@ -34,7 +34,7 @@ func (c *config) Name(name string) *config {
 }
 
 func (c *config) Logger(instance int) *config {
-	log, err := logger.NewLoggerFactory(instance)
+	log, err := log.NewLoggerFactory(instance)
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +76,7 @@ func (c *config) ContextTimeout(t time.Duration) *config {
 }
 
 func (c *config) Validator(instance int) *config {
-	v, err := validator.NewValidatorFactory(instance)
+	v, err := validation.NewValidatorFactory(instance)
 	if err != nil {
 		panic(err)
 	}

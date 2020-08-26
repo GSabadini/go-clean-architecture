@@ -6,27 +6,24 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
 	"github.com/gsabadini/go-bank-transfer/interface/api/logging"
 	"github.com/gsabadini/go-bank-transfer/interface/api/response"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 	"github.com/gsabadini/go-bank-transfer/usecase/input"
 )
 
-//CreateAccountAction armazena as dependências para as ações de Account
 type CreateAccountAction struct {
 	uc        usecase.CreateAccount
 	log       logger.Logger
 	validator validator.Validator
 }
 
-//NewCreateAccountAction constrói um Account com suas dependências
-func NewCreateAccountAction(uc usecase.CreateAccount, l logger.Logger, v validator.Validator) CreateAccountAction {
-	return CreateAccountAction{uc: uc, log: l, validator: v}
+func NewCreateAccountAction(uc usecase.CreateAccount, log logger.Logger, v validator.Validator) CreateAccountAction {
+	return CreateAccountAction{uc: uc, log: log, validator: v}
 }
 
-//Execute é um handler para criação de Account
 func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 	const logKey = "create_account"
 
@@ -49,9 +46,9 @@ func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 		logging.NewError(
 			a.log,
 			logKey,
-			"invalid validator",
+			"invalid input",
 			http.StatusBadRequest,
-			errors.New("invalid validator"),
+			errors.New("invalid input"),
 		).Log()
 
 		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
@@ -65,7 +62,7 @@ func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 		logging.NewError(
 			a.log,
 			logKey,
-			"error when creating a new validator",
+			"error when creating a new account",
 			http.StatusInternalServerError,
 			err,
 		).Log()
@@ -73,7 +70,7 @@ func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-	logging.NewInfo(a.log, logKey, "success creating validator", http.StatusCreated).Log()
+	logging.NewInfo(a.log, logKey, "success creating account", http.StatusCreated).Log()
 
 	response.NewSuccess(output, http.StatusCreated).Send(w)
 }

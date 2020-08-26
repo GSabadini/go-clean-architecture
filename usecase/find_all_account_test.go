@@ -25,10 +25,10 @@ func (m mockAccountRepoFindAll) FindAll(_ context.Context) ([]domain.Account, er
 type mockAccountPresenterFindAll struct {
 	output.AccountPresenter
 
-	result []output.AccountOutput
+	result []output.Account
 }
 
-func (m mockAccountPresenterFindAll) OutputList(_ []domain.Account) []output.AccountOutput {
+func (m mockAccountPresenterFindAll) OutputList(_ []domain.Account) []output.Account {
 	return m.result
 }
 
@@ -39,11 +39,11 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 		name          string
 		repository    domain.AccountRepository
 		presenter     output.AccountPresenter
-		expected      []output.AccountOutput
+		expected      []output.Account
 		expectedError interface{}
 	}{
 		{
-			name: "Success when returning the validator list",
+			name: "Success when returning the account list",
 			repository: mockAccountRepoFindAll{
 				result: []domain.Account{
 					domain.NewAccount(
@@ -64,7 +64,7 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 				err: nil,
 			},
 			presenter: mockAccountPresenterFindAll{
-				result: []output.AccountOutput{
+				result: []output.Account{
 					{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 						Name:      "Test",
@@ -81,7 +81,7 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []output.AccountOutput{
+			expected: []output.Account{
 				{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
@@ -99,15 +99,15 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Success when returning the empty validator list",
+			name: "Success when returning the empty account list",
 			repository: mockAccountRepoFindAll{
 				result: []domain.Account{},
 				err:    nil,
 			},
 			presenter: mockAccountPresenterFindAll{
-				result: []output.AccountOutput{},
+				result: []output.Account{},
 			},
-			expected: []output.AccountOutput{},
+			expected: []output.Account{},
 		},
 		{
 			name: "Error when returning the list of accounts",
@@ -116,10 +116,10 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 				err:    errors.New("error"),
 			},
 			presenter: mockAccountPresenterFindAll{
-				result: []output.AccountOutput{},
+				result: []output.Account{},
 			},
 			expectedError: "error",
-			expected:      []output.AccountOutput{},
+			expected:      []output.Account{},
 		},
 	}
 

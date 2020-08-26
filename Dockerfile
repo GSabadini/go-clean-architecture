@@ -5,7 +5,15 @@ ENV GO111MODULE=on \
     GOOS=linux \
     GOARCH=amd64 \
     MONGODB_HOST=mongodb \
-    MONGODB_DATABASE=bank
+    MONGODB_DATABASE=bank \
+    POSTGRES_HOST=postgres \
+    POSTGRES_PORT=5432 \
+    POSTGRES_USER=dev \
+    POSTGRES_PASSWORD=dev \
+    POSTGRES_DATABASE=bank \
+    POSTGRES_DRIVER=postgres \
+    APP_NAME=go-bank-transfer \
+    APP_PORT=3001
 
 WORKDIR /build
 COPY . .

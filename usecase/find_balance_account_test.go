@@ -25,10 +25,10 @@ func (m mockAccountRepoFindBalance) FindBalance(_ context.Context, _ domain.Acco
 type mockAccountPresenterFindBalance struct {
 	output.AccountPresenter
 
-	result output.AccountBalanceOutput
+	result output.AccountBalance
 }
 
-func (m mockAccountPresenterFindBalance) OutputBalance(_ domain.Money) output.AccountBalanceOutput {
+func (m mockAccountPresenterFindBalance) OutputBalance(_ domain.Money) output.AccountBalance {
 	return m.result
 }
 
@@ -44,11 +44,11 @@ func TestFindBalanceAccountInteractor_Execute(t *testing.T) {
 		args          args
 		repository    domain.AccountRepository
 		presenter     output.AccountPresenter
-		expected      output.AccountBalanceOutput
+		expected      output.AccountBalance
 		expectedError interface{}
 	}{
 		{
-			name: "Success when returning the validator balance",
+			name: "Success when returning the account balance",
 			args: args{
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
@@ -57,12 +57,12 @@ func TestFindBalanceAccountInteractor_Execute(t *testing.T) {
 				err:    nil,
 			},
 			presenter: mockAccountPresenterFindBalance{
-				result: output.AccountBalanceOutput{Balance: 1},
+				result: output.AccountBalance{Balance: 1},
 			},
-			expected: output.AccountBalanceOutput{Balance: 1},
+			expected: output.AccountBalance{Balance: 1},
 		},
 		{
-			name: "Success when returning the validator balance",
+			name: "Success when returning the account balance",
 			args: args{
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
@@ -71,12 +71,12 @@ func TestFindBalanceAccountInteractor_Execute(t *testing.T) {
 				err:    nil,
 			},
 			presenter: mockAccountPresenterFindBalance{
-				result: output.AccountBalanceOutput{Balance: 200.5},
+				result: output.AccountBalance{Balance: 200.5},
 			},
-			expected: output.AccountBalanceOutput{Balance: 200.5},
+			expected: output.AccountBalance{Balance: 200.5},
 		},
 		{
-			name: "Error returning validator balance",
+			name: "Error returning account balance",
 			args: args{
 				ID: "3c096a40-ccba-4b58-93ed-57379ab04680",
 			},
@@ -85,10 +85,10 @@ func TestFindBalanceAccountInteractor_Execute(t *testing.T) {
 				err:    errors.New("error"),
 			},
 			presenter: mockAccountPresenterFindBalance{
-				result: output.AccountBalanceOutput{},
+				result: output.AccountBalance{},
 			},
 			expectedError: "error",
-			expected:      output.AccountBalanceOutput{},
+			expected:      output.AccountBalance{},
 		},
 	}
 

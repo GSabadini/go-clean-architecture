@@ -3,12 +3,12 @@ package usecase
 import (
 	"context"
 	"errors"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockTransferRepoFindAll struct {
@@ -25,10 +25,10 @@ func (m mockTransferRepoFindAll) FindAll(_ context.Context) ([]domain.Transfer, 
 type mockTransferPresenterFindAll struct {
 	output.TransferPresenter
 
-	result []output.TransferOutput
+	result []output.Transfer
 }
 
-func (m mockTransferPresenterFindAll) OutputList(_ []domain.Transfer) []output.TransferOutput {
+func (m mockTransferPresenterFindAll) OutputList(_ []domain.Transfer) []output.Transfer {
 	return m.result
 }
 
@@ -37,7 +37,7 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		expected      []output.TransferOutput
+		expected      []output.Transfer
 		transferRepo  domain.TransferRepository
 		presenter     output.TransferPresenter
 		expectedError string
@@ -64,7 +64,7 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 				err: nil,
 			},
 			presenter: mockTransferPresenterFindAll{
-				result: []output.TransferOutput{
+				result: []output.Transfer{
 					{
 						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -81,7 +81,7 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []output.TransferOutput{
+			expected: []output.Transfer{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -105,9 +105,9 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 				err:    nil,
 			},
 			presenter: mockTransferPresenterFindAll{
-				result: []output.TransferOutput{},
+				result: []output.Transfer{},
 			},
-			expected: []output.TransferOutput{},
+			expected: []output.Transfer{},
 		},
 		{
 			name: "Error when returning the transfer list",
@@ -116,9 +116,9 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 				err:    errors.New("error"),
 			},
 			presenter: mockTransferPresenterFindAll{
-				result: []output.TransferOutput{},
+				result: []output.Transfer{},
 			},
-			expected:      []output.TransferOutput{},
+			expected:      []output.Transfer{},
 			expectedError: "error",
 		},
 	}

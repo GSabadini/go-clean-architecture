@@ -9,17 +9,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockFindAllTransfer struct {
-	result []output.TransferOutput
+	result []output.Transfer
 	err    error
 }
 
-func (m mockFindAllTransfer) Execute(_ context.Context) ([]output.TransferOutput, error) {
+func (m mockFindAllTransfer) Execute(_ context.Context) ([]output.Transfer, error) {
 	return m.result, m.err
 }
 
@@ -35,7 +35,7 @@ func TestTransfer_Index(t *testing.T) {
 		{
 			name: "FindAllTransferAction success one transfer",
 			ucMock: mockFindAllTransfer{
-				result: []output.TransferOutput{
+				result: []output.Transfer{
 					{
 						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04679",
 						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -52,7 +52,7 @@ func TestTransfer_Index(t *testing.T) {
 		{
 			name: "FindAllTransferAction success empty",
 			ucMock: mockFindAllTransfer{
-				result: []output.TransferOutput{},
+				result: []output.Transfer{},
 				err:    nil,
 			},
 			expectedBody:       []byte(`[]`),
@@ -74,7 +74,7 @@ func TestTransfer_Index(t *testing.T) {
 
 			var (
 				w      = httptest.NewRecorder()
-				action = NewFindAllTransferAction(tt.ucMock, logger.LoggerMock{})
+				action = NewFindAllTransferAction(tt.ucMock, log.LoggerMock{})
 			)
 
 			action.Execute(w, req)
