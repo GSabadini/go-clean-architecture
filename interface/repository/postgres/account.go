@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
@@ -15,11 +16,13 @@ type AccountRepository struct {
 }
 
 func NewAccountRepository(h repository.SQLHandler) AccountRepository {
-	return AccountRepository{handler: h}
+	return AccountRepository{
+		handler: h,
+	}
 }
 
-func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
-	query := `
+func (a AccountRepository) Create(ctx context.Context, account domain.Account) (domain.Account, error) {
+	var query = `
 		INSERT INTO 
 			accounts (id, name, cpf, balance, created_at)
 		VALUES 
@@ -52,16 +55,14 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 }
 
 func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error) {
-	var (
-		accounts = make([]domain.Account, 0)
-		query    = "SELECT * FROM accounts"
-	)
+	var query = "SELECT * FROM accounts"
 
 	rows, err := a.handler.QueryContext(ctx, query)
 	if err != nil {
 		return []domain.Account{}, errors.Wrap(err, "error listing accounts")
 	}
 
+	var accounts = make([]domain.Account, 0)
 	for rows.Next() {
 		var (
 			ID        string
@@ -102,28 +103,19 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 		createdAt time.Time
 	)
 
-	row, err := a.handler.QueryContext(ctx, query, ID)
-	if err != nil {
-		return domain.Account{}, errors.Wrap(err, "error fetching account")
+	err := a.handler.QueryRowContext(ctx, query, ID).Scan(&id, &name, &CPF, &balance, &createdAt)
+	switch {
+	case err == sql.ErrNoRows:
+		return domain.Account{}, domain.ErrAccountNotFound
+	default:
+		return domain.NewAccount(
+			domain.AccountID(id),
+			name,
+			CPF,
+			domain.Money(balance),
+			createdAt,
+		), err
 	}
-
-	row.Next()
-	if err = row.Scan(&id, &name, &CPF, &balance, &createdAt); err != nil {
-		return domain.Account{}, errors.Wrap(err, "error fetching account")
-	}
-	defer row.Close()
-
-	if err = row.Err(); err != nil {
-		return domain.Account{}, err
-	}
-
-	return domain.NewAccount(
-		domain.AccountID(id),
-		name,
-		CPF,
-		domain.Money(balance),
-		createdAt,
-	), nil
 }
 
 func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
@@ -132,20 +124,11 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 		balance int64
 	)
 
-	row, err := a.handler.QueryContext(ctx, query, ID)
-	if err != nil {
-		return domain.Account{}, errors.Wrap(err, "error fetching account balance")
+	err := a.handler.QueryRowContext(ctx, query, ID).Scan(&balance)
+	switch {
+	case err == sql.ErrNoRows:
+		return domain.Account{}, domain.ErrAccountNotFound
+	default:
+		return domain.NewAccountBalance(domain.Money(balance)), err
 	}
-
-	row.Next()
-	if err := row.Scan(&balance); err != nil {
-		return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
-	}
-	defer row.Close()
-
-	if err = row.Err(); err != nil {
-		return domain.Account{}, err
-	}
-
-	return domain.NewAccountBalance(domain.Money(balance)), nil
 }

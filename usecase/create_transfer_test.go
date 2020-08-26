@@ -19,7 +19,7 @@ type mockTransferRepoStore struct {
 	err    error
 }
 
-func (m mockTransferRepoStore) Store(_ context.Context, _ domain.Transfer) (domain.Transfer, error) {
+func (m mockTransferRepoStore) Create(_ context.Context, _ domain.Transfer) (domain.Transfer, error) {
 	return m.result, m.err
 }
 

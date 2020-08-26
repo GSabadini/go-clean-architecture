@@ -45,26 +45,48 @@ func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args 
 	return nil
 }
 
-func (p postgresHandler) QueryContext(ctx context.Context, query string, args ...interface{}) (repository.Row, error) {
+func (p postgresHandler) QueryContext(ctx context.Context, query string, args ...interface{}) (repository.Rows, error) {
 	rows, err := p.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	row := newPostgresRow(rows)
+	row := newPostgresRows(rows)
 
 	return row, nil
 }
 
-type postgresRow struct {
-	rows *sql.Rows
+func (p postgresHandler) QueryRowContext(ctx context.Context, query string, args ...interface{}) repository.Row {
+	row := p.db.QueryRowContext(ctx, query, args...)
+
+	return newPostgresRow(row)
 }
 
-func newPostgresRow(rows *sql.Rows) postgresRow {
-	return postgresRow{rows: rows}
+type postgresRow struct {
+	row *sql.Row
+}
+
+func newPostgresRow(row *sql.Row) postgresRow {
+	return postgresRow{row: row}
 }
 
 func (pr postgresRow) Scan(dest ...interface{}) error {
+	if err := pr.row.Scan(dest...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type postgresRows struct {
+	rows *sql.Rows
+}
+
+func newPostgresRows(rows *sql.Rows) postgresRows {
+	return postgresRows{rows: rows}
+}
+
+func (pr postgresRows) Scan(dest ...interface{}) error {
 	if err := pr.rows.Scan(dest...); err != nil {
 		return err
 	}
@@ -72,15 +94,15 @@ func (pr postgresRow) Scan(dest ...interface{}) error {
 	return nil
 }
 
-func (pr postgresRow) Next() bool {
+func (pr postgresRows) Next() bool {
 	return pr.rows.Next()
 }
 
-func (pr postgresRow) Err() error {
+func (pr postgresRows) Err() error {
 	return pr.rows.Err()
 }
 
-func (pr postgresRow) Close() error {
+func (pr postgresRows) Close() error {
 	return pr.rows.Close()
 }
 

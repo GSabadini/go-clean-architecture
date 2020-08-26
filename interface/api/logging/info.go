@@ -7,22 +7,20 @@ import (
 type Info struct {
 	log        logger.Logger
 	key        string
-	msg        string
 	httpStatus int
 }
 
-func NewInfo(log logger.Logger, key string, msg string, httpStatus int) Info {
+func NewInfo(log logger.Logger, key string, httpStatus int) Info {
 	return Info{
 		log:        log,
 		key:        key,
-		msg:        msg,
 		httpStatus: httpStatus,
 	}
 }
 
-func (i Info) Log() {
+func (i Info) Log(msg string) {
 	i.log.WithFields(logger.Fields{
 		"key":         i.key,
 		"http_status": i.httpStatus,
-	}).Infof(i.msg)
+	}).Infof(msg)
 }

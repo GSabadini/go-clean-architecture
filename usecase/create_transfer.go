@@ -50,7 +50,7 @@ func (t CreateTransferInteractor) Execute(ctx context.Context, input input.Trans
 		time.Now(),
 	)
 
-	transfer, err := t.transferRepo.Store(ctx, transfer)
+	transfer, err := t.transferRepo.Create(ctx, transfer)
 	if err != nil {
 		return t.presenter.Output(domain.Transfer{}), err
 	}
@@ -61,7 +61,12 @@ func (t CreateTransferInteractor) Execute(ctx context.Context, input input.Trans
 func (t CreateTransferInteractor) process(ctx context.Context, input input.Transfer) error {
 	origin, err := t.accountRepo.FindByID(ctx, domain.AccountID(input.AccountOriginID))
 	if err != nil {
-		return err
+		switch err {
+		case domain.ErrAccountNotFound:
+			return domain.ErrAccountOriginNotFound
+		default:
+			return err
+		}
 	}
 
 	if err := origin.Withdraw(domain.Money(input.Amount)); err != nil {
@@ -70,7 +75,12 @@ func (t CreateTransferInteractor) process(ctx context.Context, input input.Trans
 
 	destination, err := t.accountRepo.FindByID(ctx, domain.AccountID(input.AccountDestinationID))
 	if err != nil {
-		return err
+		switch err {
+		case domain.ErrAccountNotFound:
+			return domain.ErrAccountDestinationNotFound
+		default:
+			return err
+		}
 	}
 
 	destination.Deposit(domain.Money(input.Amount))

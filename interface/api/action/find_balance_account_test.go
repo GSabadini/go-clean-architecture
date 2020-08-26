@@ -83,9 +83,9 @@ func TestFindBalanceAccountAction_Execute(t *testing.T) {
 			},
 			ucMock: mockFindBalanceAccount{
 				result: output.AccountBalance{},
-				err:    domain.ErrNotFound,
+				err:    domain.ErrAccountNotFound,
 			},
-			expectedBody:       []byte(`{"errors":["not found"]}`),
+			expectedBody:       []byte(`{"errors":["account not found"]}`),
 			expectedStatusCode: http.StatusBadRequest,
 		},
 	}

@@ -125,8 +125,8 @@ curl -i --request GET 'http://localhost:3001/v1/accounts/{{account_id}}/balance'
 curl -i --request POST 'http://localhost:3001/v1/transfers' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-	"account_destination_id": "{{account_id}}",
 	"account_origin_id": "{{account_id}}",
+	"account_destination_id": "{{account_id}}",
 	"amount": 100
 }'
 ```

@@ -29,7 +29,7 @@ func NewAccountRepository(h repository.NoSQLHandler) AccountRepository {
 	return AccountRepository{handler: h, collectionName: "accounts"}
 }
 
-func (a AccountRepository) Store(ctx context.Context, account domain.Account) (domain.Account, error) {
+func (a AccountRepository) Create(ctx context.Context, account domain.Account) (domain.Account, error) {
 	var accountBSON = accountBSON{
 		ID:        account.ID().String(),
 		Name:      account.Name(),
@@ -54,7 +54,7 @@ func (a AccountRepository) UpdateBalance(ctx context.Context, ID domain.AccountI
 	if err := a.handler.Update(ctx, a.collectionName, query, update); err != nil {
 		switch err {
 		case mongo.ErrNilDocument:
-			return errors.Wrap(domain.ErrNotFound, "error updating account balance")
+			return errors.Wrap(domain.ErrAccountNotFound, "error updating account balance")
 		default:
 			return errors.Wrap(err, "error updating account balance")
 		}
@@ -69,7 +69,7 @@ func (a AccountRepository) FindAll(ctx context.Context) ([]domain.Account, error
 	if err := a.handler.FindAll(ctx, a.collectionName, bson.M{}, &accountsBSON); err != nil {
 		switch err {
 		case mongo.ErrNilDocument:
-			return []domain.Account{}, errors.Wrap(domain.ErrNotFound, "error listing accounts")
+			return []domain.Account{}, errors.Wrap(domain.ErrAccountNotFound, "error listing accounts")
 		default:
 			return []domain.Account{}, errors.Wrap(err, "error listing accounts")
 		}
@@ -101,7 +101,7 @@ func (a AccountRepository) FindByID(ctx context.Context, ID domain.AccountID) (d
 	if err := a.handler.FindOne(ctx, a.collectionName, query, nil, accountBSON); err != nil {
 		switch err {
 		case mongo.ErrNoDocuments:
-			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account")
+			return domain.Account{}, domain.ErrAccountNotFound
 		default:
 			return domain.Account{}, errors.Wrap(err, "error fetching account")
 		}
@@ -126,7 +126,7 @@ func (a AccountRepository) FindBalance(ctx context.Context, ID domain.AccountID)
 	if err := a.handler.FindOne(ctx, a.collectionName, query, projection, accountBSON); err != nil {
 		switch err {
 		case mongo.ErrNoDocuments:
-			return domain.Account{}, errors.Wrap(domain.ErrNotFound, "error fetching account balance")
+			return domain.Account{}, domain.ErrAccountNotFound
 		default:
 			return domain.Account{}, errors.Wrap(err, "error fetching account balance")
 		}

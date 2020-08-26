@@ -15,10 +15,12 @@ type FindAllTransferAction struct {
 }
 
 func NewFindAllTransferAction(uc usecase.FindAllTransfer, log logger.Logger) FindAllTransferAction {
-	return FindAllTransferAction{uc: uc, log: log}
+	return FindAllTransferAction{
+		uc:  uc,
+		log: log,
+	}
 }
 
-//Execute é um handler para retornar todas as Transfer
 func (t FindAllTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 	const logKey = "find_all_transfer"
 
@@ -26,16 +28,15 @@ func (t FindAllTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logging.NewError(
 			t.log,
-			logKey,
-			"error when returning the transfer list",
-			http.StatusInternalServerError,
 			err,
-		).Log()
+			logKey,
+			http.StatusInternalServerError,
+		).Log("error when returning the transfer list")
 
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-	logging.NewInfo(t.log, logKey, "success when returning transfer list", http.StatusOK).Log()
+	logging.NewInfo(t.log, logKey, http.StatusOK).Log("success when returning transfer list")
 
 	response.NewSuccess(output, http.StatusOK).Send(w)
 }

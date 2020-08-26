@@ -19,7 +19,7 @@ type mockAccountRepoStore struct {
 	err    error
 }
 
-func (m mockAccountRepoStore) Store(_ context.Context, _ domain.Account) (domain.Account, error) {
+func (m mockAccountRepoStore) Create(_ context.Context, _ domain.Account) (domain.Account, error) {
 	return m.result, m.err
 }
 

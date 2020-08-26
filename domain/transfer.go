@@ -6,7 +6,7 @@ import (
 )
 
 type TransferRepository interface {
-	Store(context.Context, Transfer) (Transfer, error)
+	Create(context.Context, Transfer) (Transfer, error)
 	FindAll(context.Context) ([]Transfer, error)
 }
 

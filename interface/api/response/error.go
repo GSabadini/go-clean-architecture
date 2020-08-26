@@ -8,6 +8,8 @@ import (
 
 var (
 	ErrParameterInvalid = errors.New("parameter invalid")
+
+	ErrInvalidInput = errors.New("invalid input")
 )
 
 type Error struct {

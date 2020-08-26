@@ -28,7 +28,7 @@ func NewTransferRepository(h repository.NoSQLHandler) TransferRepository {
 	return TransferRepository{handler: h, collectionName: "transfers"}
 }
 
-func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
+func (t TransferRepository) Create(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	transferBSON := &transferBSON{
 		ID:                   transfer.ID().String(),
 		AccountOriginID:      transfer.AccountOriginID().String(),

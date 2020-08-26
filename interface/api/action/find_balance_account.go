@@ -10,31 +10,30 @@ import (
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
-//FindAllAccountAction armazena as dependências para as ações de Account
 type FindBalanceAccountAction struct {
 	uc  usecase.FindBalanceAccount
 	log logger.Logger
 }
 
-//NewFindBalanceAccountAction constrói um FindBalanceAccountAction com suas dependências
 func NewFindBalanceAccountAction(uc usecase.FindBalanceAccount, log logger.Logger) FindBalanceAccountAction {
-	return FindBalanceAccountAction{uc: uc, log: log}
+	return FindBalanceAccountAction{
+		uc:  uc,
+		log: log,
+	}
 }
 
-//Execute é um handler para retornar o Balance de uma Account
 func (a FindBalanceAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
-	const logKey = "find_balance"
+	const logKey = "find_balance_account"
 
 	var accountID = r.URL.Query().Get("account_id")
 	if !domain.IsValidUUID(accountID) {
 		var err = response.ErrParameterInvalid
 		logging.NewError(
 			a.log,
-			logKey,
-			"parameter invalid",
-			http.StatusBadRequest,
 			err,
-		).Log()
+			logKey,
+			http.StatusBadRequest,
+		).Log("invalid parameter")
 
 		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
@@ -43,31 +42,29 @@ func (a FindBalanceAccountAction) Execute(w http.ResponseWriter, r *http.Request
 	output, err := a.uc.Execute(r.Context(), domain.AccountID(accountID))
 	if err != nil {
 		switch err {
-		case domain.ErrNotFound:
+		case domain.ErrAccountNotFound:
 			logging.NewError(
 				a.log,
-				logKey,
-				"error fetching account balance",
-				http.StatusBadRequest,
 				err,
-			).Log()
+				logKey,
+				http.StatusBadRequest,
+			).Log("error fetching account balance")
 
 			response.NewError(err, http.StatusBadRequest).Send(w)
 			return
 		default:
 			logging.NewError(
 				a.log,
-				logKey,
-				"error when returning account balance",
-				http.StatusInternalServerError,
 				err,
-			).Log()
+				logKey,
+				http.StatusInternalServerError,
+			).Log("error when returning account balance")
 
 			response.NewError(err, http.StatusInternalServerError).Send(w)
 			return
 		}
 	}
-	logging.NewInfo(a.log, logKey, "success when returning account balance", http.StatusOK).Log()
+	logging.NewInfo(a.log, logKey, http.StatusOK).Log("success when returning account balance")
 
 	response.NewSuccess(output, http.StatusOK).Send(w)
 }

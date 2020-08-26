@@ -18,8 +18,8 @@ func NewTransferRepository(h repository.SQLHandler) TransferRepository {
 	return TransferRepository{handler: h}
 }
 
-func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
-	query := `
+func (t TransferRepository) Create(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
+	var query = `
 		INSERT INTO 
 			transfers (id, account_origin_id, account_destination_id, amount, created_at)
 		VALUES 
@@ -42,16 +42,14 @@ func (t TransferRepository) Store(ctx context.Context, transfer domain.Transfer)
 }
 
 func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
-	var (
-		transfers = make([]domain.Transfer, 0)
-		query     = "SELECT * FROM transfers"
-	)
+	var query = "SELECT * FROM transfers"
 
 	rows, err := t.handler.QueryContext(ctx, query)
 	if err != nil {
-		return transfers, errors.Wrap(err, "error listing transfers")
+		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 	}
 
+	var transfers = make([]domain.Transfer, 0)
 	for rows.Next() {
 		var (
 			ID                   string

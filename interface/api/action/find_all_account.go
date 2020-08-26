@@ -15,7 +15,10 @@ type FindAllAccountAction struct {
 }
 
 func NewFindAllAccountAction(uc usecase.FindAllAccount, log logger.Logger) FindAllAccountAction {
-	return FindAllAccountAction{uc: uc, log: log}
+	return FindAllAccountAction{
+		uc:  uc,
+		log: log,
+	}
 }
 
 func (a FindAllAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
@@ -25,16 +28,15 @@ func (a FindAllAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logging.NewError(
 			a.log,
-			logKey,
-			"error when returning account list",
-			http.StatusInternalServerError,
 			err,
-		).Log()
+			logKey,
+			http.StatusInternalServerError,
+		).Log("error when returning account list")
 
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-	logging.NewInfo(a.log, logKey, "success when returning account list", http.StatusOK).Log()
+	logging.NewInfo(a.log, logKey, http.StatusOK).Log("success when returning account list")
 
 	response.NewSuccess(output, http.StatusOK).Send(w)
 }

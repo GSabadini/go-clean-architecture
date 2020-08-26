@@ -60,6 +60,7 @@ func (g ginEngine) Listen() {
 	}
 }
 
+/* TODO ADD MIDDLEWARE */
 func (g ginEngine) setAppHandlers(router *gin.Engine) {
 	router.POST("/v1/transfers", g.buildCreateTransferAction())
 	router.GET("/v1/transfers", g.buildFindAllTransferAction())

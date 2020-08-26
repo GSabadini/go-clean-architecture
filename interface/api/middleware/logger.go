@@ -38,11 +38,10 @@ func (l Logger) Execute(w http.ResponseWriter, r *http.Request, next http.Handle
 	if err != nil {
 		logging.NewError(
 			l.log,
-			logKey,
-			"error when getting payload",
-			http.StatusBadRequest,
 			err,
-		).Log()
+			logKey,
+			http.StatusBadRequest,
+		).Log("error when getting payload")
 
 		return
 	}

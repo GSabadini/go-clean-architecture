@@ -18,24 +18,34 @@ type CreateTransferAction struct {
 	log       logger.Logger
 	uc        usecase.CreateTransfer
 	validator validator.Validator
+
+	logKey, logMsg string
 }
 
 func NewCreateTransferAction(uc usecase.CreateTransfer, log logger.Logger, v validator.Validator) CreateTransferAction {
-	return CreateTransferAction{uc: uc, log: log, validator: v}
+	return CreateTransferAction{
+		uc:        uc,
+		log:       log,
+		validator: v,
+		logKey:    "create_transfer",
+		logMsg:    "creating a new transfer",
+	}
 }
 
 func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
-	const logKey = "create_transfer"
+	//const (
+	//	logKey      = "create_transfer"
+	//	logMsgError = "error when creating a new transfer"
+	//)
 
 	var transferInput input.Transfer
 	if err := json.NewDecoder(r.Body).Decode(&transferInput); err != nil {
 		logging.NewError(
 			t.log,
-			logKey,
-			"error when decoding json",
-			http.StatusBadRequest,
 			err,
-		).Log()
+			t.logKey,
+			http.StatusBadRequest,
+		).Log(t.logMsg)
 
 		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
@@ -45,11 +55,10 @@ func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 	if errs := t.validateInput(transferInput); len(errs) > 0 {
 		logging.NewError(
 			t.log,
-			logKey,
-			"invalid input",
+			response.ErrInvalidInput,
+			t.logKey,
 			http.StatusBadRequest,
-			errors.New("invalid input"),
-		).Log()
+		).Log(t.logMsg)
 
 		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
 		return
@@ -57,35 +66,58 @@ func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 
 	output, err := t.uc.Execute(r.Context(), transferInput)
 	if err != nil {
-		switch err {
-		case domain.ErrInsufficientBalance:
-			logging.NewError(
-				t.log,
-				logKey,
-				"insufficient balance",
-				http.StatusUnprocessableEntity,
-				err,
-			).Log()
-
-			response.NewError(err, http.StatusUnprocessableEntity).Send(w)
-			return
-		default:
-			logging.NewError(
-				t.log,
-				logKey,
-				"error when creating a new transfer",
-				http.StatusInternalServerError,
-				err,
-			).Log()
-
-			response.NewError(err, http.StatusInternalServerError).Send(w)
-			return
-		}
+		t.handleErr(err, w)
+		return
 	}
 
-	logging.NewInfo(t.log, logKey, "success create transfer", http.StatusCreated).Log()
+	logging.NewInfo(t.log, t.logKey, http.StatusCreated).Log(t.logMsg)
 
 	response.NewSuccess(output, http.StatusCreated).Send(w)
+}
+
+func (t CreateTransferAction) handleErr(err error, w http.ResponseWriter) {
+	switch err {
+	case domain.ErrInsufficientBalance:
+		logging.NewError(
+			t.log,
+			err,
+			t.logKey,
+			http.StatusUnprocessableEntity,
+		).Log(t.logMsg)
+
+		response.NewError(err, http.StatusUnprocessableEntity).Send(w)
+		return
+	case domain.ErrAccountOriginNotFound:
+		logging.NewError(
+			t.log,
+			err,
+			t.logKey,
+			http.StatusUnprocessableEntity,
+		).Log(t.logMsg)
+
+		response.NewError(err, http.StatusUnprocessableEntity).Send(w)
+		return
+	case domain.ErrAccountDestinationNotFound:
+		logging.NewError(
+			t.log,
+			err,
+			t.logKey,
+			http.StatusUnprocessableEntity,
+		).Log(t.logMsg)
+
+		response.NewError(err, http.StatusUnprocessableEntity).Send(w)
+		return
+	default:
+		logging.NewError(
+			t.log,
+			err,
+			t.logKey,
+			http.StatusInternalServerError,
+		).Log(t.logMsg)
+
+		response.NewError(err, http.StatusInternalServerError).Send(w)
+		return
+	}
 }
 
 func (t CreateTransferAction) validateInput(input input.Transfer) []string {

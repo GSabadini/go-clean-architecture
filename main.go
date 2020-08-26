@@ -21,6 +21,6 @@ func main() {
 		DbNoSQL(database.InstanceMongoDB)
 
 	app.WebServerPort(os.Getenv("APP_PORT")).
-		WebServer(web.InstanceGorillaMux).
+		WebServer(web.InstanceGin).
 		Start()
 }

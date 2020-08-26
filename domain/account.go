@@ -8,7 +8,11 @@ import (
 
 /* TODO rever errors */
 var (
-	ErrNotFound = errors.New("not found")
+	ErrAccountNotFound = errors.New("account not found")
+
+	ErrAccountOriginNotFound = errors.New("account origin not found")
+
+	ErrAccountDestinationNotFound = errors.New("account destination not found")
 
 	ErrInsufficientBalance = errors.New("origin account does not have sufficient balance")
 
@@ -16,7 +20,7 @@ var (
 )
 
 type AccountRepository interface {
-	Store(context.Context, Account) (Account, error)
+	Create(context.Context, Account) (Account, error)
 	UpdateBalance(context.Context, AccountID, Money) error
 	FindAll(context.Context) ([]Account, error)
 	FindByID(context.Context, AccountID) (Account, error)

@@ -2,7 +2,6 @@ package action
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strings"
 
@@ -21,7 +20,11 @@ type CreateAccountAction struct {
 }
 
 func NewCreateAccountAction(uc usecase.CreateAccount, log logger.Logger, v validator.Validator) CreateAccountAction {
-	return CreateAccountAction{uc: uc, log: log, validator: v}
+	return CreateAccountAction{
+		uc:        uc,
+		log:       log,
+		validator: v,
+	}
 }
 
 func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
@@ -31,11 +34,10 @@ func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&accountInput); err != nil {
 		logging.NewError(
 			a.log,
-			logKey,
-			"error when decoding json",
-			http.StatusBadRequest,
 			err,
-		).Log()
+			logKey,
+			http.StatusBadRequest,
+		).Log("error when decoding json")
 
 		response.NewError(err, http.StatusBadRequest).Send(w)
 		return
@@ -45,11 +47,10 @@ func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 	if errs := a.validateInput(accountInput); len(errs) > 0 {
 		logging.NewError(
 			a.log,
+			response.ErrInvalidInput,
 			logKey,
-			"invalid input",
 			http.StatusBadRequest,
-			errors.New("invalid input"),
-		).Log()
+		).Log("invalid input")
 
 		response.NewErrorMessage(errs, http.StatusBadRequest).Send(w)
 		return
@@ -61,16 +62,15 @@ func (a CreateAccountAction) Execute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logging.NewError(
 			a.log,
-			logKey,
-			"error when creating a new account",
-			http.StatusInternalServerError,
 			err,
-		).Log()
+			logKey,
+			http.StatusInternalServerError,
+		).Log("error when creating a new account")
 
 		response.NewError(err, http.StatusInternalServerError).Send(w)
 		return
 	}
-	logging.NewInfo(a.log, logKey, "success creating account", http.StatusCreated).Log()
+	logging.NewInfo(a.log, logKey, http.StatusCreated).Log("success creating account")
 
 	response.NewSuccess(output, http.StatusCreated).Send(w)
 }

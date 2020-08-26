@@ -43,7 +43,7 @@ func (a CreateAccountInteractor) Execute(ctx context.Context, input input.Accoun
 		time.Now(),
 	)
 
-	account, err := a.repo.Store(ctx, account)
+	account, err := a.repo.Create(ctx, account)
 	if err != nil {
 		return a.presenter.Output(domain.Account{}), err
 	}
