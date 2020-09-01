@@ -1,6 +1,6 @@
 debug-remote:
 	- make down
-	- docker-compose up -d postgres mongodb go-bank-transfer-debug
+	- docker-compose up -d postgres mongodb app-debug
 
 build:
 	go build -a --installsuffix cgo --ldflags="-s" -o main
@@ -9,7 +9,7 @@ test:
 	go test -cover ./...
 
 test-container:
-	docker-compose exec go-bank-transfer go test -cover ./...
+	docker-compose exec app go test -cover ./...
 
 dependencies:
 	go mod download
@@ -32,10 +32,10 @@ down:
 	docker-compose down
 
 logs:
-	docker-compose logs -f go-bank-transfer
+	docker-compose logs -f app
 
 enter-container:
-	docker-compose exec go-bank-transfer bash
+	docker-compose exec app bash
 
 coverage-report:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic

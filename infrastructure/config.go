@@ -5,27 +5,32 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
+	"github.com/gsabadini/go-bank-transfer/infrastructure/validation"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/web"
-	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
 )
 
-//config armazena a estrutura de configuração da aplicação
 type config struct {
 	appName       string
 	logger        logger.Logger
 	validator     validator.Validator
-	dbSQL         repository.SQLHandler
-	dbNoSQL       repository.NoSQLHandler
+	dbSQL         repository.SQL
+	dbNoSQL       repository.NoSQL
 	ctxTimeout    time.Duration
 	webServerPort web.Port
 	webServer     web.Server
 }
 
-//NewConfig configura a aplicação
 func NewConfig() *config {
 	return &config{}
+}
+
+func (c *config) ContextTimeout(t time.Duration) *config {
+	c.ctxTimeout = t
+	return c
 }
 
 func (c *config) Name(name string) *config {
@@ -34,7 +39,7 @@ func (c *config) Name(name string) *config {
 }
 
 func (c *config) Logger(instance int) *config {
-	log, err := logger.NewLoggerFactory(instance)
+	log, err := log.NewLoggerFactory(instance)
 	if err != nil {
 		panic(err)
 	}
@@ -70,13 +75,8 @@ func (c *config) DbNoSQL(instance int) *config {
 	return c
 }
 
-func (c *config) ContextTimeout(t time.Duration) *config {
-	c.ctxTimeout = t
-	return c
-}
-
 func (c *config) Validator(instance int) *config {
-	v, err := validator.NewValidatorFactory(instance)
+	v, err := validation.NewValidatorFactory(instance)
 	if err != nil {
 		panic(err)
 	}

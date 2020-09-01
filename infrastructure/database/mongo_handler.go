@@ -8,13 +8,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//mongoHandler armazena a estrutura para MongoDB
 type mongoHandler struct {
 	db      *mongo.Database
 	session mongo.Session
 }
 
-//NewMongoHandler constrói um novo handler de banco para MongoDB
 func NewMongoHandler(c *config) (*mongoHandler, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.ctxTimeout)
 	defer cancel()
@@ -42,7 +40,6 @@ func NewMongoHandler(c *config) (*mongoHandler, error) {
 	}, nil
 }
 
-//Store realiza uma inserção no banco de dados
 func (mgo mongoHandler) Store(ctx context.Context, collection string, data interface{}) error {
 	if _, err := mgo.db.Collection(collection).InsertOne(ctx, data); err != nil {
 		return err
@@ -51,7 +48,6 @@ func (mgo mongoHandler) Store(ctx context.Context, collection string, data inter
 	return nil
 }
 
-//Update realiza uma atualização no banco de dados
 func (mgo mongoHandler) Update(ctx context.Context, collection string, query interface{}, update interface{}) error {
 	if _, err := mgo.db.Collection(collection).UpdateOne(ctx, query, update); err != nil {
 		return err
@@ -60,7 +56,6 @@ func (mgo mongoHandler) Update(ctx context.Context, collection string, query int
 	return nil
 }
 
-//FindAll realiza uma busca por todos os registros no banco de dados
 func (mgo mongoHandler) FindAll(ctx context.Context, collection string, query interface{}, result interface{}) error {
 	cur, err := mgo.db.Collection(collection).Find(ctx, query)
 	if err != nil {
@@ -79,7 +74,6 @@ func (mgo mongoHandler) FindAll(ctx context.Context, collection string, query in
 	return nil
 }
 
-//FindOne realiza a busca de um item específico no banco de dados
 func (mgo mongoHandler) FindOne(
 	ctx context.Context,
 	collection string,

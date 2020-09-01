@@ -4,18 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
-	"github.com/gsabadini/go-bank-transfer/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
+
 	_ "github.com/lib/pq"
 )
 
-//postgresHandler armazena a estrutura para o Postgres
 type postgresHandler struct {
 	db *sql.DB
 }
 
-//NewPostgresHandler constrói um novo handler de banco para Postgres
 func NewPostgresHandler(c *config) (*postgresHandler, error) {
 	var ds = fmt.Sprintf(
 		"host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
@@ -26,7 +24,7 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 		c.password,
 	)
 
-	db, err := sql.Open(os.Getenv("POSTGRES_DRIVER"), ds)
+	db, err := sql.Open(c.driver, ds)
 	if err != nil {
 		return &postgresHandler{}, err
 	}
@@ -39,37 +37,6 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 	return &postgresHandler{db: db}, nil
 }
 
-//BeginTx
-func (p postgresHandler) BeginTx(ctx context.Context) (postgresTx, error) {
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return postgresTx{}, err
-	}
-
-	return postgresTx{tx: tx}, nil
-}
-
-//postgresRow
-type postgresTx struct {
-	tx *sql.Tx
-}
-
-//Commit
-func (p postgresTx) Commit() error {
-	return p.tx.Commit()
-}
-
-//Rollback
-func (p postgresTx) Rollback() error {
-	return p.tx.Rollback()
-}
-
-//newPostgresTx
-func newPostgresTx(tx *sql.Tx) postgresTx {
-	return postgresTx{tx: tx}
-}
-
-//ExecuteContext
 func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
 	_, err := p.db.ExecContext(ctx, query, args...)
 	if err != nil {
@@ -79,30 +46,48 @@ func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args 
 	return nil
 }
 
-//Query
-func (p postgresHandler) QueryContext(ctx context.Context, query string, args ...interface{}) (repository.Row, error) {
+func (p postgresHandler) QueryContext(ctx context.Context, query string, args ...interface{}) (repository.Rows, error) {
 	rows, err := p.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	row := newPostgresRow(rows)
+	row := newPostgresRows(rows)
 
 	return row, nil
 }
 
-//postgresRow
+func (p postgresHandler) QueryRowContext(ctx context.Context, query string, args ...interface{}) repository.Row {
+	row := p.db.QueryRowContext(ctx, query, args...)
+
+	return newPostgresRow(row)
+}
+
 type postgresRow struct {
+	row *sql.Row
+}
+
+func newPostgresRow(row *sql.Row) postgresRow {
+	return postgresRow{row: row}
+}
+
+func (pr postgresRow) Scan(dest ...interface{}) error {
+	if err := pr.row.Scan(dest...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type postgresRows struct {
 	rows *sql.Rows
 }
 
-//newPostgresRow
-func newPostgresRow(rows *sql.Rows) postgresRow {
-	return postgresRow{rows: rows}
+func newPostgresRows(rows *sql.Rows) postgresRows {
+	return postgresRows{rows: rows}
 }
 
-//Scan
-func (pr postgresRow) Scan(dest ...interface{}) error {
+func (pr postgresRows) Scan(dest ...interface{}) error {
 	if err := pr.rows.Scan(dest...); err != nil {
 		return err
 	}
@@ -110,17 +95,39 @@ func (pr postgresRow) Scan(dest ...interface{}) error {
 	return nil
 }
 
-//Next retorna o método next
-func (pr postgresRow) Next() bool {
+func (pr postgresRows) Next() bool {
 	return pr.rows.Next()
 }
 
-//Err retorna o método err
-func (pr postgresRow) Err() error {
+func (pr postgresRows) Err() error {
 	return pr.rows.Err()
 }
 
-//Close retorna o método close
-func (pr postgresRow) Close() error {
+func (pr postgresRows) Close() error {
 	return pr.rows.Close()
+}
+
+func (p postgresHandler) BeginTx(ctx context.Context) (postgresTx, error) {
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return postgresTx{}, err
+	}
+
+	return newPostgresTx(tx), nil
+}
+
+type postgresTx struct {
+	tx *sql.Tx
+}
+
+func newPostgresTx(tx *sql.Tx) postgresTx {
+	return postgresTx{tx: tx}
+}
+
+func (p postgresTx) Commit() error {
+	return p.tx.Commit()
+}
+
+func (p postgresTx) Rollback() error {
+	return p.tx.Rollback()
 }
