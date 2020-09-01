@@ -33,11 +33,6 @@ func NewCreateTransferAction(uc usecase.CreateTransfer, log logger.Logger, v val
 }
 
 func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
-	//const (
-	//	logKey      = "create_transfer"
-	//	logMsgError = "error when creating a new transfer"
-	//)
-
 	var transferInput input.Transfer
 	if err := json.NewDecoder(r.Body).Decode(&transferInput); err != nil {
 		logging.NewError(
