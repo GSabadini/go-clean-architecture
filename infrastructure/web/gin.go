@@ -5,21 +5,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/api/action"
-	"github.com/gsabadini/go-bank-transfer/api/presenter"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
-	"github.com/gsabadini/go-bank-transfer/repository"
-	"github.com/gsabadini/go-bank-transfer/repository/mongodb"
-	"github.com/gsabadini/go-bank-transfer/usecase"
-
 	"github.com/gin-gonic/gin"
+	"github.com/gsabadini/go-bank-transfer/interface/api/action"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/interface/presenter"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
+	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 
 type ginEngine struct {
 	router     *gin.Engine
 	log        logger.Logger
-	db         repository.NoSQLHandler
+	db         repository.NoSQL
 	validator  validator.Validator
 	port       Port
 	ctxTimeout time.Duration
@@ -27,7 +25,7 @@ type ginEngine struct {
 
 func newGinServer(
 	log logger.Logger,
-	db repository.NoSQLHandler,
+	db repository.NoSQL,
 	validator validator.Validator,
 	port Port,
 	t time.Duration,
@@ -61,96 +59,95 @@ func (g ginEngine) Listen() {
 	}
 }
 
+/* TODO ADD MIDDLEWARE */
 func (g ginEngine) setAppHandlers(router *gin.Engine) {
-	router.POST("/v1/transfers", g.buildActionStoreTransfer())
-	router.GET("/v1/transfers", g.buildActionFindAllTransfer())
+	router.POST("/v1/transfers", g.buildCreateTransferAction())
+	router.GET("/v1/transfers", g.buildFindAllTransferAction())
 
-	router.GET("/v1/accounts/:account_id/balance", g.buildActionFindBalanceAccount())
-	router.POST("/v1/accounts", g.buildActionStoreAccount())
-	router.GET("/v1/accounts", g.buildActionFindAllAccount())
+	router.GET("/v1/accounts/:account_id/balance", g.buildFindBalanceAccountAction())
+	router.POST("/v1/accounts", g.buildCreateAccountAction())
+	router.GET("/v1/accounts", g.buildFindAllAccountAction())
 
-	router.GET("/v1/healthcheck", g.healthcheck())
+	router.GET("/v1/health", g.healthcheck())
 }
 
-func (g ginEngine) buildActionStoreTransfer() gin.HandlerFunc {
+func (g ginEngine) buildCreateTransferAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			transferUseCase = usecase.NewTransfer(
-				mongodb.NewTransferRepository(g.db),
-				mongodb.NewAccountRepository(g.db),
+			uc = usecase.NewCreateTransferInteractor(
+				repository.NewTransferNoSQL(g.db),
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
-
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			act = action.NewCreateTransferAction(uc, g.log, g.validator)
 		)
 
-		transferAction.Store(c.Writer, c.Request)
+		act.Execute(c.Writer, c.Request)
 	}
 }
 
-func (g ginEngine) buildActionFindAllTransfer() gin.HandlerFunc {
+func (g ginEngine) buildFindAllTransferAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			transferUseCase = usecase.NewTransfer(
-				mongodb.NewTransferRepository(g.db),
-				mongodb.NewAccountRepository(g.db),
+			uc = usecase.NewFindAllTransferInteractor(
+				repository.NewTransferNoSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			act = action.NewFindAllTransferAction(uc, g.log)
 		)
 
-		transferAction.FindAll(c.Writer, c.Request)
+		act.Execute(c.Writer, c.Request)
 	}
 }
 
-func (g ginEngine) buildActionStoreAccount() gin.HandlerFunc {
+func (g ginEngine) buildCreateAccountAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				mongodb.NewAccountRepository(g.db),
+			uc = usecase.NewCreateAccountInteractor(
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			act = action.NewCreateAccountAction(uc, g.log, g.validator)
 		)
 
-		accountAction.Store(c.Writer, c.Request)
+		act.Execute(c.Writer, c.Request)
 	}
 }
 
-func (g ginEngine) buildActionFindAllAccount() gin.HandlerFunc {
+func (g ginEngine) buildFindAllAccountAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				mongodb.NewAccountRepository(g.db),
+			uc = usecase.NewFindAllAccountInteractor(
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			act = action.NewFindAllAccountAction(uc, g.log)
 		)
 
-		accountAction.FindAll(c.Writer, c.Request)
+		act.Execute(c.Writer, c.Request)
 	}
 }
 
-func (g ginEngine) buildActionFindBalanceAccount() gin.HandlerFunc {
+func (g ginEngine) buildFindBalanceAccountAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				mongodb.NewAccountRepository(g.db),
+			uc = usecase.NewFindBalanceAccountInteractor(
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			act = action.NewFindBalanceAccountAction(uc, g.log)
 		)
 
 		q := c.Request.URL.Query()
 		q.Add("account_id", c.Param("account_id"))
 		c.Request.URL.RawQuery = q.Encode()
 
-		accountAction.FindBalance(c.Writer, c.Request)
+		act.Execute(c.Writer, c.Request)
 	}
 }
 

@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/api/action"
-	"github.com/gsabadini/go-bank-transfer/api/middleware"
-	"github.com/gsabadini/go-bank-transfer/api/presenter"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/logger"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validator"
-	"github.com/gsabadini/go-bank-transfer/repository"
-	"github.com/gsabadini/go-bank-transfer/repository/postgres"
+	"github.com/gsabadini/go-bank-transfer/interface/api/action"
+	"github.com/gsabadini/go-bank-transfer/interface/api/middleware"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/interface/presenter"
+	"github.com/gsabadini/go-bank-transfer/interface/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 
 	"github.com/gorilla/mux"
@@ -22,7 +21,7 @@ type gorillaMux struct {
 	router     *mux.Router
 	middleware *negroni.Negroni
 	log        logger.Logger
-	db         repository.SQLHandler
+	db         repository.SQL
 	validator  validator.Validator
 	port       Port
 	ctxTimeout time.Duration
@@ -30,7 +29,7 @@ type gorillaMux struct {
 
 func newGorillaMux(
 	log logger.Logger,
-	db repository.SQLHandler,
+	db repository.SQL,
 	validator validator.Validator,
 	port Port,
 	t time.Duration,
@@ -46,7 +45,6 @@ func newGorillaMux(
 	}
 }
 
-//Listen inicia o servidor HTTP
 func (g gorillaMux) Listen() {
 	g.setAppHandlers(g.router)
 	g.middleware.UseHandler(g.router)
@@ -67,30 +65,29 @@ func (g gorillaMux) Listen() {
 func (g gorillaMux) setAppHandlers(router *mux.Router) {
 	api := router.PathPrefix("/v1").Subrouter()
 
-	api.Handle("/transfers", g.buildActionStoreTransfer()).Methods(http.MethodPost)
-	api.Handle("/transfers", g.buildActionIndexTransfer()).Methods(http.MethodGet)
+	api.Handle("/transfers", g.buildCreateTransferAction()).Methods(http.MethodPost)
+	api.Handle("/transfers", g.buildFindAllTransferAction()).Methods(http.MethodGet)
 
-	api.Handle("/accounts/{account_id}/balance", g.buildActionFindBalanceAccount()).Methods(http.MethodGet)
-	api.Handle("/accounts", g.buildActionStoreAccount()).Methods(http.MethodPost)
-	api.Handle("/accounts", g.buildActionFindAllAccount()).Methods(http.MethodGet)
+	api.Handle("/accounts/{account_id}/balance", g.buildFindBalanceAccountAction()).Methods(http.MethodGet)
+	api.Handle("/accounts", g.buildCreateAccountAction()).Methods(http.MethodPost)
+	api.Handle("/accounts", g.buildFindAllAccountAction()).Methods(http.MethodGet)
 
-	api.HandleFunc("/healthcheck", action.HealthCheck).Methods(http.MethodGet)
+	api.HandleFunc("/health", action.HealthCheck).Methods(http.MethodGet)
 }
 
-func (g gorillaMux) buildActionStoreTransfer() *negroni.Negroni {
+func (g gorillaMux) buildCreateTransferAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferUseCase = usecase.NewTransfer(
-				postgres.NewTransferRepository(g.db),
-				postgres.NewAccountRepository(g.db),
+			uc = usecase.NewCreateTransferInteractor(
+				repository.NewTransferSQL(g.db),
+				repository.NewAccountSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
-
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			act = action.NewCreateTransferAction(uc, g.log, g.validator)
 		)
 
-		transferAction.Store(res, req)
+		act.Execute(res, req)
 	}
 
 	return negroni.New(
@@ -100,19 +97,18 @@ func (g gorillaMux) buildActionStoreTransfer() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionIndexTransfer() *negroni.Negroni {
+func (g gorillaMux) buildFindAllTransferAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			transferUseCase = usecase.NewTransfer(
-				postgres.NewTransferRepository(g.db),
-				postgres.NewAccountRepository(g.db),
+			uc = usecase.NewFindAllTransferInteractor(
+				repository.NewTransferSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
-			transferAction = action.NewTransfer(transferUseCase, g.log, g.validator)
+			act = action.NewFindAllTransferAction(uc, g.log)
 		)
 
-		transferAction.FindAll(res, req)
+		act.Execute(res, req)
 	}
 
 	return negroni.New(
@@ -122,18 +118,18 @@ func (g gorillaMux) buildActionIndexTransfer() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionStoreAccount() *negroni.Negroni {
+func (g gorillaMux) buildCreateAccountAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				postgres.NewAccountRepository(g.db),
+			uc = usecase.NewCreateAccountInteractor(
+				repository.NewAccountSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			act = action.NewCreateAccountAction(uc, g.log, g.validator)
 		)
 
-		accountAction.Store(res, req)
+		act.Execute(res, req)
 	}
 
 	return negroni.New(
@@ -143,18 +139,18 @@ func (g gorillaMux) buildActionStoreAccount() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionFindAllAccount() *negroni.Negroni {
+func (g gorillaMux) buildFindAllAccountAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				postgres.NewAccountRepository(g.db),
+			uc = usecase.NewFindAllAccountInteractor(
+				repository.NewAccountSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			act = action.NewFindAllAccountAction(uc, g.log)
 		)
 
-		accountAction.FindAll(res, req)
+		act.Execute(res, req)
 	}
 
 	return negroni.New(
@@ -164,15 +160,15 @@ func (g gorillaMux) buildActionFindAllAccount() *negroni.Negroni {
 	)
 }
 
-func (g gorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
+func (g gorillaMux) buildFindBalanceAccountAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
-			accountUseCase = usecase.NewAccount(
-				postgres.NewAccountRepository(g.db),
+			uc = usecase.NewFindBalanceAccountInteractor(
+				repository.NewAccountSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
-			accountAction = action.NewAccount(accountUseCase, g.log, g.validator)
+			act = action.NewFindBalanceAccountAction(uc, g.log)
 		)
 
 		var (
@@ -183,7 +179,7 @@ func (g gorillaMux) buildActionFindBalanceAccount() *negroni.Negroni {
 		q.Add("account_id", vars["account_id"])
 		req.URL.RawQuery = q.Encode()
 
-		accountAction.FindBalance(res, req)
+		act.Execute(res, req)
 	}
 
 	return negroni.New(

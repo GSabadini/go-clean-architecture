@@ -186,3 +186,62 @@ func TestNewAccount(t *testing.T) {
 		})
 	}
 }
+
+func TestAccount_Fields(t *testing.T) {
+	type fields struct {
+		id        AccountID
+		name      string
+		cpf       string
+		balance   Money
+		createdAt time.Time
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "Get fields",
+			fields: fields{
+				id:        "",
+				name:      "",
+				cpf:       "",
+				balance:   0,
+				createdAt: time.Time{},
+			},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			account := NewAccount(
+				tt.fields.id,
+				tt.fields.name,
+				tt.fields.cpf,
+				tt.fields.balance,
+				tt.fields.createdAt,
+			)
+
+			if got := account.ID(); got != tt.fields.id {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.fields.id)
+			}
+
+			if got := account.Name(); got != tt.fields.name {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.fields.name)
+			}
+
+			if got := account.CPF(); got != tt.fields.cpf {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.fields.cpf)
+			}
+
+			if got := account.Balance(); got != tt.fields.balance {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.fields.balance)
+			}
+
+			if got := account.CreatedAt(); got != tt.fields.createdAt {
+				t.Errorf("[TestCase '%s'] Result: '%v' | Expected: '%v'", tt.name, got, tt.fields.createdAt)
+			}
+		})
+	}
+}

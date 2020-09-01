@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to Go Bank Transfer :bank:</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.6.0-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.7.0-blue.svg?cacheSeconds=2592000" />
   <a href="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" />
   </a>
@@ -10,21 +10,23 @@
   <a href="https://travis-ci.org/github/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://travis-ci.org/GSabadini/go-bank-transfer.svg?branch=master" />
   </a>
+  <a href="https://codecov.io/gh/GSabadini/go-bank-transfer">
+    <img src="https://codecov.io/gh/GSabadini/go-bank-transfer/branch/master/graph/badge.svg" />
+  </a>
 </p>
 
 - Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
-
-- Database Plug-in (MongoDB and Postgres)
-- Logger Plug-in (Logrus and Zap)
-- HTTP Router Plug-in (Gorilla Mux and Gin)
 
 ## Architecture
 -  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
 ![Clean Architecture](cleanarch.png)
 
+## Example Create Account Usecase
+
+![Clean Architecture](create_account.png)
+
 ## Requirements/dependencies
-- Golang (not obligatory)
 - Docker
 - Docker-compose
 
@@ -75,6 +77,7 @@ make enter-container
 | `/v1/accounts/{{account_id}}/balance`   | `GET`                |    `Find balance account` |
 | `/v1/transfers`| `POST`                | `Create transfer` |
 | `/v1/transfers`| `GET`                 | `List transfers`  |
+| `/v1/health`| `GET`                 | `Health check`  |
 
 #### Test endpoints API using Postman
 
@@ -112,8 +115,8 @@ curl -i --request GET 'http://localhost:3001/v1/accounts/{{account_id}}/balance'
 curl -i --request POST 'http://localhost:3001/v1/transfers' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-	"account_destination_id": "{{account_id}}",
 	"account_origin_id": "{{account_id}}",
+	"account_destination_id": "{{account_id}}",
 	"amount": 100
 }'
 ```
