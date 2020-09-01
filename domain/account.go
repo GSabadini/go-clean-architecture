@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-/* TODO rever errors */
 var (
 	ErrAccountNotFound = errors.New("account not found")
 
@@ -15,9 +14,13 @@ var (
 	ErrAccountDestinationNotFound = errors.New("account destination not found")
 
 	ErrInsufficientBalance = errors.New("origin account does not have sufficient balance")
-
-	ErrUpdateBalance = errors.New("error update account balance")
 )
+
+type AccountID string
+
+func (a AccountID) String() string {
+	return string(a)
+}
 
 type AccountRepository interface {
 	Create(context.Context, Account) (Account, error)
@@ -61,12 +64,6 @@ func (a *Account) Withdraw(amount Money) error {
 	a.balance -= amount
 
 	return nil
-}
-
-type AccountID string
-
-func (a AccountID) String() string {
-	return string(a)
 }
 
 func (a Account) ID() AccountID {

@@ -1,24 +1,24 @@
-package postgres
+package repository
 
 import (
 	"context"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
-
 	"github.com/pkg/errors"
 )
 
-type TransferRepository struct {
-	handler repository.SQLHandler
+type TransferSQL struct {
+	db SQL
 }
 
-func NewTransferRepository(h repository.SQLHandler) TransferRepository {
-	return TransferRepository{handler: h}
+func NewTransferSQL(db SQL) TransferSQL {
+	return TransferSQL{
+		db: db,
+	}
 }
 
-func (t TransferRepository) Create(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
+func (t TransferSQL) Create(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
 	var query = `
 		INSERT INTO 
 			transfers (id, account_origin_id, account_destination_id, amount, created_at)
@@ -26,7 +26,7 @@ func (t TransferRepository) Create(ctx context.Context, transfer domain.Transfer
 			($1, $2, $3, $4, $5)
 	`
 
-	if err := t.handler.ExecuteContext(
+	if err := t.db.ExecuteContext(
 		ctx,
 		query,
 		transfer.ID(),
@@ -41,10 +41,10 @@ func (t TransferRepository) Create(ctx context.Context, transfer domain.Transfer
 	return transfer, nil
 }
 
-func (t TransferRepository) FindAll(ctx context.Context) ([]domain.Transfer, error) {
+func (t TransferSQL) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	var query = "SELECT * FROM transfers"
 
-	rows, err := t.handler.QueryContext(ctx, query)
+	rows, err := t.db.QueryContext(ctx, query)
 	if err != nil {
 		return []domain.Transfer{}, errors.Wrap(err, "error listing transfers")
 	}

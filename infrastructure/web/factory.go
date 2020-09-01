@@ -2,10 +2,10 @@ package web
 
 import (
 	"errors"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/interface/logger"
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
 	"github.com/gsabadini/go-bank-transfer/interface/validator"
 )
 
@@ -27,8 +27,8 @@ const (
 func NewWebServerFactory(
 	instance int,
 	log logger.Logger,
-	dbSQL repository.SQLHandler,
-	dbNoSQL repository.NoSQLHandler,
+	dbSQL repository.SQL,
+	dbNoSQL repository.NoSQL,
 	validator validator.Validator,
 	port Port,
 	ctxTimeout time.Duration,

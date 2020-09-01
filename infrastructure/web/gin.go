@@ -7,10 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gsabadini/go-bank-transfer/interface/api/action"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
 	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/presenter"
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
-	"github.com/gsabadini/go-bank-transfer/interface/repository/mongodb"
 	"github.com/gsabadini/go-bank-transfer/interface/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
@@ -18,7 +17,7 @@ import (
 type ginEngine struct {
 	router     *gin.Engine
 	log        logger.Logger
-	db         repository.NoSQLHandler
+	db         repository.NoSQL
 	validator  validator.Validator
 	port       Port
 	ctxTimeout time.Duration
@@ -26,7 +25,7 @@ type ginEngine struct {
 
 func newGinServer(
 	log logger.Logger,
-	db repository.NoSQLHandler,
+	db repository.NoSQL,
 	validator validator.Validator,
 	port Port,
 	t time.Duration,
@@ -76,8 +75,8 @@ func (g ginEngine) buildCreateTransferAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			uc = usecase.NewCreateTransferInteractor(
-				mongodb.NewTransferRepository(g.db),
-				mongodb.NewAccountRepository(g.db),
+				repository.NewTransferNoSQL(g.db),
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
@@ -92,7 +91,7 @@ func (g ginEngine) buildFindAllTransferAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			uc = usecase.NewFindAllTransferInteractor(
-				mongodb.NewTransferRepository(g.db),
+				repository.NewTransferNoSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
@@ -107,7 +106,7 @@ func (g ginEngine) buildCreateAccountAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			uc = usecase.NewCreateAccountInteractor(
-				mongodb.NewAccountRepository(g.db),
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
@@ -122,7 +121,7 @@ func (g ginEngine) buildFindAllAccountAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			uc = usecase.NewFindAllAccountInteractor(
-				mongodb.NewAccountRepository(g.db),
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
@@ -137,7 +136,7 @@ func (g ginEngine) buildFindBalanceAccountAction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			uc = usecase.NewFindBalanceAccountInteractor(
-				mongodb.NewAccountRepository(g.db),
+				repository.NewAccountNoSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)

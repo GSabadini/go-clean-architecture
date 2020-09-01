@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/usecase/input"
 	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 

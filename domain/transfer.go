@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+type TransferID string
+
+func (t TransferID) String() string {
+	return string(t)
+}
+
 type TransferRepository interface {
 	Create(context.Context, Transfer) (Transfer, error)
 	FindAll(context.Context) ([]Transfer, error)
@@ -32,12 +38,6 @@ func NewTransfer(
 		amount:               amount,
 		createdAt:            createdAt,
 	}
-}
-
-type TransferID string
-
-func (t TransferID) String() string {
-	return string(t)
 }
 
 func (t Transfer) ID() TransferID {

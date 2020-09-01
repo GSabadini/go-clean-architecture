@@ -66,7 +66,7 @@ func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 
 	output, err := t.uc.Execute(r.Context(), transferInput)
 	if err != nil {
-		t.handleErr(err, w)
+		t.handleErr(w, err)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (t CreateTransferAction) Execute(w http.ResponseWriter, r *http.Request) {
 	response.NewSuccess(output, http.StatusCreated).Send(w)
 }
 
-func (t CreateTransferAction) handleErr(err error, w http.ResponseWriter) {
+func (t CreateTransferAction) handleErr(w http.ResponseWriter, err error) {
 	switch err {
 	case domain.ErrInsufficientBalance:
 		logging.NewError(

@@ -148,7 +148,7 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Create transfer generic error transfer repository",
+			name: "Create transfer generic error transfer gateway",
 			args: args{input: input.Transfer{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
@@ -220,6 +220,34 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 			expected:      output.Transfer{},
 		},
 		{
+			name: "Create transfer error not found find origin account",
+			args: args{input: input.Transfer{
+				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				Amount:               1999,
+			}},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: mockAccountRepo{
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
+					return nil
+				},
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.Account{}, domain.ErrAccountOriginNotFound
+				},
+			},
+			presenter: mockTransferPresenterStore{
+				result: output.Transfer{},
+			},
+			expectedError: "account origin not found",
+			expected:      output.Transfer{},
+		},
+		{
 			name: "Create transfer error find destination account",
 			args: args{input: input.Transfer{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
@@ -255,6 +283,44 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				result: output.Transfer{},
 			},
 			expectedError: "error",
+			expected:      output.Transfer{},
+		},
+		{
+			name: "Create transfer error not found find destination account",
+			args: args{input: input.Transfer{
+				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
+				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
+				Amount:               100,
+			}},
+			transferRepo: mockTransferRepoStore{
+				result: domain.Transfer{},
+				err:    nil,
+			},
+			accountRepo: &mockAccountRepo{
+				updateBalanceOriginFake: func() error {
+					return nil
+				},
+				updateBalanceDestinationFake: func() error {
+					return nil
+				},
+				findByIDOriginFake: func() (domain.Account, error) {
+					return domain.NewAccount(
+						"3c096a40-ccba-4b58-93ed-57379ab04681",
+						"Test",
+						"08098565895",
+						5000,
+						time.Time{},
+					), nil
+				},
+				findByIDDestinationFake: func() (domain.Account, error) {
+					return domain.Account{}, domain.ErrAccountDestinationNotFound
+				},
+				invokedFind: &invoked{call: false},
+			},
+			presenter: mockTransferPresenterStore{
+				result: output.Transfer{},
+			},
+			expectedError: "account destination not found",
 			expected:      output.Transfer{},
 		},
 		{

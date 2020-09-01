@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type FindAllTransfer interface {

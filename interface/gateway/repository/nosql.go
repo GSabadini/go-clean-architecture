@@ -2,7 +2,7 @@ package repository
 
 import "context"
 
-type NoSQLHandler interface {
+type NoSQL interface {
 	Store(context.Context, string, interface{}) error
 	Update(context.Context, string, interface{}, interface{}) error
 	FindAll(context.Context, string, interface{}, interface{}) error

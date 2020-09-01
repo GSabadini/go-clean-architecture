@@ -5,15 +5,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/gsabadini/go-bank-transfer/interface/api/action"
 	"github.com/gsabadini/go-bank-transfer/interface/api/middleware"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
 	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/interface/presenter"
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
-	"github.com/gsabadini/go-bank-transfer/interface/repository/postgres"
 	"github.com/gsabadini/go-bank-transfer/interface/validator"
 	"github.com/gsabadini/go-bank-transfer/usecase"
+
+	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )
 
@@ -21,7 +21,7 @@ type gorillaMux struct {
 	router     *mux.Router
 	middleware *negroni.Negroni
 	log        logger.Logger
-	db         repository.SQLHandler
+	db         repository.SQL
 	validator  validator.Validator
 	port       Port
 	ctxTimeout time.Duration
@@ -29,7 +29,7 @@ type gorillaMux struct {
 
 func newGorillaMux(
 	log logger.Logger,
-	db repository.SQLHandler,
+	db repository.SQL,
 	validator validator.Validator,
 	port Port,
 	t time.Duration,
@@ -79,8 +79,8 @@ func (g gorillaMux) buildCreateTransferAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			uc = usecase.NewCreateTransferInteractor(
-				postgres.NewTransferRepository(g.db),
-				postgres.NewAccountRepository(g.db),
+				repository.NewTransferSQL(g.db),
+				repository.NewAccountSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
@@ -101,7 +101,7 @@ func (g gorillaMux) buildFindAllTransferAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			uc = usecase.NewFindAllTransferInteractor(
-				postgres.NewTransferRepository(g.db),
+				repository.NewTransferSQL(g.db),
 				presenter.NewTransferPresenter(),
 				g.ctxTimeout,
 			)
@@ -122,7 +122,7 @@ func (g gorillaMux) buildCreateAccountAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			uc = usecase.NewCreateAccountInteractor(
-				postgres.NewAccountRepository(g.db),
+				repository.NewAccountSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
@@ -143,7 +143,7 @@ func (g gorillaMux) buildFindAllAccountAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			uc = usecase.NewFindAllAccountInteractor(
-				postgres.NewAccountRepository(g.db),
+				repository.NewAccountSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)
@@ -164,7 +164,7 @@ func (g gorillaMux) buildFindBalanceAccountAction() *negroni.Negroni {
 	var handler http.HandlerFunc = func(res http.ResponseWriter, req *http.Request) {
 		var (
 			uc = usecase.NewFindBalanceAccountInteractor(
-				postgres.NewAccountRepository(g.db),
+				repository.NewAccountSQL(g.db),
 				presenter.NewAccountPresenter(),
 				g.ctxTimeout,
 			)

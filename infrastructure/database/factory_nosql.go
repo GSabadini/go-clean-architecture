@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
 )
 
 var (
@@ -14,7 +14,7 @@ const (
 	InstanceMongoDB int = iota
 )
 
-func NewDatabaseNoSQLFactory(instance int) (repository.NoSQLHandler, error) {
+func NewDatabaseNoSQLFactory(instance int) (repository.NoSQL, error) {
 	switch instance {
 	case InstanceMongoDB:
 		return NewMongoHandler(newConfigMongoDB())

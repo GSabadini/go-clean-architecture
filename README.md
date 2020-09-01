@@ -17,26 +17,16 @@
 
 - Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
 
-- Database Plug-in (MongoDB and Postgres)
-- Logger Plug-in (Logrus and Zap)
-- HTTP Router Plug-in (Gorilla Mux and Gin)
-
 ## Architecture
 -  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
 ![Clean Architecture](cleanarch.png)
 
-###Domain
-    -
-###Use Cases
-    -
-###Interfaces
-    -
-###Infrastructure
-    -
+## Example Create Account Usecase
+
+![Clean Architecture](create_account.png)
 
 ## Requirements/dependencies
-- Golang (not obligatory)
 - Docker
 - Docker-compose
 

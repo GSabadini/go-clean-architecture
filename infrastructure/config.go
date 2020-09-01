@@ -8,8 +8,8 @@ import (
 	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/validation"
 	"github.com/gsabadini/go-bank-transfer/infrastructure/web"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
 	"github.com/gsabadini/go-bank-transfer/interface/logger"
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
 	"github.com/gsabadini/go-bank-transfer/interface/validator"
 )
 
@@ -17,8 +17,8 @@ type config struct {
 	appName       string
 	logger        logger.Logger
 	validator     validator.Validator
-	dbSQL         repository.SQLHandler
-	dbNoSQL       repository.NoSQLHandler
+	dbSQL         repository.SQL
+	dbNoSQL       repository.NoSQL
 	ctxTimeout    time.Duration
 	webServerPort web.Port
 	webServer     web.Server
@@ -26,6 +26,11 @@ type config struct {
 
 func NewConfig() *config {
 	return &config{}
+}
+
+func (c *config) ContextTimeout(t time.Duration) *config {
+	c.ctxTimeout = t
+	return c
 }
 
 func (c *config) Name(name string) *config {
@@ -67,11 +72,6 @@ func (c *config) DbNoSQL(instance int) *config {
 	c.logger.Infof("Successfully connected to the NoSQL database")
 
 	c.dbNoSQL = db
-	return c
-}
-
-func (c *config) ContextTimeout(t time.Duration) *config {
-	c.ctxTimeout = t
 	return c
 }
 

@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
 )
 
 var (
@@ -14,7 +14,7 @@ const (
 	InstancePostgres int = iota
 )
 
-func NewDatabaseSQLFactory(instance int) (repository.SQLHandler, error) {
+func NewDatabaseSQLFactory(instance int) (repository.SQL, error) {
 	switch instance {
 	case InstancePostgres:
 		return NewPostgresHandler(newConfigPostgres())

@@ -1,11 +1,11 @@
 package action
 
 import (
-	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"net/http"
 
 	"github.com/gsabadini/go-bank-transfer/interface/api/logging"
 	"github.com/gsabadini/go-bank-transfer/interface/api/response"
+	"github.com/gsabadini/go-bank-transfer/interface/logger"
 	"github.com/gsabadini/go-bank-transfer/usecase"
 )
 

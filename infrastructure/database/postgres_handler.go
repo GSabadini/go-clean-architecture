@@ -5,7 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/gsabadini/go-bank-transfer/interface/repository"
+	"github.com/gsabadini/go-bank-transfer/interface/gateway/repository"
+
 	_ "github.com/lib/pq"
 )
 

@@ -101,6 +101,42 @@ func TestCreateTransferAction_Execute(t *testing.T) {
 			expectedStatusCode: http.StatusUnprocessableEntity,
 		},
 		{
+			name: "CreateTransferAction error not found account origin",
+			args: args{
+				rawPayload: []byte(
+					`{
+						"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+						"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
+						"amount": 10
+					}`,
+				),
+			},
+			ucMock: mockCreateTransfer{
+				result: output.Transfer{},
+				err:    domain.ErrAccountOriginNotFound,
+			},
+			expectedBody:       []byte(`{"errors":["account origin not found"]}`),
+			expectedStatusCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "CreateTransferAction error not found account destination",
+			args: args{
+				rawPayload: []byte(
+					`{
+						"account_destination_id": "3c096a40-ccba-4b58-93ed-57379ab04680",
+						"account_origin_id": "3c096a40-ccba-4b58-93ed-57379ab04681",
+						"amount": 10
+					}`,
+				),
+			},
+			ucMock: mockCreateTransfer{
+				result: output.Transfer{},
+				err:    domain.ErrAccountDestinationNotFound,
+			},
+			expectedBody:       []byte(`{"errors":["account destination not found"]}`),
+			expectedStatusCode: http.StatusUnprocessableEntity,
+		},
+		{
 			name: "CreateTransferAction error account origin equals account destination",
 			args: args{
 				rawPayload: []byte(

@@ -1,6 +1,6 @@
 FROM golang:1.14-stretch
 
-WORKDIR /go-bank-transfer
+WORKDIR /app
 
 COPY . .
 

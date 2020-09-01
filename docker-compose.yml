@@ -1,7 +1,7 @@
 version: "3.3"
 
 services:
-  go-bank-transfer:
+  app:
     container_name: "go-bank-transfer"
     build:
       context: .
@@ -18,7 +18,7 @@ services:
       - postgres
 
   mongodb:
-    container_name: "mongodb"
+    container_name: "account"
     image: "mongo:3.6.2"
     ports:
       - 27017:27017
@@ -26,7 +26,7 @@ services:
       - ./script/mongodb:/docker-entrypoint-initdb.d
 
   postgres:
-    container_name: "postgres"
+    container_name: "transfer"
     image: "postgres:12.2-alpine"
     ports:
       - 5432:5432
@@ -35,9 +35,9 @@ services:
       POSTGRES_PASSWORD: dev
       POSTGRES_DB: bank
     volumes:
-      - ./script/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./script/postgres:/docker-entrypoint-initdb.d
 
-#  go-bank-transfer-debug:
+#  app-debug:
 #    container_name: "go-bank-transfer-debug"
 #    build:
 #      context: .
@@ -55,5 +55,5 @@ services:
 #    env_file:
 #      - .env
 #    depends_on:
-#      - mongodb
-#      - postgres
+#      - account
+#      - transfer

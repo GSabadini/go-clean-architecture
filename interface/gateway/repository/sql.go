@@ -2,7 +2,7 @@ package repository
 
 import "context"
 
-type SQLHandler interface {
+type SQL interface {
 	ExecuteContext(context.Context, string, ...interface{}) error
 	QueryContext(context.Context, string, ...interface{}) (Rows, error)
 	QueryRowContext(context.Context, string, ...interface{}) Row
