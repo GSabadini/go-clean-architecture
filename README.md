@@ -1,5 +1,8 @@
 <h1 align="center">Welcome to Go Bank Transfer :bank:</h1>
 <p>
+  <a href="https://github.com/fabianoleittes/go-bank-transfer" target="_blank">
+    <img src="https://github.com/fabianoleittes/go-bank-transfer/workflows/Test/badge.svg"
+  </a>
   <img alt="Version" src="https://img.shields.io/badge/version-1.7.0-blue.svg?cacheSeconds=2592000" />
   <a href="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" />
