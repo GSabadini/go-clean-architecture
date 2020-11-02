@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockTransferRepoFindAll struct {
@@ -22,13 +21,11 @@ func (m mockTransferRepoFindAll) FindAll(_ context.Context) ([]domain.Transfer, 
 	return m.result, m.err
 }
 
-type mockTransferPresenterFindAll struct {
-	output.TransferPresenter
-
-	result []output.Transfer
+type mockFindAllTransferPresenter struct {
+	result []FindAllTransferOutput
 }
 
-func (m mockTransferPresenterFindAll) OutputList(_ []domain.Transfer) []output.Transfer {
+func (m mockFindAllTransferPresenter) Output(_ []domain.Transfer) []FindAllTransferOutput {
 	return m.result
 }
 
@@ -37,9 +34,9 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		expected      []output.Transfer
+		expected      []FindAllTransferOutput
 		transferRepo  domain.TransferRepository
-		presenter     output.TransferPresenter
+		presenter     FindAllTransferPresenter
 		expectedError string
 	}{
 		{
@@ -63,38 +60,38 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 				},
 				err: nil,
 			},
-			presenter: mockTransferPresenterFindAll{
-				result: []output.Transfer{
+			presenter: mockFindAllTransferPresenter{
+				result: []FindAllTransferOutput{
 					{
 						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Amount:               1,
-						CreatedAt:            time.Time{},
+						CreatedAt:            time.Time{}.String(),
 					},
 					{
 						ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 						AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 						AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 						Amount:               5,
-						CreatedAt:            time.Time{},
+						CreatedAt:            time.Time{}.String(),
 					},
 				},
 			},
-			expected: []output.Transfer{
+			expected: []FindAllTransferOutput{
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 					Amount:               1,
-					CreatedAt:            time.Time{},
+					CreatedAt:            time.Time{}.String(),
 				},
 				{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 					Amount:               5,
-					CreatedAt:            time.Time{},
+					CreatedAt:            time.Time{}.String(),
 				},
 			},
 		},
@@ -104,10 +101,10 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 				result: []domain.Transfer{},
 				err:    nil,
 			},
-			presenter: mockTransferPresenterFindAll{
-				result: []output.Transfer{},
+			presenter: mockFindAllTransferPresenter{
+				result: []FindAllTransferOutput{},
 			},
-			expected: []output.Transfer{},
+			expected: []FindAllTransferOutput{},
 		},
 		{
 			name: "Error when returning the transfer list",
@@ -115,10 +112,10 @@ func TestTransferFindAllInteractor_Execute(t *testing.T) {
 				result: []domain.Transfer{},
 				err:    errors.New("error"),
 			},
-			presenter: mockTransferPresenterFindAll{
-				result: []output.Transfer{},
+			presenter: mockFindAllTransferPresenter{
+				result: []FindAllTransferOutput{},
 			},
-			expected:      []output.Transfer{},
+			expected:      []FindAllTransferOutput{},
 			expectedError: "error",
 		},
 	}

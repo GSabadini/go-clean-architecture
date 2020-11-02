@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/adapter/logger"
 	"github.com/sirupsen/logrus"
 )
 

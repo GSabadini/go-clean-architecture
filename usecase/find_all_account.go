@@ -5,39 +5,57 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
-type FindAllAccount interface {
-	Execute(context.Context) ([]output.Account, error)
-}
+type (
+	// Input port
+	FindAllAccount interface {
+		Execute(context.Context) ([]FindAllAccountOutput, error)
+	}
 
-type FindAllAccountInteractor struct {
-	repo       domain.AccountRepository
-	presenter  output.AccountPresenter
-	ctxTimeout time.Duration
-}
+	// Output port
+	FindAllAccountPresenter interface {
+		Output([]domain.Account) []FindAllAccountOutput
+	}
 
+	// OutputData
+	FindAllAccountOutput struct {
+		ID        string  `json:"id"`
+		Name      string  `json:"name"`
+		CPF       string  `json:"cpf"`
+		Balance   float64 `json:"balance"`
+		CreatedAt string  `json:"created_at"`
+	}
+
+	findAllAccountInteractor struct {
+		repo       domain.AccountRepository
+		presenter  FindAllAccountPresenter
+		ctxTimeout time.Duration
+	}
+)
+
+// NewFindAllAccountInteractor creates new findAllAccountInteractor with its dependencies
 func NewFindAllAccountInteractor(
 	repo domain.AccountRepository,
-	presenter output.AccountPresenter,
+	presenter FindAllAccountPresenter,
 	t time.Duration,
-) FindAllAccountInteractor {
-	return FindAllAccountInteractor{
+) FindAllAccount {
+	return findAllAccountInteractor{
 		repo:       repo,
 		presenter:  presenter,
 		ctxTimeout: t,
 	}
 }
 
-func (a FindAllAccountInteractor) Execute(ctx context.Context) ([]output.Account, error) {
+// Execute orchestrates the use case
+func (a findAllAccountInteractor) Execute(ctx context.Context) ([]FindAllAccountOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
 	defer cancel()
 
 	accounts, err := a.repo.FindAll(ctx)
 	if err != nil {
-		return a.presenter.OutputList([]domain.Account{}), err
+		return a.presenter.Output([]domain.Account{}), err
 	}
 
-	return a.presenter.OutputList(accounts), nil
+	return a.presenter.Output(accounts), nil
 }

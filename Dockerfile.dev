@@ -4,11 +4,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod download
-RUN go get github.com/cespare/reflex
+RUN go mod download && go get github.com/cespare/reflex
 
-COPY script/reflex/reflex.conf /
+COPY _scripts/reflex/reflex.conf /
 
 EXPOSE 3001
 
-ENTRYPOINT ["reflex", "-c", "./script/reflex/reflex.conf"]
+ENTRYPOINT ["reflex", "-c", "./_scripts/reflex/reflex.conf"]

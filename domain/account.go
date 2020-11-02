@@ -22,25 +22,23 @@ func (a AccountID) String() string {
 	return string(a)
 }
 
-type AccountRepository interface {
-	Create(context.Context, Account) (Account, error)
-	UpdateBalance(context.Context, AccountID, Money) error
-	FindAll(context.Context) ([]Account, error)
-	FindByID(context.Context, AccountID) (Account, error)
-	FindBalance(context.Context, AccountID) (Account, error)
-}
+type (
+	AccountRepository interface {
+		Create(context.Context, Account) (Account, error)
+		UpdateBalance(context.Context, AccountID, Money) error
+		FindAll(context.Context) ([]Account, error)
+		FindByID(context.Context, AccountID) (Account, error)
+		FindBalance(context.Context, AccountID) (Account, error)
+	}
 
-type Account struct {
-	id        AccountID
-	name      string
-	cpf       string
-	balance   Money
-	createdAt time.Time
-}
-
-func NewAccountBalance(balance Money) Account {
-	return Account{balance: balance}
-}
+	Account struct {
+		id        AccountID
+		name      string
+		cpf       string
+		balance   Money
+		createdAt time.Time
+	}
+)
 
 func NewAccount(ID AccountID, name, CPF string, balance Money, createdAt time.Time) Account {
 	return Account{
@@ -84,4 +82,8 @@ func (a Account) Balance() Money {
 
 func (a Account) CreatedAt() time.Time {
 	return a.createdAt
+}
+
+func NewAccountBalance(balance Money) Account {
+	return Account{balance: balance}
 }

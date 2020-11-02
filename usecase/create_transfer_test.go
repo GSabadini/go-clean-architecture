@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockTransferRepoStore struct {
@@ -61,13 +59,11 @@ func (m mockAccountRepo) FindByID(_ context.Context, _ domain.AccountID) (domain
 	return m.findByIDOriginFake()
 }
 
-type mockTransferPresenterStore struct {
-	output.TransferPresenter
-
-	result output.Transfer
+type mockCreateTransferPresenter struct {
+	result CreateTransferOutput
 }
 
-func (m mockTransferPresenterStore) Output(_ domain.Transfer) output.Transfer {
+func (m mockCreateTransferPresenter) Output(_ domain.Transfer) CreateTransferOutput {
 	return m.result
 }
 
@@ -75,7 +71,7 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		input input.Transfer
+		input CreateTransferInput
 	}
 
 	tests := []struct {
@@ -83,13 +79,13 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 		args          args
 		transferRepo  domain.TransferRepository
 		accountRepo   domain.AccountRepository
-		presenter     output.TransferPresenter
-		expected      output.Transfer
+		presenter     CreateTransferPresenter
+		expected      CreateTransferOutput
 		expectedError string
 	}{
 		{
 			name: "Create transfer successful",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 				Amount:               2999,
@@ -130,26 +126,26 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					), nil
 				},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{
 					ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 					AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 					AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 					Amount:               29.99,
-					CreatedAt:            time.Time{},
+					CreatedAt:            time.Time{}.String(),
 				},
 			},
-			expected: output.Transfer{
+			expected: CreateTransferOutput{
 				ID:                   "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04681",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04682",
 				Amount:               29.99,
-				CreatedAt:            time.Time{},
+				CreatedAt:            time.Time{}.String(),
 			},
 		},
 		{
 			name: "Create transfer generic error transfer gateway",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               200,
@@ -185,15 +181,15 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					), nil
 				},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "error",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 		{
 			name: "Create transfer error find origin account",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               1999,
@@ -213,15 +209,15 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					return domain.Account{}, errors.New("error")
 				},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "error",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 		{
 			name: "Create transfer error not found find origin account",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               1999,
@@ -241,15 +237,15 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					return domain.Account{}, domain.ErrAccountOriginNotFound
 				},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "account origin not found",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 		{
 			name: "Create transfer error find destination account",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               100,
@@ -279,15 +275,15 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 				invokedFind: &invoked{call: false},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "error",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 		{
 			name: "Create transfer error not found find destination account",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               100,
@@ -317,15 +313,15 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 				},
 				invokedFind: &invoked{call: false},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "account destination not found",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 		{
 			name: "Create transfer error update origin account",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               250,
@@ -360,15 +356,15 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					), nil
 				},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "error",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 		{
 			name: "Create transfer error update destination account",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               100,
@@ -404,15 +400,15 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					), nil
 				},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "error",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 		{
 			name: "Create transfer amount not have sufficient",
-			args: args{input: input.Transfer{
+			args: args{input: CreateTransferInput{
 				AccountOriginID:      "3c096a40-ccba-4b58-93ed-57379ab04680",
 				AccountDestinationID: "3c096a40-ccba-4b58-93ed-57379ab04681",
 				Amount:               200,
@@ -448,11 +444,11 @@ func TestTransferCreateInteractor_Execute(t *testing.T) {
 					), nil
 				},
 			},
-			presenter: mockTransferPresenterStore{
-				result: output.Transfer{},
+			presenter: mockCreateTransferPresenter{
+				result: CreateTransferOutput{},
 			},
 			expectedError: "origin account does not have sufficient balance",
-			expected:      output.Transfer{},
+			expected:      CreateTransferOutput{},
 		},
 	}
 

@@ -23,7 +23,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./script/mongodb:/docker-entrypoint-initdb.d
+      - ./_scripts/mongodb:/docker-entrypoint-initdb.d
 
   postgres:
     container_name: "transfer"
@@ -35,25 +35,4 @@ services:
       POSTGRES_PASSWORD: dev
       POSTGRES_DB: bank
     volumes:
-      - ./script/postgres:/docker-entrypoint-initdb.d
-
-#  app-debug:
-#    container_name: "go-bank-transfer-debug"
-#    build:
-#      context: .
-#      dockerfile: Dockerfile.debug
-#    ports:
-#      - 3001:3001
-#      - 40000:40000
-#    volumes:
-#      - ./:/go-bank-transfer
-#      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
-#    security_opt:
-#      - "seccomp:unconfined"
-#    cap_add:
-#      - SYS_PTRACE
-#    env_file:
-#      - .env
-#    depends_on:
-#      - account
-#      - transfer
+      - ./_scripts/postgres:/docker-entrypoint-initdb.d
