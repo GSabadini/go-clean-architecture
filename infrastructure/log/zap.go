@@ -8,8 +8,7 @@ import (
 type zapLogger struct {
 	logger *zap.SugaredLogger
 }
-
-//NewZapLogger constrói uma instância do log Zap
+git
 func NewZapLogger() (logger.Logger, error) {
 	log, err := zap.NewProduction()
 	if err != nil {
@@ -21,28 +20,23 @@ func NewZapLogger() (logger.Logger, error) {
 
 	return &zapLogger{logger: sugar}, nil
 }
-
-//Infof
+git
 func (l *zapLogger) Infof(format string, args ...interface{}) {
 	l.logger.Infof(format, args...)
 }
-
-//Warnf
+git
 func (l *zapLogger) Warnf(format string, args ...interface{}) {
 	l.logger.Warnf(format, args...)
 }
-
-//Errorf
+git
 func (l *zapLogger) Errorf(format string, args ...interface{}) {
 	l.logger.Errorf(format, args...)
 }
-
-//Fatalln
+git
 func (l *zapLogger) Fatalln(args ...interface{}) {
 	l.logger.Fatal(args)
 }
-
-//WithFields
+git
 func (l *zapLogger) WithFields(fields logger.Fields) logger.Logger {
 	var f = make([]interface{}, 0)
 	for index, field := range fields {
@@ -53,8 +47,7 @@ func (l *zapLogger) WithFields(fields logger.Fields) logger.Logger {
 	log := l.logger.With(f...)
 	return &zapLogger{logger: log}
 }
-
-//WithError
+git
 func (l *zapLogger) WithError(err error) logger.Logger {
 	var log = l.logger.With(err.Error())
 	return &zapLogger{logger: log}
