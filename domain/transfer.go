@@ -11,18 +11,20 @@ func (t TransferID) String() string {
 	return string(t)
 }
 
-type TransferRepository interface {
-	Create(context.Context, Transfer) (Transfer, error)
-	FindAll(context.Context) ([]Transfer, error)
-}
+type (
+	TransferRepository interface {
+		Create(context.Context, Transfer) (Transfer, error)
+		FindAll(context.Context) ([]Transfer, error)
+	}
 
-type Transfer struct {
-	id                   TransferID
-	accountOriginID      AccountID
-	accountDestinationID AccountID
-	amount               Money
-	createdAt            time.Time
-}
+	Transfer struct {
+		id                   TransferID
+		accountOriginID      AccountID
+		accountDestinationID AccountID
+		amount               Money
+		createdAt            time.Time
+	}
+)
 
 func NewTransfer(
 	ID TransferID,

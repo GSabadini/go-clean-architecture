@@ -3,7 +3,7 @@ package log
 import (
 	"errors"
 
-	"github.com/gsabadini/go-bank-transfer/interface/logger"
+	"github.com/gsabadini/go-bank-transfer/adapter/logger"
 )
 
 const (
