@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockAccountRepoFindAll struct {
@@ -22,13 +21,11 @@ func (m mockAccountRepoFindAll) FindAll(_ context.Context) ([]domain.Account, er
 	return m.result, m.err
 }
 
-type mockAccountPresenterFindAll struct {
-	output.AccountPresenter
-
-	result []output.Account
+type mockFindAllAccountPresenter struct {
+	result []FindAllAccountOutput
 }
 
-func (m mockAccountPresenterFindAll) OutputList(_ []domain.Account) []output.Account {
+func (m mockFindAllAccountPresenter) Output(_ []domain.Account) []FindAllAccountOutput {
 	return m.result
 }
 
@@ -38,8 +35,8 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 	tests := []struct {
 		name          string
 		repository    domain.AccountRepository
-		presenter     output.AccountPresenter
-		expected      []output.Account
+		presenter     FindAllAccountPresenter
+		expected      []FindAllAccountOutput
 		expectedError interface{}
 	}{
 		{
@@ -63,38 +60,38 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 				},
 				err: nil,
 			},
-			presenter: mockAccountPresenterFindAll{
-				result: []output.Account{
+			presenter: mockFindAllAccountPresenter{
+				result: []FindAllAccountOutput{
 					{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 						Name:      "Test",
 						CPF:       "02815517078",
 						Balance:   1.25,
-						CreatedAt: time.Time{},
+						CreatedAt: time.Time{}.String(),
 					},
 					{
 						ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 						Name:      "Test",
 						CPF:       "02815517071",
 						Balance:   999.99,
-						CreatedAt: time.Time{},
+						CreatedAt: time.Time{}.String(),
 					},
 				},
 			},
-			expected: []output.Account{
+			expected: []FindAllAccountOutput{
 				{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "02815517078",
 					Balance:   1.25,
-					CreatedAt: time.Time{},
+					CreatedAt: time.Time{}.String(),
 				},
 				{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04681",
 					Name:      "Test",
 					CPF:       "02815517071",
 					Balance:   999.99,
-					CreatedAt: time.Time{},
+					CreatedAt: time.Time{}.String(),
 				},
 			},
 		},
@@ -104,10 +101,10 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 				result: []domain.Account{},
 				err:    nil,
 			},
-			presenter: mockAccountPresenterFindAll{
-				result: []output.Account{},
+			presenter: mockFindAllAccountPresenter{
+				result: []FindAllAccountOutput{},
 			},
-			expected: []output.Account{},
+			expected: []FindAllAccountOutput{},
 		},
 		{
 			name: "Error when returning the list of accounts",
@@ -115,11 +112,11 @@ func TestFindAllAccountInteractor_Execute(t *testing.T) {
 				result: []domain.Account{},
 				err:    errors.New("error"),
 			},
-			presenter: mockAccountPresenterFindAll{
-				result: []output.Account{},
+			presenter: mockFindAllAccountPresenter{
+				result: []FindAllAccountOutput{},
 			},
 			expectedError: "error",
-			expected:      []output.Account{},
+			expected:      []FindAllAccountOutput{},
 		},
 	}
 

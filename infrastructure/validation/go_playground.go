@@ -3,7 +3,7 @@ package validation
 import (
 	"errors"
 
-	"github.com/gsabadini/go-bank-transfer/interface/validator"
+	"github.com/gsabadini/go-bank-transfer/adapter/validator"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"

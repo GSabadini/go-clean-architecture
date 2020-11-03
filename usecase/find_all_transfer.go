@@ -5,39 +5,57 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
-type FindAllTransfer interface {
-	Execute(context.Context) ([]output.Transfer, error)
-}
+type (
+	// Input port
+	FindAllTransfer interface {
+		Execute(context.Context) ([]FindAllTransferOutput, error)
+	}
 
-type FindAllTransferInteractor struct {
-	repo       domain.TransferRepository
-	presenter  output.TransferPresenter
-	ctxTimeout time.Duration
-}
+	// Output port
+	FindAllTransferPresenter interface {
+		Output([]domain.Transfer) []FindAllTransferOutput
+	}
 
+	// Output data
+	FindAllTransferOutput struct {
+		ID                   string  `json:"id"`
+		AccountOriginID      string  `json:"account_origin_id"`
+		AccountDestinationID string  `json:"account_destination_id"`
+		Amount               float64 `json:"amount"`
+		CreatedAt            string  `json:"created_at"`
+	}
+
+	findAllTransferInteractor struct {
+		repo       domain.TransferRepository
+		presenter  FindAllTransferPresenter
+		ctxTimeout time.Duration
+	}
+)
+
+// NewFindAllTransferInteractor creates new findAllTransferInteractor with its dependencies
 func NewFindAllTransferInteractor(
 	repo domain.TransferRepository,
-	presenter output.TransferPresenter,
+	presenter FindAllTransferPresenter,
 	t time.Duration,
-) FindAllTransferInteractor {
-	return FindAllTransferInteractor{
+) FindAllTransfer {
+	return findAllTransferInteractor{
 		repo:       repo,
 		presenter:  presenter,
 		ctxTimeout: t,
 	}
 }
 
-func (t FindAllTransferInteractor) Execute(ctx context.Context) ([]output.Transfer, error) {
+// Execute orchestrates the use case
+func (t findAllTransferInteractor) Execute(ctx context.Context) ([]FindAllTransferOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 
 	transfers, err := t.repo.FindAll(ctx)
 	if err != nil {
-		return t.presenter.OutputList([]domain.Transfer{}), err
+		return t.presenter.Output([]domain.Transfer{}), err
 	}
 
-	return t.presenter.OutputList(transfers), nil
+	return t.presenter.Output(transfers), nil
 }

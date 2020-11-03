@@ -5,33 +5,57 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
-type CreateAccount interface {
-	Execute(context.Context, input.Account) (output.Account, error)
-}
+type (
+	// Input port
+	CreateAccount interface {
+		Execute(context.Context, CreateAccountInput) (CreateAccountOutput, error)
+	}
 
-type CreateAccountInteractor struct {
-	repo       domain.AccountRepository
-	presenter  output.AccountPresenter
-	ctxTimeout time.Duration
-}
+	// Input data
+	CreateAccountInput struct {
+		Name    string `json:"name" validate:"required"`
+		CPF     string `json:"cpf" validate:"required"`
+		Balance int64  `json:"balance" validate:"gt=0,required"`
+	}
 
+	// Output port
+	CreateAccountPresenter interface {
+		Output(domain.Account) CreateAccountOutput
+	}
+
+	// Output data
+	CreateAccountOutput struct {
+		ID        string  `json:"id"`
+		Name      string  `json:"name"`
+		CPF       string  `json:"cpf"`
+		Balance   float64 `json:"balance"`
+		CreatedAt string  `json:"created_at"`
+	}
+
+	createAccountInteractor struct {
+		repo       domain.AccountRepository
+		presenter  CreateAccountPresenter
+		ctxTimeout time.Duration
+	}
+)
+
+// NewCreateAccountInteractor creates new createAccountInteractor with its dependencies
 func NewCreateAccountInteractor(
 	repo domain.AccountRepository,
-	presenter output.AccountPresenter,
+	presenter CreateAccountPresenter,
 	t time.Duration,
-) CreateAccountInteractor {
-	return CreateAccountInteractor{
+) CreateAccount {
+	return createAccountInteractor{
 		repo:       repo,
 		presenter:  presenter,
 		ctxTimeout: t,
 	}
 }
 
-func (a CreateAccountInteractor) Execute(ctx context.Context, input input.Account) (output.Account, error) {
+// Execute orchestrates the use case
+func (a createAccountInteractor) Execute(ctx context.Context, input CreateAccountInput) (CreateAccountOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, a.ctxTimeout)
 	defer cancel()
 

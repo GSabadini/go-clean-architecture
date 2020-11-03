@@ -1,7 +1,3 @@
-debug-remote:
-	- make down
-	- docker-compose up -d postgres mongodb app-debug
-
 build:
 	go build -a --installsuffix cgo --ldflags="-s" -o main
 

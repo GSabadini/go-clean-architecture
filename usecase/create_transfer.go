@@ -5,28 +5,51 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
-type CreateTransfer interface {
-	Execute(context.Context, input.Transfer) (output.Transfer, error)
-}
+type (
+	// Input port
+	CreateTransfer interface {
+		Execute(context.Context, CreateTransferInput) (CreateTransferOutput, error)
+	}
 
-type CreateTransferInteractor struct {
-	transferRepo domain.TransferRepository
-	accountRepo  domain.AccountRepository
-	presenter    output.TransferPresenter
-	ctxTimeout   time.Duration
-}
+	// Input data
+	CreateTransferInput struct {
+		AccountOriginID      string `json:"account_origin_id" validate:"required,uuid4"`
+		AccountDestinationID string `json:"account_destination_id" validate:"required,uuid4"`
+		Amount               int64  `json:"amount" validate:"gt=0,required"`
+	}
 
+	// Output port
+	CreateTransferPresenter interface {
+		Output(domain.Transfer) CreateTransferOutput
+	}
+
+	// Output data
+	CreateTransferOutput struct {
+		ID                   string  `json:"id"`
+		AccountOriginID      string  `json:"account_origin_id"`
+		AccountDestinationID string  `json:"account_destination_id"`
+		Amount               float64 `json:"amount"`
+		CreatedAt            string  `json:"created_at"`
+	}
+
+	createTransferInteractor struct {
+		transferRepo domain.TransferRepository
+		accountRepo  domain.AccountRepository
+		presenter    CreateTransferPresenter
+		ctxTimeout   time.Duration
+	}
+)
+
+// NewCreateTransferInteractor creates new createTransferInteractor with its dependencies
 func NewCreateTransferInteractor(
 	transferRepo domain.TransferRepository,
 	accountRepo domain.AccountRepository,
-	presenter output.TransferPresenter,
+	presenter CreateTransferPresenter,
 	t time.Duration,
-) CreateTransferInteractor {
-	return CreateTransferInteractor{
+) CreateTransfer {
+	return createTransferInteractor{
 		transferRepo: transferRepo,
 		accountRepo:  accountRepo,
 		presenter:    presenter,
@@ -34,7 +57,8 @@ func NewCreateTransferInteractor(
 	}
 }
 
-func (t CreateTransferInteractor) Execute(ctx context.Context, input input.Transfer) (output.Transfer, error) {
+// Execute orchestrates the use case
+func (t createTransferInteractor) Execute(ctx context.Context, input CreateTransferInput) (CreateTransferOutput, error) {
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 
@@ -58,7 +82,7 @@ func (t CreateTransferInteractor) Execute(ctx context.Context, input input.Trans
 	return t.presenter.Output(transfer), nil
 }
 
-func (t CreateTransferInteractor) process(ctx context.Context, input input.Transfer) error {
+func (t createTransferInteractor) process(ctx context.Context, input CreateTransferInput) error {
 	origin, err := t.accountRepo.FindByID(ctx, domain.AccountID(input.AccountOriginID))
 	if err != nil {
 		switch err {

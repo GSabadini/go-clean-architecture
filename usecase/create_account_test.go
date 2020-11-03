@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase/input"
-	"github.com/gsabadini/go-bank-transfer/usecase/output"
 )
 
 type mockAccountRepoStore struct {
@@ -23,13 +21,11 @@ func (m mockAccountRepoStore) Create(_ context.Context, _ domain.Account) (domai
 	return m.result, m.err
 }
 
-type mockAccountPresenterStore struct {
-	output.AccountPresenter
-
-	result output.Account
+type mockCreateAccountPresenter struct {
+	result CreateAccountOutput
 }
 
-func (m mockAccountPresenterStore) Output(_ domain.Account) output.Account {
+func (m mockCreateAccountPresenter) Output(_ domain.Account) CreateAccountOutput {
 	return m.result
 }
 
@@ -37,21 +33,21 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		input input.Account
+		input CreateAccountInput
 	}
 
 	tests := []struct {
 		name          string
 		args          args
 		repository    domain.AccountRepository
-		presenter     output.AccountPresenter
-		expected      output.Account
+		presenter     CreateAccountPresenter
+		expected      CreateAccountOutput
 		expectedError interface{}
 	}{
 		{
 			name: "Create account successful",
 			args: args{
-				input: input.Account{
+				input: CreateAccountInput{
 					Name:    "Test",
 					CPF:     "02815517078",
 					Balance: 19944,
@@ -67,27 +63,27 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 				),
 				err: nil,
 			},
-			presenter: mockAccountPresenterStore{
-				result: output.Account{
+			presenter: mockCreateAccountPresenter{
+				result: CreateAccountOutput{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "02815517078",
 					Balance:   199.44,
-					CreatedAt: time.Time{},
+					CreatedAt: time.Time{}.String(),
 				},
 			},
-			expected: output.Account{
+			expected: CreateAccountOutput{
 				ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:      "Test",
 				CPF:       "02815517078",
 				Balance:   199.44,
-				CreatedAt: time.Time{},
+				CreatedAt: time.Time{}.String(),
 			},
 		},
 		{
 			name: "Create account successful",
 			args: args{
-				input: input.Account{
+				input: CreateAccountInput{
 					Name:    "Test",
 					CPF:     "02815517078",
 					Balance: 2350,
@@ -103,27 +99,27 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 				),
 				err: nil,
 			},
-			presenter: mockAccountPresenterStore{
-				result: output.Account{
+			presenter: mockCreateAccountPresenter{
+				result: CreateAccountOutput{
 					ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 					Name:      "Test",
 					CPF:       "02815517078",
 					Balance:   23.5,
-					CreatedAt: time.Time{},
+					CreatedAt: time.Time{}.String(),
 				},
 			},
-			expected: output.Account{
+			expected: CreateAccountOutput{
 				ID:        "3c096a40-ccba-4b58-93ed-57379ab04680",
 				Name:      "Test",
 				CPF:       "02815517078",
 				Balance:   23.5,
-				CreatedAt: time.Time{},
+				CreatedAt: time.Time{}.String(),
 			},
 		},
 		{
 			name: "Create account generic error",
 			args: args{
-				input: input.Account{
+				input: CreateAccountInput{
 					Name:    "",
 					CPF:     "",
 					Balance: 0,
@@ -133,11 +129,11 @@ func TestCreateAccountInteractor_Execute(t *testing.T) {
 				result: domain.Account{},
 				err:    errors.New("error"),
 			},
-			presenter: mockAccountPresenterStore{
-				result: output.Account{},
+			presenter: mockCreateAccountPresenter{
+				result: CreateAccountOutput{},
 			},
 			expectedError: "error",
-			expected:      output.Account{},
+			expected:      CreateAccountOutput{},
 		},
 	}
 

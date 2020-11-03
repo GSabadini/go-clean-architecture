@@ -87,6 +87,7 @@ make enter-container
 
 - Creating new account
 
+`Request`
 ```bash
 curl -i --request POST 'http://localhost:3001/v1/accounts' \
 --header 'Content-Type: application/json' \
@@ -97,20 +98,53 @@ curl -i --request POST 'http://localhost:3001/v1/accounts' \
 }'
 ```
 
+`Response`
+```json
+{
+    "id":"5cf59c6c-0047-4b13-a118-65878313e329",
+    "name":"Test",
+    "cpf":"070.910.584-24",
+    "balance":1,
+    "created_at":"2020-11-02T14:50:46Z"
+}
+```
 - Listing accounts
 
+`Request`
 ```bash
 curl -i --request GET 'http://localhost:3001/v1/accounts'
 ```
 
+`Response`
+```json
+[
+    {
+        "id": "5cf59c6c-0047-4b13-a118-65878313e329",
+        "name": "Test",
+        "cpf": "070.910.584-24",
+        "balance": 1,
+        "created_at": "2020-11-02T14:50:46Z"
+    }
+]
+```
+
 - Fetching account balance
 
+`Request`
 ```bash
 curl -i --request GET 'http://localhost:3001/v1/accounts/{{account_id}}/balance'
 ```
 
+`Response`
+```json
+{
+    "balance": 1
+}
+```
+
 - Creating new transfer
 
+`Request`
 ```bash
 curl -i --request POST 'http://localhost:3001/v1/transfers' \
 --header 'Content-Type: application/json' \
@@ -121,10 +155,35 @@ curl -i --request POST 'http://localhost:3001/v1/transfers' \
 }'
 ```
 
+`Response`
+```json
+{
+    "id": "b51cd6c7-a55c-491e-9140-91903fe66fa9",
+    "account_origin_id": "{{account_id}}",
+    "account_destination_id": "{{account_id}}",
+    "amount": 1,
+    "created_at": "2020-11-02T14:57:35Z"
+}
+```
+
 - Listing transfers
 
+`Request`
 ```bash
 curl -i --request GET 'http://localhost:3001/v1/transfers'
+```
+
+`Response`
+```json
+[
+    {
+        "id": "b51cd6c7-a55c-491e-9140-91903fe66fa9",
+        "account_origin_id": "{{account_id}}",
+        "account_destination_id": "{{account_id}}",
+        "amount": 1,
+        "created_at": "2020-11-02T14:57:35Z"
+    }
+]
 ```
 
 ## Git workflow
