@@ -10,7 +10,7 @@
   <a href="https://travis-ci.org/github/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://travis-ci.org/GSabadini/go-bank-transfer.svg?branch=master" />
   </a>
-  <a href="https://github.com/GSabadini/go-bank-transfer" target="_blank">
+  <a href="https://github.com/GSabadini/go-bank-transfer/actions" target="_blank">
     <img src="https://github.com/GSabadini/go-bank-transfer/workflows/test/badge.svg" />
   </a>
   <a href="https://codecov.io/gh/GSabadini/go-bank-transfer">
