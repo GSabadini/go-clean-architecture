@@ -1,0 +1,9 @@
+*/Makefile
+*/README.md
+*/.git*
+*/coverage*
+*/.idea*
+*/docker-compose.yml
+*/Dockerfile*
+*/.env*
+*.png
