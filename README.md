@@ -11,7 +11,7 @@
     <img alt="Build" src="https://travis-ci.org/GSabadini/go-bank-transfer.svg?branch=master" />
   </a>
   <a href="https://github.com/GSabadini/go-bank-transfer" target="_blank">
-    <img src="https://github.com/GSabadini/go-bank-transfer/workflows/Test/badge.svg"
+    <img src="https://github.com/GSabadini/go-bank-transfer/workflows/Test/badge.svg" />
   </a>
   <a href="https://codecov.io/gh/GSabadini/go-bank-transfer">
     <img src="https://codecov.io/gh/GSabadini/go-bank-transfer/branch/master/graph/badge.svg" />
@@ -23,9 +23,9 @@
 ## Architecture
 -  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
-![Clean Architecture](cleanarch.png)
+![Clean Architecture](clean.png)
 
-## Example Create Account Usecase
+## Example create account use case
 
 ![Clean Architecture](create_account.png)
 
@@ -82,13 +82,9 @@ make enter-container
 | `/v1/transfers`| `GET`                 | `List transfers`  |
 | `/v1/health`| `GET`                 | `Health check`  |
 
-#### Test endpoints API using Postman
+## Test endpoints API using curl
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/8406204152f98cc33eac)
-
-#### Test endpoints API using curl
-
-- Creating new account
+- #### Creating new account
 
 `Request`
 ```bash
@@ -111,7 +107,7 @@ curl -i --request POST 'http://localhost:3001/v1/accounts' \
     "created_at":"2020-11-02T14:50:46Z"
 }
 ```
-- Listing accounts
+- #### Listing accounts
 
 `Request`
 ```bash
@@ -131,7 +127,7 @@ curl -i --request GET 'http://localhost:3001/v1/accounts'
 ]
 ```
 
-- Fetching account balance
+- #### Fetching account balance
 
 `Request`
 ```bash
@@ -145,7 +141,7 @@ curl -i --request GET 'http://localhost:3001/v1/accounts/{{account_id}}/balance'
 }
 ```
 
-- Creating new transfer
+- #### Creating new transfer
 
 `Request`
 ```bash
