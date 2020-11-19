@@ -4,10 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod download && go get github.com/cespare/reflex
+RUN go mod download && go get github.com/pilu/fresh
 
-COPY _scripts/reflex/reflex.conf /
+COPY _scripts/fresh/runner.conf /
 
-EXPOSE 3001
-
-ENTRYPOINT ["reflex", "-c", "./_scripts/reflex/reflex.conf"]
+ENTRYPOINT ["fresh", "-c", "./_scripts/fresh/runner.conf"]

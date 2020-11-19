@@ -9,7 +9,7 @@ import (
 
 type (
 	// Input port
-	CreateAccount interface {
+	CreateAccountUseCase interface {
 		Execute(context.Context, CreateAccountInput) (CreateAccountOutput, error)
 	}
 
@@ -46,7 +46,7 @@ func NewCreateAccountInteractor(
 	repo domain.AccountRepository,
 	presenter CreateAccountPresenter,
 	t time.Duration,
-) CreateAccount {
+) CreateAccountUseCase {
 	return createAccountInteractor{
 		repo:       repo,
 		presenter:  presenter,

@@ -15,6 +15,7 @@ type (
 	TransferRepository interface {
 		Create(context.Context, Transfer) (Transfer, error)
 		FindAll(context.Context) ([]Transfer, error)
+		WithTransaction(context.Context, func(context.Context) error) error
 	}
 
 	Transfer struct {

@@ -9,7 +9,7 @@ import (
 
 type (
 	// Input port
-	FindAllTransfer interface {
+	FindAllTransferUseCase interface {
 		Execute(context.Context) ([]FindAllTransferOutput, error)
 	}
 
@@ -39,7 +39,7 @@ func NewFindAllTransferInteractor(
 	repo domain.TransferRepository,
 	presenter FindAllTransferPresenter,
 	t time.Duration,
-) FindAllTransfer {
+) FindAllTransferUseCase {
 	return findAllTransferInteractor{
 		repo:       repo,
 		presenter:  presenter,

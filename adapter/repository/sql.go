@@ -6,7 +6,7 @@ type SQL interface {
 	ExecuteContext(context.Context, string, ...interface{}) error
 	QueryContext(context.Context, string, ...interface{}) (Rows, error)
 	QueryRowContext(context.Context, string, ...interface{}) Row
-	//BeginTx(ctx context.Context) (Tx, error)
+	BeginTx(ctx context.Context) (Tx, error)
 }
 
 type Rows interface {
@@ -21,6 +21,9 @@ type Row interface {
 }
 
 type Tx interface {
+	ExecuteContext(context.Context, string, ...interface{}) error
+	QueryContext(context.Context, string, ...interface{}) (Rows, error)
+	QueryRowContext(context.Context, string, ...interface{}) Row
 	Commit() error
 	Rollback() error
 }

@@ -11,11 +11,11 @@ import (
 )
 
 type FindAccountBalanceAction struct {
-	uc  usecase.FindAccountBalance
+	uc  usecase.FindAccountBalanceUseCase
 	log logger.Logger
 }
 
-func NewFindAccountBalanceAction(uc usecase.FindAccountBalance, log logger.Logger) FindAccountBalanceAction {
+func NewFindAccountBalanceAction(uc usecase.FindAccountBalanceUseCase, log logger.Logger) FindAccountBalanceAction {
 	return FindAccountBalanceAction{
 		uc:  uc,
 		log: log,

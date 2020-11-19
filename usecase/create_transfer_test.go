@@ -21,6 +21,14 @@ func (m mockTransferRepoStore) Create(_ context.Context, _ domain.Transfer) (dom
 	return m.result, m.err
 }
 
+func (m mockTransferRepoStore) WithTransaction(_ context.Context, fn func(context.Context) error) error {
+	if err := fn(context.Background()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type invoked struct {
 	call bool
 }

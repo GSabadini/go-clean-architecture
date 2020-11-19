@@ -37,7 +37,7 @@ func TestCreateTransferAction_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		args               args
-		ucMock             usecase.CreateTransfer
+		ucMock             usecase.CreateTransferUseCase
 		expectedBody       string
 		expectedStatusCode int
 	}{

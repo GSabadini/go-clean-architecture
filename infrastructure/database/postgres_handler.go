@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/gsabadini/go-bank-transfer/adapter/repository"
 
@@ -31,10 +32,19 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	return &postgresHandler{db: db}, nil
+}
+
+func (p postgresHandler) BeginTx(ctx context.Context) (repository.Tx, error) {
+	tx, err := p.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return postgresTx{}, err
+	}
+
+	return newPostgresTx(tx), nil
 }
 
 func (p postgresHandler) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
@@ -107,21 +117,38 @@ func (pr postgresRows) Close() error {
 	return pr.rows.Close()
 }
 
-func (p postgresHandler) BeginTx(ctx context.Context) (postgresTx, error) {
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return postgresTx{}, err
-	}
-
-	return newPostgresTx(tx), nil
-}
-
 type postgresTx struct {
 	tx *sql.Tx
 }
 
 func newPostgresTx(tx *sql.Tx) postgresTx {
 	return postgresTx{tx: tx}
+}
+
+func (p postgresTx) ExecuteContext(ctx context.Context, query string, args ...interface{}) error {
+	_, err := p.tx.ExecContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p postgresTx) QueryContext(ctx context.Context, query string, args ...interface{}) (repository.Rows, error) {
+	rows, err := p.tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	row := newPostgresRows(rows)
+
+	return row, nil
+}
+
+func (p postgresTx) QueryRowContext(ctx context.Context, query string, args ...interface{}) repository.Row {
+	row := p.tx.QueryRowContext(ctx, query, args...)
+
+	return newPostgresRow(row)
 }
 
 func (p postgresTx) Commit() error {

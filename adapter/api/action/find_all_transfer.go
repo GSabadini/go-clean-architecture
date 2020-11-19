@@ -10,11 +10,11 @@ import (
 )
 
 type FindAllTransferAction struct {
-	uc  usecase.FindAllTransfer
+	uc  usecase.FindAllTransferUseCase
 	log logger.Logger
 }
 
-func NewFindAllTransferAction(uc usecase.FindAllTransfer, log logger.Logger) FindAllTransferAction {
+func NewFindAllTransferAction(uc usecase.FindAllTransferUseCase, log logger.Logger) FindAllTransferAction {
 	return FindAllTransferAction{
 		uc:  uc,
 		log: log,

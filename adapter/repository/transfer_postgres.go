@@ -19,6 +19,15 @@ func NewTransferSQL(db SQL) TransferSQL {
 }
 
 func (t TransferSQL) Create(ctx context.Context, transfer domain.Transfer) (domain.Transfer, error) {
+	tx, ok := ctx.Value("TransactionContextKey").(Tx)
+	if !ok {
+		var err error
+		tx, err = t.db.BeginTx(ctx)
+		if err != nil {
+			return domain.Transfer{}, errors.Wrap(err, "error creating transfer")
+		}
+	}
+
 	var query = `
 		INSERT INTO 
 			transfers (id, account_origin_id, account_destination_id, amount, created_at)
@@ -26,7 +35,7 @@ func (t TransferSQL) Create(ctx context.Context, transfer domain.Transfer) (doma
 			($1, $2, $3, $4, $5)
 	`
 
-	if err := t.db.ExecuteContext(
+	if err := tx.ExecuteContext(
 		ctx,
 		query,
 		transfer.ID(),
@@ -78,4 +87,22 @@ func (t TransferSQL) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 	}
 
 	return transfers, nil
+}
+
+func (t TransferSQL) WithTransaction(ctx context.Context, fn func(ctxTx context.Context) error) error {
+	tx, err := t.db.BeginTx(ctx)
+	if err != nil {
+		return errors.Wrap(err, "error begin tx")
+	}
+
+	ctxTx := context.WithValue(ctx, "TransactionContextKey", tx)
+	err = fn(ctxTx)
+	if err != nil {
+		if rbErr := tx.Rollback(); rbErr != nil {
+			return errors.Wrap(err, "rollback error")
+		}
+		return err
+	}
+
+	return tx.Commit()
 }

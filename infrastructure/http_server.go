@@ -41,7 +41,7 @@ func (c *config) Name(name string) *config {
 func (c *config) Logger(instance int) *config {
 	log, err := log.NewLoggerFactory(instance)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	c.logger = log
@@ -52,8 +52,7 @@ func (c *config) Logger(instance int) *config {
 func (c *config) DbSQL(instance int) *config {
 	db, err := database.NewDatabaseSQLFactory(instance)
 	if err != nil {
-		c.logger.Fatalln("Could not make a connection to the database")
-		panic(err)
+		c.logger.Fatalln(err, "Could not make a connection to the database")
 	}
 
 	c.logger.Infof("Successfully connected to the SQL database")
@@ -65,8 +64,7 @@ func (c *config) DbSQL(instance int) *config {
 func (c *config) DbNoSQL(instance int) *config {
 	db, err := database.NewDatabaseNoSQLFactory(instance)
 	if err != nil {
-		c.logger.Fatalln("Could not make a connection to the database")
-		panic(err)
+		c.logger.Fatalln(err, "Could not make a connection to the database")
 	}
 
 	c.logger.Infof("Successfully connected to the NoSQL database")
@@ -78,7 +76,7 @@ func (c *config) DbNoSQL(instance int) *config {
 func (c *config) Validator(instance int) *config {
 	v, err := validation.NewValidatorFactory(instance)
 	if err != nil {
-		panic(err)
+		c.logger.Fatalln(err)
 	}
 
 	c.logger.Infof("Successfully configured validator")
@@ -99,7 +97,7 @@ func (c *config) WebServer(instance int) *config {
 	)
 
 	if err != nil {
-		panic(err)
+		c.logger.Fatalln(err)
 	}
 
 	c.logger.Infof("Successfully configured router server")
@@ -111,7 +109,7 @@ func (c *config) WebServer(instance int) *config {
 func (c *config) WebServerPort(port string) *config {
 	p, err := strconv.ParseInt(port, 10, 64)
 	if err != nil {
-		panic(err)
+		c.logger.Fatalln(err)
 	}
 
 	c.webServerPort = router.Port(p)

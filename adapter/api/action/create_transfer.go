@@ -15,13 +15,13 @@ import (
 
 type CreateTransferAction struct {
 	log       logger.Logger
-	uc        usecase.CreateTransfer
+	uc        usecase.CreateTransferUseCase
 	validator validator.Validator
 
 	logKey, logMsg string
 }
 
-func NewCreateTransferAction(uc usecase.CreateTransfer, log logger.Logger, v validator.Validator) CreateTransferAction {
+func NewCreateTransferAction(uc usecase.CreateTransferUseCase, log logger.Logger, v validator.Validator) CreateTransferAction {
 	return CreateTransferAction{
 		uc:        uc,
 		log:       log,
