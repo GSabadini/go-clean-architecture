@@ -9,24 +9,16 @@ services:
     ports:
       - 3001:3001
     volumes:
-      - ./:/go-bank-transfer
+      - ./:/app
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
     env_file:
       - .env
     depends_on:
-      - mongodb
+      - mongodb-primary
       - postgres
 
-  mongodb:
-    container_name: "account"
-    image: "mongo:3.6.2"
-    ports:
-      - 27017:27017
-    volumes:
-      - ./_scripts/mongodb:/docker-entrypoint-initdb.d
-
   postgres:
-    container_name: "transfer"
+    container_name: "postgres"
     image: "postgres:12.2-alpine"
     ports:
       - 5432:5432
@@ -36,3 +28,38 @@ services:
       POSTGRES_DB: bank
     volumes:
       - ./_scripts/postgres:/docker-entrypoint-initdb.d
+
+  mongodb-primary:
+    container_name: mongodb-primary
+    image: 'docker.io/bitnami/mongodb:4.4-debian-10'
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    ports:
+      - 27017:27017
+
+  mongodb-secondary:
+    container_name: mongodb-secondary
+    image: 'docker.io/bitnami/mongodb:4.4-debian-10'
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+
+  mongodb-arbiter:
+    container_name: mongodb-arbiter
+    image: 'docker.io/bitnami/mongodb:4.4-debian-10'
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
+      - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123

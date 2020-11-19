@@ -36,7 +36,7 @@ func TestCreateAccountAction_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		args               args
-		ucMock             usecase.CreateAccount
+		ucMock             usecase.CreateAccountUseCase
 		expectedBody       string
 		expectedStatusCode int
 	}{

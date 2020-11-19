@@ -33,7 +33,7 @@ func TestFindAccountBalanceAction_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		args               args
-		ucMock             usecase.FindAccountBalance
+		ucMock             usecase.FindAccountBalanceUseCase
 		expectedBody       string
 		expectedStatusCode int
 	}{

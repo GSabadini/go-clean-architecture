@@ -9,7 +9,7 @@ import (
 
 type (
 	// Input port
-	CreateTransfer interface {
+	CreateTransferUseCase interface {
 		Execute(context.Context, CreateTransferInput) (CreateTransferOutput, error)
 	}
 
@@ -48,7 +48,7 @@ func NewCreateTransferInteractor(
 	accountRepo domain.AccountRepository,
 	presenter CreateTransferPresenter,
 	t time.Duration,
-) CreateTransfer {
+) CreateTransferUseCase {
 	return createTransferInteractor{
 		transferRepo: transferRepo,
 		accountRepo:  accountRepo,
@@ -62,19 +62,31 @@ func (t createTransferInteractor) Execute(ctx context.Context, input CreateTrans
 	ctx, cancel := context.WithTimeout(ctx, t.ctxTimeout)
 	defer cancel()
 
-	if err := t.process(ctx, input); err != nil {
-		return t.presenter.Output(domain.Transfer{}), err
-	}
-
-	var transfer = domain.NewTransfer(
-		domain.TransferID(domain.NewUUID()),
-		domain.AccountID(input.AccountOriginID),
-		domain.AccountID(input.AccountDestinationID),
-		domain.Money(input.Amount),
-		time.Now(),
+	var (
+		transfer domain.Transfer
+		err      error
 	)
 
-	transfer, err := t.transferRepo.Create(ctx, transfer)
+	err = t.transferRepo.WithTransaction(ctx, func(ctxTx context.Context) error {
+		if err = t.process(ctxTx, input); err != nil {
+			return err
+		}
+
+		transfer = domain.NewTransfer(
+			domain.TransferID(domain.NewUUID()),
+			domain.AccountID(input.AccountOriginID),
+			domain.AccountID(input.AccountDestinationID),
+			domain.Money(input.Amount),
+			time.Now(),
+		)
+
+		transfer, err = t.transferRepo.Create(ctxTx, transfer)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 	if err != nil {
 		return t.presenter.Output(domain.Transfer{}), err
 	}

@@ -9,7 +9,7 @@ import (
 
 type (
 	// Input port
-	FindAllAccount interface {
+	FindAllAccountUseCase interface {
 		Execute(context.Context) ([]FindAllAccountOutput, error)
 	}
 
@@ -39,7 +39,7 @@ func NewFindAllAccountInteractor(
 	repo domain.AccountRepository,
 	presenter FindAllAccountPresenter,
 	t time.Duration,
-) FindAllAccount {
+) FindAllAccountUseCase {
 	return findAllAccountInteractor{
 		repo:       repo,
 		presenter:  presenter,
