@@ -80,6 +80,7 @@ func (g ginEngine) buildCreateTransferAction() gin.HandlerFunc {
 				presenter.NewCreateTransferPresenter(),
 				g.ctxTimeout,
 			)
+
 			act = action.NewCreateTransferAction(uc, g.log, g.validator)
 		)
 

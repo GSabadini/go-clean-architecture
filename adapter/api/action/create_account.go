@@ -13,12 +13,12 @@ import (
 )
 
 type CreateAccountAction struct {
-	uc        usecase.CreateAccount
+	uc        usecase.CreateAccountUseCase
 	log       logger.Logger
 	validator validator.Validator
 }
 
-func NewCreateAccountAction(uc usecase.CreateAccount, log logger.Logger, v validator.Validator) CreateAccountAction {
+func NewCreateAccountAction(uc usecase.CreateAccountUseCase, log logger.Logger, v validator.Validator) CreateAccountAction {
 	return CreateAccountAction{
 		uc:        uc,
 		log:       log,

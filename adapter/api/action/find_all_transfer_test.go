@@ -27,7 +27,7 @@ func TestTransfer_Index(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		ucMock             usecase.FindAllTransfer
+		ucMock             usecase.FindAllTransferUseCase
 		expectedBody       string
 		expectedStatusCode int
 	}{

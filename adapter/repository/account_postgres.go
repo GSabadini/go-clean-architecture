@@ -43,9 +43,18 @@ func (a AccountSQL) Create(ctx context.Context, account domain.Account) (domain.
 }
 
 func (a AccountSQL) UpdateBalance(ctx context.Context, ID domain.AccountID, balance domain.Money) error {
+	tx, ok := ctx.Value("TransactionContextKey").(Tx)
+	if !ok {
+		var err error
+		tx, err = a.db.BeginTx(ctx)
+		if err != nil {
+			return errors.Wrap(err, "error updating account balance")
+		}
+	}
+
 	query := "UPDATE accounts SET balance = $1 WHERE id = $2"
 
-	if err := a.db.ExecuteContext(ctx, query, balance, ID); err != nil {
+	if err := tx.ExecuteContext(ctx, query, balance, ID); err != nil {
 		return errors.Wrap(err, "error updating account balance")
 	}
 
@@ -92,6 +101,15 @@ func (a AccountSQL) FindAll(ctx context.Context) ([]domain.Account, error) {
 }
 
 func (a AccountSQL) FindByID(ctx context.Context, ID domain.AccountID) (domain.Account, error) {
+	tx, ok := ctx.Value("TransactionContextKey").(Tx)
+	if !ok {
+		var err error
+		tx, err = a.db.BeginTx(ctx)
+		if err != nil {
+			return domain.Account{}, errors.Wrap(err, "error find account by id")
+		}
+	}
+
 	var (
 		query     = "SELECT * FROM accounts WHERE id = $1"
 		id        string
@@ -101,7 +119,7 @@ func (a AccountSQL) FindByID(ctx context.Context, ID domain.AccountID) (domain.A
 		createdAt time.Time
 	)
 
-	err := a.db.QueryRowContext(ctx, query, ID).Scan(&id, &name, &CPF, &balance, &createdAt)
+	err := tx.QueryRowContext(ctx, query, ID).Scan(&id, &name, &CPF, &balance, &createdAt)
 	switch {
 	case err == sql.ErrNoRows:
 		return domain.Account{}, domain.ErrAccountNotFound

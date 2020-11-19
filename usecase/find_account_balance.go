@@ -9,7 +9,7 @@ import (
 
 type (
 	// Input port
-	FindAccountBalance interface {
+	FindAccountBalanceUseCase interface {
 		Execute(context.Context, domain.AccountID) (FindAccountBalanceOutput, error)
 	}
 
@@ -40,7 +40,7 @@ func NewFindBalanceAccountInteractor(
 	repo domain.AccountRepository,
 	presenter FindAccountBalancePresenter,
 	t time.Duration,
-) FindAccountBalance {
+) FindAccountBalanceUseCase {
 	return findBalanceAccountInteractor{
 		repo:       repo,
 		presenter:  presenter,

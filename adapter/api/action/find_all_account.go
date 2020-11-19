@@ -10,11 +10,11 @@ import (
 )
 
 type FindAllAccountAction struct {
-	uc  usecase.FindAllAccount
+	uc  usecase.FindAllAccountUseCase
 	log logger.Logger
 }
 
-func NewFindAllAccountAction(uc usecase.FindAllAccount, log logger.Logger) FindAllAccountAction {
+func NewFindAllAccountAction(uc usecase.FindAllAccountUseCase, log logger.Logger) FindAllAccountAction {
 	return FindAllAccountAction{
 		uc:  uc,
 		log: log,

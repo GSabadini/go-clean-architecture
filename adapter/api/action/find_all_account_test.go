@@ -27,7 +27,7 @@ func TestFindAllAccountAction_Execute(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		ucMock             usecase.FindAllAccount
+		ucMock             usecase.FindAllAccountUseCase
 		expectedBody       string
 		expectedStatusCode int
 	}{

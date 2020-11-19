@@ -69,3 +69,18 @@ func (t TransferNoSQL) FindAll(ctx context.Context) ([]domain.Transfer, error) {
 
 	return transfers, nil
 }
+
+func (t TransferNoSQL) WithTransaction(ctx context.Context, fn func(ctxTx context.Context) error) error {
+	session, err := t.db.StartSession()
+	if err != nil {
+		return err
+	}
+	defer session.EndSession(ctx)
+
+	err = session.WithTransaction(ctx, fn)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
