@@ -111,7 +111,7 @@ func (a AccountSQL) FindByID(ctx context.Context, ID domain.AccountID) (domain.A
 	}
 
 	var (
-		query     = "SELECT * FROM accounts WHERE id = $1"
+		query     = "SELECT * FROM accounts WHERE id = $1 LIMIT 1 FOR NO KEY UPDATE"
 		id        string
 		name      string
 		CPF       string
