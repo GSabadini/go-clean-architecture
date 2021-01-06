@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to Go Bank Transfer :bank:</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.9.0-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.9.1-blue.svg?cacheSeconds=2592000" />
   <a href="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" />
   </a>
@@ -47,16 +47,25 @@ make init
 make up
 ```
 
-- Run tests in container (it is necessary to have the application started)
+- Run tests in container
 
 ```sh
-make test-container
+make test
 ```
 
 - Run tests local (it is necessary to have golang installed)
 
 ```sh
-make test
+make test-local
+```
+
+- Run coverage report
+
+```sh
+make coverage-report-browser
+```
+```sh
+make coverage-report-func
 ```
 
 - View logs
