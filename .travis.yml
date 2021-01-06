@@ -8,7 +8,7 @@ env:
 
 script:
   - make code-review
-  - make coverage-report
+  - make coverage-report-text
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
