@@ -204,5 +204,5 @@ curl -i --request GET 'http://localhost:3001/v1/transfers'
 - Gabriel Sabadini Facina - [GSabadini](https://github.com/GSabadini)
 
 ## License
-Copyright © 2020 [GSabadini](https://github.com/GSabadini).<br />
+Copyright © 2020 [GSabadini](https://github.com/GSabadini).
 This project is [MIT](LICENSE) licensed.
