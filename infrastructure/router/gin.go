@@ -1,8 +1,12 @@
 package router
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -53,10 +57,28 @@ func (g ginEngine) Listen() {
 		Handler:      g.router,
 	}
 
-	g.log.WithFields(logger.Fields{"port": g.port}).Infof("Starting HTTP Server")
-	if err := server.ListenAndServe(); err != nil {
-		g.log.WithError(err).Fatalln("Error starting HTTP server")
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		g.log.WithFields(logger.Fields{"port": g.port}).Infof("Starting HTTP Server")
+		if err := server.ListenAndServe(); err != nil {
+			g.log.WithError(err).Fatalln("Error starting HTTP server")
+		}
+	}()
+
+	<-stop
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		cancel()
+	}()
+
+	if err := server.Shutdown(ctx); err != nil {
+		g.log.WithError(err).Fatalln("Server Shutdown Failed")
 	}
+
+	g.log.Infof("Service down")
 }
 
 /* TODO ADD MIDDLEWARE */

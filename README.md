@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to Go Bank Transfer :bank:</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.9.1-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.10.0-blue.svg?cacheSeconds=2592000" />
   <a href="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" target="_blank">
     <img alt="Build" src="https://goreportcard.com/badge/github.com/GSabadini/go-bank-transfer" />
   </a>
@@ -204,5 +204,5 @@ curl -i --request GET 'http://localhost:3001/v1/transfers'
 - Gabriel Sabadini Facina - [GSabadini](https://github.com/GSabadini)
 
 ## License
-Copyright © 2020 [GSabadini](https://github.com/GSabadini).<br />
+Copyright © 2020 [GSabadini](https://github.com/GSabadini).
 This project is [MIT](LICENSE) licensed.

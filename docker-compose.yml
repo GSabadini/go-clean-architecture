@@ -13,6 +13,8 @@ services:
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
     env_file:
       - .env
+    networks:
+      - bank
     depends_on:
       - mongodb-primary
       - postgres
