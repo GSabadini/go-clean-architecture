@@ -13,6 +13,8 @@ services:
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
     env_file:
       - .env
+    networks:
+      - bank
     depends_on:
       - mongodb-primary
       - postgres
@@ -28,6 +30,8 @@ services:
       POSTGRES_DB: bank
     volumes:
       - ./_scripts/postgres:/docker-entrypoint-initdb.d
+    networks:
+      - bank
 
   mongodb-primary:
     container_name: mongodb-primary
@@ -39,6 +43,8 @@ services:
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
     ports:
       - 27017:27017
+    networks:
+      - bank
 
   mongodb-secondary:
     container_name: mongodb-secondary
@@ -51,6 +57,8 @@ services:
       - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    networks:
+      - bank
 
   mongodb-arbiter:
     container_name: mongodb-arbiter
@@ -63,3 +71,8 @@ services:
       - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    networks:
+      - bank
+
+networks:
+  bank:
