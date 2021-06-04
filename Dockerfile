@@ -1,29 +1,28 @@
-FROM golang:alpine as builder
-
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64 \
-    MONGODB_HOST=mongodb \
-    MONGODB_DATABASE=bank \
-    POSTGRES_HOST=postgres \
-    POSTGRES_PORT=5432 \
-    POSTGRES_USER=dev \
-    POSTGRES_PASSWORD=dev \
-    POSTGRES_DATABASE=bank \
-    POSTGRES_DRIVER=postgres \
-    APP_NAME=go-bank-transfer \
-    APP_PORT=3001
-
-WORKDIR /build
+FROM golang:1.16 AS base
+WORKDIR /app
 COPY . .
-RUN go mod download
+
+FROM base AS debugger
+WORKDIR /app
+COPY . .
+RUN go get github.com/go-delve/delve/cmd/dlv
+EXPOSE 3001 40000
+ENTRYPOINT ["dlv", "debug", "--listen=:40000", "--headless", "--accept-multiclient", "--continue", "--api-version=2"]
+
+FROM base AS development
+WORKDIR /app
+COPY . .
+RUN go get github.com/pilu/fresh
+EXPOSE 3001
+ENTRYPOINT ["fresh"]
+
+FROM base AS builder
+WORKDIR /app
+COPY . .
 RUN go build -a --installsuffix cgo --ldflags="-s" -o main
 
-FROM scratch
-
-COPY --from=builder /build .
-
-ENTRYPOINT ["./main"]
-
+FROM alpine:latest AS production
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /app .
 EXPOSE 3001
+ENTRYPOINT ["./main"]
