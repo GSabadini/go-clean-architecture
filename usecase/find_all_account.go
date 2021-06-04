@@ -8,17 +8,17 @@ import (
 )
 
 type (
-	// Input port
+	// FindAllAccountUseCase input port
 	FindAllAccountUseCase interface {
 		Execute(context.Context) ([]FindAllAccountOutput, error)
 	}
 
-	// Output port
+	// FindAllAccountPresenter output port
 	FindAllAccountPresenter interface {
 		Output([]domain.Account) []FindAllAccountOutput
 	}
 
-	// OutputData
+	// FindAllAccountOutput outputData
 	FindAllAccountOutput struct {
 		ID        string  `json:"id"`
 		Name      string  `json:"name"`
