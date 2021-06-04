@@ -41,7 +41,7 @@
 make init
 ```
 
-- Starting API
+- Starting API in development mode
 
 ```sh
 make up
@@ -62,22 +62,16 @@ make test-local
 - Run coverage report
 
 ```sh
-make coverage-report-browser
+make test-report
 ```
 ```sh
-make coverage-report-func
+make test-report-func
 ```
 
 - View logs
 
 ```sh
 make logs
-```
-
-- Enter in container
-
-```sh
-make enter-container
 ```
 
 ## API Request

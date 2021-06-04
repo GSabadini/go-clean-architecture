@@ -25,6 +25,7 @@ func NewPostgresHandler(c *config) (*postgresHandler, error) {
 		c.password,
 	)
 
+	fmt.Println(ds)
 	db, err := sql.Open(c.driver, ds)
 	if err != nil {
 		return &postgresHandler{}, err

@@ -8,24 +8,24 @@ import (
 )
 
 type (
-	// Input port
+	// CreateAccountUseCase input port
 	CreateAccountUseCase interface {
 		Execute(context.Context, CreateAccountInput) (CreateAccountOutput, error)
 	}
 
-	// Input data
+	// CreateAccountInput input data
 	CreateAccountInput struct {
 		Name    string `json:"name" validate:"required"`
 		CPF     string `json:"cpf" validate:"required"`
 		Balance int64  `json:"balance" validate:"gt=0,required"`
 	}
 
-	// Output port
+	// CreateAccountPresenter output port
 	CreateAccountPresenter interface {
 		Output(domain.Account) CreateAccountOutput
 	}
 
-	// Output data
+	// CreateAccountOutput output data
 	CreateAccountOutput struct {
 		ID        string  `json:"id"`
 		Name      string  `json:"name"`

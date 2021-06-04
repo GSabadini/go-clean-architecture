@@ -8,22 +8,22 @@ import (
 )
 
 type (
-	// Input port
+	// FindAccountBalanceUseCase input port
 	FindAccountBalanceUseCase interface {
 		Execute(context.Context, domain.AccountID) (FindAccountBalanceOutput, error)
 	}
 
-	//Input data
+	// FindAccountBalaceInput input data
 	FindAccountBalaceInput struct {
 		ID int64 `json:"balance" validate:"gt=0,required"`
 	}
 
-	// Output port
+	// FindAccountBalancePresenter output port
 	FindAccountBalancePresenter interface {
 		Output(domain.Money) FindAccountBalanceOutput
 	}
 
-	// Output data
+	// FindAccountBalanceOutput output data
 	FindAccountBalanceOutput struct {
 		Balance float64 `json:"balance"`
 	}

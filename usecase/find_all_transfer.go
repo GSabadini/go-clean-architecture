@@ -8,17 +8,17 @@ import (
 )
 
 type (
-	// Input port
+	// FindAllTransferUseCase input port
 	FindAllTransferUseCase interface {
 		Execute(context.Context) ([]FindAllTransferOutput, error)
 	}
 
-	// Output port
+	// FindAllTransferPresenter output port
 	FindAllTransferPresenter interface {
 		Output([]domain.Transfer) []FindAllTransferOutput
 	}
 
-	// Output data
+	// FindAllTransferOutput output data
 	FindAllTransferOutput struct {
 		ID                   string  `json:"id"`
 		AccountOriginID      string  `json:"account_origin_id"`

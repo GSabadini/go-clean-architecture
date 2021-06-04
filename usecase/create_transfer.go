@@ -8,24 +8,24 @@ import (
 )
 
 type (
-	// Input port
+	// CreateTransferUseCase input port
 	CreateTransferUseCase interface {
 		Execute(context.Context, CreateTransferInput) (CreateTransferOutput, error)
 	}
 
-	// Input data
+	// CreateTransferInput input data
 	CreateTransferInput struct {
 		AccountOriginID      string `json:"account_origin_id" validate:"required,uuid4"`
 		AccountDestinationID string `json:"account_destination_id" validate:"required,uuid4"`
 		Amount               int64  `json:"amount" validate:"gt=0,required"`
 	}
 
-	// Output port
+	// CreateTransferPresenter output port
 	CreateTransferPresenter interface {
 		Output(domain.Transfer) CreateTransferOutput
 	}
 
-	// Output data
+	// CreateTransferOutput output data
 	CreateTransferOutput struct {
 		ID                   string  `json:"id"`
 		AccountOriginID      string  `json:"account_origin_id"`
