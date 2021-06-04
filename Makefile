@@ -36,6 +36,10 @@ test-report-func: ## Run tests with func report -covermode=set
 	${DOCKER_RUN} go test -covermode=set -coverprofile=coverage.out -p=1 ./... && \
 	go tool cover -func=coverage.out
 
+.PHONY: test-report-text
+test-report-text:
+	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
 # https://golangci-lint.run/usage/linters/
 .PHONY: lint
 lint: ## Lint with golangci-lint

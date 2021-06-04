@@ -1,14 +1,11 @@
 language:  go
 
 go:
-  - 1.14.x
-
-env:
-  - GO111MODULE=on
+  - 1.16.x
 
 script:
-  - make code-review
-  - make coverage-report-text
+  - make test-local
+  - make test-report-text
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
