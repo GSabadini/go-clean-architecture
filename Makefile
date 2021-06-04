@@ -38,7 +38,7 @@ test-report-func: ## Run tests with func report -covermode=set
 
 .PHONY: test-report-text
 test-report-text:
-	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+	go test ./... -coverprofile=coverage.txt -covermode=atomic
 
 # https://golangci-lint.run/usage/linters/
 .PHONY: lint
