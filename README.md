@@ -18,10 +18,10 @@
   </a>
 </p>
 
-- Go Bank Transfer is a simple API for some banking routines, such as creating accounts, listing accounts, listing balance for a specific account, transfers between accounts and listing transfers.
+- The Go Bank Transfer API is a user-friendly solution designed for a range of banking tasks, including account creation, account listing, checking the balance of specific accounts, facilitating transfers between accounts, and compiling transfer records.
 
 ## Architecture
--  This is an attempt to implement a clean architecture, in case you don’t know it yet, here’s a reference https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+-  This represents an endeavor to implement a clean architecture. In the event that you're not yet familiar with it, I'd like to provide you with a [reference](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
 ![Clean Architecture](clean.png)
 
