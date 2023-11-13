@@ -8,13 +8,13 @@
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
   <a href="https://travis-ci.org/github/GSabadini/go-clean-architecture" target="_blank">
-    <img alt="Build" src="https://travis-ci.org/GSabadini/go-clean-architecture.svg?branch=master" />
+    <img alt="Build" src="https://app.travis-ci.com/GSabadini/go-clean-architecture.svg?branch=master" />
   </a>
   <a href="https://github.com/GSabadini/go-clean-architecture/actions" target="_blank">
     <img src="https://github.com/GSabadini/go-clean-architecture/workflows/test/badge.svg" />
   </a>
   <a href="https://codecov.io/gh/GSabadini/go-clean-architecture">
-    <img src="https://codecov.io/gh/GSabadini/go-clean-architecture/branch/master/graph/badge.svg" />
+    <img src="https://codecov.io/gh/GSabadini/go-clean-architecture/graph/badge.svg?token=GAbOSycMO4"/>
   </a>
 </p>
 
