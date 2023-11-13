@@ -3,11 +3,11 @@ package action
 import (
 	"net/http"
 
-	"github.com/gsabadini/go-bank-transfer/adapter/api/logging"
-	"github.com/gsabadini/go-bank-transfer/adapter/api/response"
-	"github.com/gsabadini/go-bank-transfer/adapter/logger"
-	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase"
+	"github.com/gsabadini/go-clean-architecture/adapter/api/logging"
+	"github.com/gsabadini/go-clean-architecture/adapter/api/response"
+	"github.com/gsabadini/go-clean-architecture/adapter/logger"
+	"github.com/gsabadini/go-clean-architecture/domain"
+	"github.com/gsabadini/go-clean-architecture/usecase"
 )
 
 type FindAccountBalanceAction struct {

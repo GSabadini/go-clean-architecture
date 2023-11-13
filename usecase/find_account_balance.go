@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-clean-architecture/domain"
 )
 
 type (
@@ -13,8 +13,8 @@ type (
 		Execute(context.Context, domain.AccountID) (FindAccountBalanceOutput, error)
 	}
 
-	// FindAccountBalaceInput input data
-	FindAccountBalaceInput struct {
+	// FindAccountBalanceInput input data
+	FindAccountBalanceInput struct {
 		ID int64 `json:"balance" validate:"gt=0,required"`
 	}
 

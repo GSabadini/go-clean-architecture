@@ -10,12 +10,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gsabadini/go-bank-transfer/adapter/api/action"
-	"github.com/gsabadini/go-bank-transfer/adapter/logger"
-	"github.com/gsabadini/go-bank-transfer/adapter/presenter"
-	"github.com/gsabadini/go-bank-transfer/adapter/repository"
-	"github.com/gsabadini/go-bank-transfer/adapter/validator"
-	"github.com/gsabadini/go-bank-transfer/usecase"
+	"github.com/gsabadini/go-clean-architecture/adapter/api/action"
+	"github.com/gsabadini/go-clean-architecture/adapter/logger"
+	"github.com/gsabadini/go-clean-architecture/adapter/presenter"
+	"github.com/gsabadini/go-clean-architecture/adapter/repository"
+	"github.com/gsabadini/go-clean-architecture/adapter/validator"
+	"github.com/gsabadini/go-clean-architecture/usecase"
 )
 
 type ginEngine struct {

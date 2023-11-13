@@ -3,8 +3,8 @@ package presenter
 import (
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/domain"
-	"github.com/gsabadini/go-bank-transfer/usecase"
+	"github.com/gsabadini/go-clean-architecture/domain"
+	"github.com/gsabadini/go-clean-architecture/usecase"
 )
 
 type createAccountPresenter struct{}
