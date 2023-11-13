@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validation"
-	"github.com/gsabadini/go-bank-transfer/usecase"
+	"github.com/gsabadini/go-clean-architecture/infrastructure/log"
+	"github.com/gsabadini/go-clean-architecture/infrastructure/validation"
+	"github.com/gsabadini/go-clean-architecture/usecase"
 )
 
 type mockAccountCreateAccount struct {

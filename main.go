@@ -4,11 +4,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/infrastructure"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/database"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/log"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/router"
-	"github.com/gsabadini/go-bank-transfer/infrastructure/validation"
+	"github.com/gsabadini/go-clean-architecture/infrastructure"
+	"github.com/gsabadini/go-clean-architecture/infrastructure/database"
+	"github.com/gsabadini/go-clean-architecture/infrastructure/log"
+	"github.com/gsabadini/go-clean-architecture/infrastructure/router"
+	"github.com/gsabadini/go-clean-architecture/infrastructure/validation"
 )
 
 func main() {

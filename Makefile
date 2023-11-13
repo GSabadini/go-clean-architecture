@@ -1,8 +1,8 @@
 ENVIRONMENT=development
-SYSTEM=go-bank-transfer
+SYSTEM=go-clean-architecture
 SYSTEM_VERSION=$(shell git branch --show-current | cut -d '/' -f2)
 PWD=$(shell pwd -L)
-DOCKER_RUN=docker run --rm -it -w /app -v ${PWD}:/app -v ${GOPATH}/pkg/mod/cache:/go/pkg/mod/cache golang:1.16-buster
+DOCKER_RUN=docker run --rm -it -w /app -v ${PWD}:/app -v ${GOPATH}/pkg/mod/cache:/go/pkg/mod/cache golang:1.21
 
 .PHONY: all
 all: help
@@ -27,13 +27,13 @@ test: ## Run golang tests
 
 .PHONY: test-report
 test-report: ## Run tests with HTML coverage report
-	${DOCKER_RUN} go test -covermode=count -coverprofile coverage.out -p=1 ./... && \
+	${DOCKER_RUN} go test -covermode=count -coverprofile coverage.out ./... && \
 	go tool cover -html=coverage.out -o coverage.html && \
 	xdg-open ./coverage.html
 
 .PHONY: test-report-func
 test-report-func: ## Run tests with func report -covermode=set
-	${DOCKER_RUN} go test -covermode=set -coverprofile=coverage.out -p=1 ./... && \
+	${DOCKER_RUN} go test -covermode=set -coverprofile=coverage.out ./... && \
 	go tool cover -func=coverage.out
 
 .PHONY: test-report-text
@@ -101,7 +101,7 @@ docker-run: docker-deps ## Run docker container for image project
 	-e SYSTEM_VERSION=$(SYSTEM_VERSION) \
 	-p 3001:3001 \
 	--env-file .env \
-	--network go-bank-transfer_bank  \
+	--network go-clean-architecture_main  \
 	--name $(SYSTEM)-$(SYSTEM_VERSION) gsabadini/$(SYSTEM):$(SYSTEM_VERSION)
 
 docker-deps:

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-clean-architecture/domain"
 	"github.com/pkg/errors"
 )
 

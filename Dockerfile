@@ -1,4 +1,4 @@
-FROM golang:1.16 AS base
+FROM golang:1.21 AS base
 WORKDIR /app
 COPY . .
 
@@ -12,9 +12,9 @@ ENTRYPOINT ["dlv", "debug", "--listen=:40000", "--headless", "--accept-multiclie
 FROM base AS development
 WORKDIR /app
 COPY . .
-RUN go get github.com/pilu/fresh
+RUN go install github.com/cosmtrek/air@latest
 EXPOSE 3001
-ENTRYPOINT ["fresh"]
+ENTRYPOINT ["air"]
 
 FROM base AS builder
 WORKDIR /app

@@ -2,20 +2,20 @@ version: "3.7"
 
 services:
   app:
-    container_name: "go-bank-transfer"
+    container_name: "go-clean-architecture"
     build:
       context: .
       dockerfile: Dockerfile
       target: development
     ports:
-      - 3001:3001
+      - "3001:3001"
     volumes:
       - ./:/app
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
     env_file:
       - .env
     networks:
-      - bank
+      - main
     depends_on:
       - mongodb-primary
       - postgres
@@ -24,7 +24,7 @@ services:
     container_name: "postgres"
     image: "postgres:12.2-alpine"
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./_scripts/postgres:/docker-entrypoint-initdb.d
     networks:
-      - bank
+      - main
 
   mongodb-primary:
     container_name: mongodb-primary
@@ -43,9 +43,9 @@ services:
       - MONGODB_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
     ports:
-      - 27017:27017
+      - "27017:27017"
     networks:
-      - bank
+      - main
 
   mongodb-secondary:
     container_name: mongodb-secondary
@@ -59,7 +59,7 @@ services:
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
     networks:
-      - bank
+      - main
 
   mongodb-arbiter:
     container_name: mongodb-arbiter
@@ -73,7 +73,7 @@ services:
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
     networks:
-      - bank
+      - main
 
 networks:
-  bank:
+  main:

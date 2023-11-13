@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/gsabadini/go-bank-transfer/adapter/logger"
+	"github.com/gsabadini/go-clean-architecture/adapter/logger"
 )
 
 type Error struct {

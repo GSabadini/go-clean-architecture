@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gsabadini/go-bank-transfer/domain"
+	"github.com/gsabadini/go-clean-architecture/domain"
 )
 
 type mockAccountRepoStore struct {

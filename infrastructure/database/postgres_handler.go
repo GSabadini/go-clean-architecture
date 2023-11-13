@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gsabadini/go-bank-transfer/adapter/repository"
+	"github.com/gsabadini/go-clean-architecture/adapter/repository"
 
 	_ "github.com/lib/pq"
 )
